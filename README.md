@@ -29,22 +29,24 @@ Core dialogue engine for chatbots
     *Body - User message
     *From - session id (uuid or some Session/ User identifier)
 
-    Curl request for the same:
+    - Response:  Text based response
 
-    curl -X POST \
-    http://<IP>:<PORT>/bot \
-    -H 'content-type: application/json' \
-    -d '{
-    "Body": "Hi",
-    "From": "AC6436e7066283ef84c88a05392cc0fcd6"
-    }'
+    - Curl request for the same:
+
+        curl -X POST \
+        http://<IP>:<PORT>/bot \
+        -H 'content-type: application/json' \
+        -d '{
+        "Body": "Hi",
+        "From": "AC6436e7066283ef84c88a05392cc0fcd6"
+        }'
 
 
 - Socket Integration
-    Socket message body sample(using socket.io):
-    Request:
+    - Socket message body sample(using socket.io):
+    - Request:
         Url: http://52.173.240.27:4005
         Body:
         ["user_uttered",{"message":"what are the timelines for portal?","customData":{"userId":"123"}}]
-    Response: 
+    - Response: 
         ["bot_uttered",{"text":"please choose from CBSE or State Board, other bords are not handled as of yet. 1. CBSE \n 2. State Board","intent":"template_ans_demo","type":"response"}]
