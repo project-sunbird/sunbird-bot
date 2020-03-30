@@ -1,0 +1,25 @@
+{
+  "name": "router",
+  "version": "1.0.0",
+  "description": "thor bot router",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "waibhav",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cors": "^2.8.5",
+    "dateformat": "^3.0.3",
+    "elasticsearch": "^16.6.0",
+    "express": "^4.17.1",
+    "helmet": "^3.21.2",
+    "method-override": "^3.0.0",
+    "request": "^2.88.0",
+    "socket.io": "^2.3.0",
+    "tz-lookup": "^6.1.25",
+    "uuid": "^3.4.0",
+    "winston": "^3.2.1"
+  }
+}

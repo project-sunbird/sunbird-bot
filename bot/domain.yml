@@ -1,0 +1,71 @@
+intents:
+  - greet
+  - goodbye
+  - bot_challenge
+  - get_started
+  - how_you
+
+actions:
+- utter_greet
+- utter_goodbye
+- utter_iamabot
+- fallback_action
+- utter_out_of_scope
+- utter_how_you
+- utter_low_confidence
+
+responses:
+  utter_greet:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Hi there!"
+       intent: "greet"
+
+  utter_how_you:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "I am good, how can i help you?"
+       intent: "how_you"
+
+  utter_get_started:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Hello! How can i help you?"
+       intent: "get_started"
+
+  utter_iamabot:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "I am bot, here to help you."
+       intent: "who_am_i"
+
+  utter_goodbye:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "See ya!"
+       intent: "goodbye"
+
+  utter_low_confidence:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Can you rephrase that please?"
+       intent: "low_confidence"
+
+  utter_out_of_scope:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Sorry, I could not understand you."
+       intent: "out_of_scope"
+
+
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
