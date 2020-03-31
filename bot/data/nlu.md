@@ -42,3 +42,88 @@
 - who is this?
 - tell me about yourself
 
+## intent:worksheet
+- about worksheet
+- tell me about worksheet for a course
+- what does worksheet do
+- What is a worksheet for
+- What is a worksheet?
+- what are worksheets for?
+- i need to know about worksheet
+- how can a worksheet help me?
+- what can a worksheet do for me?
+- Explain me about worksheet
+- How does a worksheet work?
+
+## intent:course_mentor
+- what is a course mentor?
+- who is course mentor
+- course mentor
+- who is mentor
+- tell me about mentor for a course
+- what do course mentors do
+- what is a mentor for
+- what are mentors for?
+- i need to know about mentors
+- how can a course mentor help me?
+- what can a mentor do for me?
+
+## intent:flag_reviewer
+- what is a flag reviewer?
+- who is flag reviewer
+- flag reviewer
+- who is flag reviewer
+- tell me about reviewer for flag
+- what do flag reviewer do
+- what is a reviewer for
+- what are flag reviewers for?
+- i need to know about flag reviewers
+- how can a flag reviewer help me?
+- what can a flag reviewer do for me?
+
+## intent:language_support
+- How many languages does Diksha support?
+- Does Diksha support [hindi](subject)?
+- Can I learn in [hindi](subject) language?
+- I want to learn in [hindi](subject). Is it possible in this?
+- is there content in [kannada](subject)?
+- i want content in [english](subject)
+- in which languages content is there
+- what language do you support
+- do you support [marathi](subject) language
+
+## intent:content_customization
+- Can we make the content specific to an organisation?
+- Can we have private content for an organisation?
+- Is there a way we can make the contents private for an organisation?
+- can we customize the content for us?
+- can we have customized content for our company?
+- can we have our own content base?
+- can we have separate content repository?
+- i want to create content for my organisation
+- i need content specific to our organisation
+- i need content specific to our company
+- can we get tailored content for us?
+- customize content for us
+- customized content
+
+## intent:author_credit
+- How can I give credits to the authors?
+- Can I see who are the authors?
+- How can I add the names of authors in the content?
+- Is there a way to give credits to the content authors?
+- add author name to content
+- add author credit
+- how to add name to credits
+- how can i add my name as author
+- content author adding
+- process to add name in credits as author
+- process to add name in author credit
+- i am author to book, how can i add my name in credit
+- add author to material
+- add name in credit of content
+
+## lookup:subject
+  data/subject.txt
+
+  

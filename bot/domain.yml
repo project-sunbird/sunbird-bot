@@ -4,6 +4,15 @@ intents:
   - bot_challenge
   - get_started
   - how_you
+  - worksheet
+  - course_mentor
+  - flag_reviewer
+  - language_support
+  - content_customization
+  - author_credit
+
+entities:
+  - subject
 
 actions:
 - utter_greet
@@ -13,34 +22,40 @@ actions:
 - utter_out_of_scope
 - utter_how_you
 - utter_low_confidence
+- utter_course_mentor
+- utter_flag_reviewer
+- utter_content_customization
+- utter_language_support
+- utter_author_credit
+- utter_worksheet
 
 responses:
   utter_greet:
   - custom:
      blocks:
      - type: "response"
-       text: "Hi there!"
+       text: "Hi there! Please press 0 for menu."
        intent: "greet"
 
   utter_how_you:
   - custom:
      blocks:
      - type: "response"
-       text: "I am good, how can i help you?"
+       text: "I am good, thanks for asking. Please press 0 for menu."
        intent: "how_you"
 
   utter_get_started:
   - custom:
      blocks:
      - type: "response"
-       text: "Hello! How can i help you?"
+       text: "Hello!"
        intent: "get_started"
 
   utter_iamabot:
   - custom:
      blocks:
      - type: "response"
-       text: "I am bot, here to help you."
+       text: "I am bot, here to help you. Please press 0 for menu."
        intent: "who_am_i"
 
   utter_goodbye:
@@ -54,16 +69,60 @@ responses:
   - custom:
      blocks:
      - type: "response"
-       text: "Can you rephrase that please?"
+       text: "Can you rephrase that please? Press 0 for menu."
        intent: "low_confidence"
 
   utter_out_of_scope:
   - custom:
      blocks:
      - type: "response"
-       text: "Sorry, I could not understand you."
+       text: "Sorry, I could not understand you. Please press 0 for menu."
        intent: "out_of_scope"
 
+  utter_worksheet:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "A set or questions or tasks put together to assess the understanding of any particular topic/unit/chapter. Worksheets can be created on DIKSHA using the inbuilt content editor."
+       intent: "worksheet"
+
+
+  utter_course_mentor:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "A Course Mentor guides and instructs learners on how to undertake a course On DIKSHA, a course mentor creates batches of users to to enrol for and take a course. Mentors also ensure completion of a course within a stipulated time."
+       intent: "course_mentor"
+
+  utter_language_support:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "We support English, Hindi, Kannada, Bengali, Marathi, Tamil, Telugu, Urdu languages."
+       intent: "language_support"
+
+
+  utter_content_customization:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Yes, you can customize the content for your domain. Any field/screen on DISKHA can be customized to suit organization needs."
+       intent: "utter_content_customization"
+
+
+  utter_flag_reviewer:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "A person who assesses flagged content. On DIKSHA the flag reviewer reviews the content and rejects if the content is inappropriate according to DIKSHA review guidelines. The flag is removed if the content fits the guidelines"
+       intent: "flag_reviewer"
+
+  utter_author_credit:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "An author can be credited by following these steps. Log in to the diksha portal  -> Select Workspace -> Select Create -> click the Course tile. -> Click Edit Details to enter/ modify the course details -> Enter Creators -> Enter Contributors details -> Enter Original Author details -> Click Save to save the details"
+       intent: "author_credit"
 
 
 session_config:

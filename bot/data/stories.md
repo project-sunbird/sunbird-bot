@@ -18,6 +18,29 @@
 * bot_challenge
   - utter_iamabot
 
+# course_mentor
+* course_mentor
+  - utter_course_mentor
+
+# flag_reviewer
+* flag_reviewer
+  - utter_flag_reviewer
+
+# content_customization
+* content_customization
+  - utter_content_customization
+
+# language_support
+* language_support
+  - utter_language_support
+
+# author_credit
+* author_credit
+  - utter_author_credit
+
+# worksheet
+* worksheet
+  - utter_worksheet
 
 
  
