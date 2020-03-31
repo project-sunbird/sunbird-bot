@@ -17,9 +17,9 @@ process.on('SIGINT', function () {
 });
 //// IVR is best done outside the bot...as no NLU interpretation is required
 var options = {
-  key: fs.readFileSync(config.HTTPS.PATH.KEY),
-  cert: fs.readFileSync(config.HTTPS.PATH.CERT),
-  ca: fs.readFileSync(config.HTTPS.PATH.CA)
+  key: fs.readFileSync(config.HTTPS_PATH_KEY),
+  cert: fs.readFileSync(config.HTTPS_PATH_CERT),
+  ca: fs.readFileSync(config.HTTPS_PATH_CA)
 };
 
 startApp()
@@ -214,12 +214,12 @@ function startApp() {
                 })
         }
 
-        server.listen(config.SOCKET.HTTP.PORT, function () {
-                LOG.info("starting the application at [%s]", config.REST.HTTP.PORT)
+        server.listen(config.SOCKET_HTTP_PORT, function () {
+                LOG.info("starting the application at [%s]", config.REST_HTTP_PORT)
         });
 
-	serverHTTPS.listen(config.SOCKET.HTTPS.PORT, function () {
-                LOG.info("starting the application at [%s]", config.SOCKET.HTTPS.PORT)
+	serverHTTPS.listen(config.SOCKET_HTTPS_PORT, function () {
+                LOG.info("starting the application at [%s]", config.SOCKET_HTTPS_PORT)
         });
 }
 

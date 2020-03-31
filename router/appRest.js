@@ -15,10 +15,10 @@ var RasaCoreController = require('./controllers/rasaCoreController')
 
 //https certificate setup
 var options = {
-  key: fs.readFileSync(config.HTTPS.PATH.KEY),
-  cert: fs.readFileSync(config.HTTPS.PATH.CERT),
-  ca: fs.readFileSync(config.HTTPS.PATH.CA)
-};
+	key: fs.readFileSync(config.HTTPS_PATH_KEY),
+	cert: fs.readFileSync(config.HTTPS_PATH_CERT),
+	ca: fs.readFileSync(config.HTTPS_PATH_CA)
+  };
 
 //cors handling
 appBot.use(cors());
@@ -138,20 +138,20 @@ appBot.post('/bot', function (req, res) {
 	}
 })
 //http endpoint
-http.createServer(appBot).listen(config.REST.HTTP.PORT, function (err) {
+http.createServer(appBot).listen(config.REST_HTTP_PORT, function (err) {
         if (err) {
                 throw err
         }
 
-        LOG.info('Server started on port '+config.REST.HTTP.PORT)
+        LOG.info('Server started on port '+config.REST_HTTP_PORT)
 });
 //https endpoint
-https.createServer(options, appBot).listen(config.REST.HTTPS.PORT, function (err) {
+https.createServer(options, appBot).listen(config.REST_HTTPS_PORT, function (err) {
         if (err) {
                 throw err
         }
 
-        LOG.info('Server started on port '+config.REST.HTTPS.PORT)
+        LOG.info('Server started on port '+config.REST_HTTPS_PORT)
 });
 
 
