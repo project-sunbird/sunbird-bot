@@ -2,16 +2,31 @@
 Core dialogue engine for chatbots
 
 
-# Router Module
-- "npm install" to install dependencies
-- "config/config.js" can be modified to change ports
-- "node appRest" to start the REST endpoint
-- "node appSocket" to start Socket endpoint
+# Router Module (A node js application to interface with frontend and bot server)
+- Installation:
+    - install node and npm
+    - "npm install" to install dependencies
+
+- configuration:
+    - "config/config.js" can be modified to change ports and other parameters
+
+- Starting the services:
+    - "node appRest" to start the REST endpoint
+    - "node appSocket" to start Socket endpoint
 
 # Bot module
-- activate appropriate environment (conda)
-- start RASA core server by running "rasa run -m pm_models -p 5006 --enable-api --cors "*" -vv"
-- start RASA action endpoint server by running "rasa run actions -vv -p 5056"
+- Installation:
+    - install latest anaconda environment
+    - run "conda env create -f environment.yml" to install python dependencies
+    - activate the environment "source activate rasa"
+
+- configuration:
+    - modify config.yml to change NLU components for training or change policies
+    - modify endpoints.yml to change action server endpoint
+
+- Starting the services:
+    - start RASA core server by running "make bot" or "rasa run -p 5006 --enable-api --cors "*" -vv"
+    - start RASA action endpoint server by running "make action" or "rasa run actions -vv -p 5056"
 
 # Integration Instructions
 
