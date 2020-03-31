@@ -45,11 +45,11 @@ appBot.post('/bot', function (req, res) {
 	// all non numeric user messages go to bot
 	if (isNaN(body)) {
 		///Bot interaction flow
-		RasaCoreController.processUserData(data, sessionID, (err, res) => {
+		RasaCoreController.processUserData(data, sessionID, (err, resp) => {
 			if (err) {
 				res.send(literals.message.SORRY)
 			} else {
-				let responses = res.res;
+				let responses = resp.res;
 				for (var i = 0; i < responses.length; i++) {
 					res.send(responses[i].text)
 				}

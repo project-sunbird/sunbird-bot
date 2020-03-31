@@ -11,6 +11,7 @@ intents:
   - content_customization
   - author_credit
   - find_content
+  - content_suggestions
 
 entities:
   - subject
