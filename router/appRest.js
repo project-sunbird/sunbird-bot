@@ -10,7 +10,7 @@ var literals     = require('./config/literals')
 var config       = require('./config/config')
 var RasaCoreController = require('./controllers/rasaCoreController')
 
-
+const appBot     = express()
 //// IVR is best done outside the bot...as no NLU interpretation is required
 
 //https certificate setup
