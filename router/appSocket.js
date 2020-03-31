@@ -1,11 +1,13 @@
 var http                     = require('http');
+var https                    = require('https');
+var fs                       = require('fs');
 var express                  = require('express');
 var helmet                   = require('helmet')
 var bodyParser               = require('body-parser');
 var methodOverride           = require('method-override');
 var RasaCoreController       = require('./controllers/rasaCoreController')
 var UUIDV4                   = require('uuid')
-var APP_CONFIG               = require('./config/config')
+var config                   = require('./config/config')
 var LOG                      = require('./log/logger')
 var literals                 = require('./config/literals')
 
@@ -13,8 +15,12 @@ process.on('SIGINT', function () {
         LOG.info("stopping the application")
         process.exit(0);
 });
-
 //// IVR is best done outside the bot...as no NLU interpretation is required
+var options = {
+  key: fs.readFileSync(config.HTTPS.PATH.KEY),
+  cert: fs.readFileSync(config.HTTPS.PATH.CERT),
+  ca: fs.readFileSync(config.HTTPS.PATH.CA)
+};
 
 startApp()
 // this object tracks session. It needs to be moved to Redis
@@ -47,6 +53,12 @@ function startApp() {
         const io = require('socket.io')(server, {
                 path: '/socket.io'
         });
+
+        var serverHTTPS = https.createServer(options, app);
+        const io = require('socket.io')(server, {
+                path: '/socket.io'
+        });
+
 
 
         io.on('connection', client => {
@@ -202,8 +214,12 @@ function startApp() {
                 })
         }
 
-        server.listen(APP_CONFIG.SOCKET.PORT, function () {
-                LOG.info("starting the application at [%s]", APP_CONFIG.SOCKET.PORT)
+        server.listen(config.SOCKET.HTTP.PORT, function () {
+                LOG.info("starting the application at [%s]", config.REST.HTTP.PORT)
+        });
+
+	serverHTTPS.listen(config.SOCKET.HTTPS.PORT, function () {
+                LOG.info("starting the application at [%s]", config.SOCKET.HTTPS.PORT)
         });
 }
 

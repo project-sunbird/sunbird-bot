@@ -1,16 +1,24 @@
 const express    = require('express')
 const bodyParser = require('body-parser')
 const cors       = require('cors')
-const appBot     = express()
+var https        = require('https');
+var http         = require('http');
+var fs           = require('fs');
 var origins      = require('./config/corsList')
 var LOG          = require('./log/logger')
 var literals     = require('./config/literals')
-var APP_CONFIG               = require('./config/config')
-
+var config       = require('./config/config')
 var RasaCoreController = require('./controllers/rasaCoreController')
+
 
 //// IVR is best done outside the bot...as no NLU interpretation is required
 
+//https certificate setup
+var options = {
+  key: fs.readFileSync(config.HTTPS.PATH.KEY),
+  cert: fs.readFileSync(config.HTTPS.PATH.CERT),
+  ca: fs.readFileSync(config.HTTPS.PATH.CA)
+};
 
 //cors handling
 appBot.use(cors());
@@ -129,13 +137,21 @@ appBot.post('/bot', function (req, res) {
 		res.send(literals.message.MENU)
 	}
 })
+//http endpoint
+http.createServer(appBot).listen(config.REST.HTTP.PORT, function (err) {
+        if (err) {
+                throw err
+        }
 
-appBot.listen(APP_CONFIG.REST.PORT, function (err) {
-	if (err) {
-		throw err
-	}
+        LOG.info('Server started on port '+config.REST.HTTP.PORT)
+});
+//https endpoint
+https.createServer(options, appBot).listen(config.REST.HTTPS.PORT, function (err) {
+        if (err) {
+                throw err
+        }
 
-	LOG.info('Server started on port :' + APP_CONFIG.REST.PORT)
-})
+        LOG.info('Server started on port '+config.REST.HTTPS.PORT)
+});
 
 
