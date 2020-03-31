@@ -83,14 +83,15 @@
 
 ## intent:language_support
 - How many languages does Diksha support?
-- Does Diksha support [hindi](subject)?
-- Can I learn in [hindi](subject) language?
-- I want to learn in [hindi](subject). Is it possible in this?
-- is there content in [kannada](subject)?
-- i want content in [english](subject)
+- Does Diksha support [hindi](medium)?
+- Can I learn in [hindi](medium) language?
+- I want to learn in [hindi](medium). Is it possible in this?
+- is there content in [kannada](medium)?
+- i want content in [english](medium)
 - in which languages content is there
 - what language do you support
-- do you support [marathi](subject) language
+- do you support [marathi](medium) language
+- do you support [urdu](medium) medium
 
 ## intent:content_customization
 - Can we make the content specific to an organisation?
@@ -123,7 +124,24 @@
 - add author to material
 - add name in credit of content
 
-## lookup:subject
-  data/subject.txt
+## intent:content_suggestions
+- I want to learn [CBSE](board) content
+- I'm a student from [Maharashtra](board) and want to learn from home
+- Do you have any content from [Karnataka](board) state board
+- Show me class [one](grade) content from [Tamil Nadu](board)
+- Please show [second](grade) standard content
+- I want to do [maths](subject) revision
+- I want to learn [fourth](grade) standard [physics](subject)
 
+## lookup:board
+data/boards.txt
+
+## lookup:grade
+data/grades.txt
+
+## lookup:subject
+data/subjects.txt
+
+## lookup:medium
+data/mediums.txt
   
