@@ -30,6 +30,10 @@
 * content_customization
   - utter_content_customization
 
+# content_suggestions
+* content_suggestions
+  - utter_content_suggestions
+
 # language_support
 * language_support
   - utter_language_support
@@ -41,6 +45,3 @@
 # worksheet
 * worksheet
   - utter_worksheet
-
-
- 

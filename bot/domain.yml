@@ -10,8 +10,13 @@ intents:
   - language_support
   - content_customization
   - author_credit
+  - find_content
+  - content_suggestions
 
 entities:
+  - board
+  - grade
+  - medium
   - subject
 
 actions:
@@ -28,6 +33,7 @@ actions:
 - utter_language_support
 - utter_author_credit
 - utter_worksheet
+- utter_content_suggestions
 
 responses:
   utter_greet:
@@ -109,6 +115,8 @@ responses:
        text: "Yes, you can customize the content for your domain. Any field/screen on DISKHA can be customized to suit organization needs."
        intent: "utter_content_customization"
 
+  utter_content_suggestions:
+  - text: "Sure, here are a few content for {board} {medium} {grade} {subject}"
 
   utter_flag_reviewer:
   - custom:
