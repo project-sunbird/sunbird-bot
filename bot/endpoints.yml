@@ -18,6 +18,12 @@ action_endpoint:
 # https://rasa.com/docs/rasa/api/tracker-stores/
 
 #tracker_store:
+#        type: tracker.elasticStore.ElasticTrackerStore
+#        url: "<elastic_endpoint>"
+#        host: "<elastic_endpoint>"
+#        db: "<index>"
+#        username: "<user>"
+#        password: "<pass>"
 
 
 #tracker_store:
