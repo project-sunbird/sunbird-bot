@@ -14,4 +14,9 @@ config.HTTPS_PATH_CERT               = ''
 config.HTTPS_PATH_CA                 = ''
 
 
+config.ELASTIC_HOST                  = 'http://<user>:<password><IP>:<Port>'
+config.ELASTIC_INDEX_NAME            = 'indx_name'
+config.ELASTIC_INDEX_TYPE            = 'indx_type'
+
+
 module.exports = config;

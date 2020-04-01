@@ -10,6 +10,7 @@ var UUIDV4                   = require('uuid')
 var config                   = require('./config/config')
 var LOG                      = require('./log/logger')
 var literals                 = require('./config/literals')
+var EDB                = require('./api/elastic/connection')
 
 process.on('SIGINT', function () {
         LOG.info("stopping the application")
@@ -92,6 +93,12 @@ function startApp() {
                         sessionID = data.customData.userId
                         LOG.info('context for: ' + sessionID)
                         LOG.info(memory[sessionID])
+
+                        //persisting incoming data to EDB
+	                dataPersist = {'message': body, 'channel' : 'socket'}
+	                //EDB.saveToEDB(dataPersist, 'user', sessionID,(err,response)=>{})
+
+
                         if (body == '0') {
                                 delete memory[sessionID]
                         }
@@ -107,6 +114,10 @@ function startApp() {
                                                         RasaCoreController.sendDataToUser(client, responses[i], (err, res) => {
                                                                 if (err) {
                                                                         LOG.error(err)
+                                                                }else{
+                                                                        //persisting outgoing data to EDB
+	                                                                dataPersist = {'message': body, 'channel' : 'socket'}
+	                                                                //EDB.saveToEDB(dataPersist, 'bot', sessionID,(err,response)=>{})
                                                                 }
                                                         })
                                                 }
@@ -202,6 +213,9 @@ function startApp() {
 
         function emitToUser(client, text) {
                 LOG.info('emitToUser called')
+                //persisting outgoing data to EDB
+                dataPersist = {'message': body, 'channel' : 'socket'}
+                //EDB.saveToEDB(dataPersist, 'bot', sessionID,(err,response)=>{})
                 data = {}
                 data['text'] = text
                 data['intent'] = 'template_ans_demo'
