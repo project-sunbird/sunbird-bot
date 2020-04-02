@@ -1,14 +1,13 @@
 # Chatbot-core
 Core dialogue engine for chatbots
 
-
 # Router Module (A node js application to interface with frontend and bot server)
 - Installation:
     - install node and npm
     - "npm install" to install dependencies
 
 - configuration:
-    - "config/config.js" can be modified to change ports and other parameters
+    - "config/config.js" can be modified if needed to change ports and other parameters
 
 - Starting the services:
     - "node appRest" to start the REST endpoint
@@ -17,15 +16,15 @@ Core dialogue engine for chatbots
 # Bot module
 - Installation:
     - install latest anaconda environment
-    - run "conda env create -f environment.yml" to install python dependencies
-    - activate the environment "source activate rasa"
+    - run "conda env create -f environment.yml" to install python dependencies. This step creates a virtual environment named rasa with python 3.6 and all dependencies
+    - activate the environment "conda activate rasa". "conda deactivate" to de-activate the environment
 
 - configuration:
-    - modify config.yml to change NLU components for training or change policies
-    - modify endpoints.yml to change action server endpoint
+    - modify config.yml if needed to change NLU components for training or change policies
+    - modify endpoints.yml if needed to change action server endpoint
 
 - Starting the services:
-    - start RASA core server by running "make bot" or "rasa run -p 5006 --enable-api --cors "*" -vv"
+    - start RASA core server by running "make bot" or "rasa run -p 5005 --enable-api --cors "*" -vv"
     - start RASA action endpoint server by running "make action" or "rasa run actions -vv -p 5056"
 
 # Integration Instructions
