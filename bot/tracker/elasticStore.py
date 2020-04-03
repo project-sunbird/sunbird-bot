@@ -15,8 +15,8 @@ class ElasticTrackerStore(TrackerStore):
     def __init__(
         self,
         domain: Domain,
-        host: Optional[Text] = "elastic_endpoint",
-        db: Optional[Text] = "index",
+        host: Optional[Text] = "",
+        db: Optional[Text] = "",
         username: Optional[Text] = None,
         password: Optional[Text] = None,
         auth_source: Optional[Text] = "admin",
@@ -24,21 +24,35 @@ class ElasticTrackerStore(TrackerStore):
         event_broker: Optional[EventBroker] = None,
     ):
         print('initialized tracker')
-        self.domain       = domain
+        self.domain = domain
         self.event_broker = event_broker
-        self.username     = username
-        self.password     = password
-        self.host         = host
-        self.db           = db
-        self.esClient     = Elasticsearch(['http://'+username+':'+password+'@'+host])
+        self.username = username
+        self.password = password
+        self.host     = host
+        self.db       = db
+        self.esClient = Elasticsearch(['http://'+username+':'+password+'@'+host])
 
 
 
     def save(self, tracker, timeout=None):
-        print('save event called')
         for event in tracker.events:
-            persistenceObj = {}
-            if event.type_name is 'user':
-                res = self.esClient.index(index=self.db, body={"event": event.type_name , "text": event.text , "entities" : event.entities , "intent" : event.intent['name'], "confidence":event.intent['confidence'], "timeStamp" :time.time() })
-            if event.type_name is 'bot':
-                res = self.esClient.index(index=self.db, body={"event":event.type_name,"data" : event.data , "timeStamp" :time.time()})
+               t1 = threading.Thread(target = self.persist, args=([event]),)
+               t1.start()
+
+
+
+    def persist(self,event):
+        print('persist called')
+        print(event.type_name)
+        print('-------------persist called-------------')
+        try:
+                if event.type_name is 'user':
+                    res = self.esClient.index(index=self.db, body={"event": event.type_name , "text": event.text , "entities" : event.entities , "intent" : event.intent.get('name'), "confidence": event.intent.get('confidence'), "timeStamp" :time.time() })
+                if event.type_name is 'bot':
+                    print(event.data)
+                    res = self.esClient.index(index=self.db, body={"event":event.type_name,"payload" : event.data , "timeStamp" :time.time()})
+        except Exception as e:
+                print(e)
+
+
+
