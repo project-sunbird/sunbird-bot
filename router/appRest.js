@@ -4,6 +4,7 @@ const cors             = require('cors')
 var https              = require('https');
 var http               = require('http');
 var fs                 = require('fs');
+var redis 			   = require('redis');
 var origins            = require('./config/corsList')
 var LOG                = require('./log/logger')
 var literals           = require('./config/literals')
@@ -11,6 +12,7 @@ var config             = require('./config/config')
 var RasaCoreController = require('./controllers/rasaCoreController')
 var EDB                = require('./api/elastic/connection')
 const appBot     = express()
+
 //// IVR is best done outside the bot...as no NLU interpretation is required
 
 
@@ -23,16 +25,19 @@ appBot.use(bodyParser.urlencoded({ extended: false }))
 
 // this object tracks session. It needs to be moved to Redis
 var memory = {}
+var userData = {}; //  TODO Add interface for the data that is stored in the redis session
+
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
 	const body = req.body.Body
 	LOG.info('req.body:')
 	LOG.info(req.body)
 	data = { message: body, customData: { userId: req.body.From } }
-	sessionID = req.body.From
+	sessionID = req.body.From;
 	LOG.info('context for: ' + sessionID)
 	LOG.info(memory[sessionID])
 	res.set('Content-Type', 'text/plain')
+	redis_client = createRedisClient();
 
 	//persisting incoming data to EDB
 	dataPersist = {'message': body, 'channel' : 'rest'}
@@ -40,7 +45,22 @@ appBot.post('/bot', function (req, res) {
 
 	if (body == '0') {
 		memory = {}
+		userData = {};
 	}
+
+	if (req.body.From) {
+		redis_client.get(req.body.From, (err, data) => {
+			if (data != null) {
+				// Key is already exist and hence assiging data which is already there at the posted key
+				 userData = data;
+			} else {
+			 obj = { sessionId: req.body.From, role: '', educationLvl: '',  board: '', boardType: ''};
+			 // Adding data in redis for the key
+			 setRedisKeyValue(redis_client, req.body.From, JSON.stringify(obj), 3600);
+			}
+		});		
+	}
+
 	// all non numeric user messages go to bot
 	if (isNaN(body)) {
 		///Bot interaction flow
@@ -129,10 +149,14 @@ appBot.post('/bot', function (req, res) {
 		else {
 			LOG.info('setting up role:' + req.body.Body)
 			memory[sessionID]['role'] = req.body.Body
+			obj = { sessionId: req.body.From, role: req.body.Body, educationLvl: '',  board: '', boardType: ''};
+			setRedisKeyValue(redis_client, req.body.From, JSON.stringify(obj), 3600);
 			emitToUser(sessionID, res, literals.message.EDUCATION_LEVEL)
 		}
 	} else {
 		memory[sessionID] = {}
+		obj = { };
+		setRedisKeyValue(redis_client, req.body.From, JSON.stringify(obj), 3600);
 		emitToUser(sessionID, res, literals.message.MENU)
 	}
 })
@@ -174,3 +198,12 @@ if (config.HTTPS_PATH_KEY) {
 
 }
 
+function createRedisClient() {
+	//configure redis client on port 6379
+	const port_redis = config.REDIS_PORT || 6379;
+	return redis.createClient(port_redis);
+}
+
+function setRedisKeyValue(client, key, value, expireTime) {
+	client.setex(key, expireTime, value);
+}
