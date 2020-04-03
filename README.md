@@ -1,7 +1,31 @@
 # Chatbot-core
 Core dialogue engine for chatbots
 
-# Router Module (A node js application to interface with frontend and bot server)
+
+# Getting the chatbot running on docker
+- Install Docker
+- Clone this repo
+- `cd clonedrepo\bot`
+- `docker build --tag rasachatbot:0.0.1 .` This would build a docker image for the rasa bot
+- `cd clonedrepo\router`
+- `docker build --tag rasachatrouter:0.0.1 .` This would build a docker image for the router that will integrate with Rasa bot
+- `docker run --net=host rasachatrouter:0.0.1` and `docker run --net=host rasachatbot:0.0.1` to run the docker containers
+
+Run the below curl to check if the bot is up and running. A successful setup would return the following response **'Hi there! Please press 0 for menu.'**. 
+
+```
+    curl -X POST \
+        http://localhost:4000/bot \
+        -H 'content-type: application/json' \
+        -d '{
+            "Body": "Hi",
+            "From": "123"
+        }'
+```
+
+# Getting the chatbot running on a VM
+
+## Router Module (A node js application to interface between the chat client and bot server)
 - Installation:
     - install node and npm
     - `npm install` to install dependencies
@@ -13,7 +37,7 @@ Core dialogue engine for chatbots
     - `node appRest` to start the REST endpoint
     - `node appSocket` to start Socket endpoint
 
-# Bot module
+## Bot module
 - Installation:
     - install latest anaconda environment
     - run `conda env create -f environment.yml` to install python dependencies. This step creates a virtual environment named rasa with python 3.6 and all dependencies
