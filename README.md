@@ -19,17 +19,18 @@ Run the below curl to check if the bot is up and running. A successful setup wou
         }'
 ```
 
-# Getting the chatbot running on docker swarm in production
+# Getting the chatbot running on docker swarm in production (assumes SSL)
 - Install Docker and initialise a docker swarm by running `docker swarm init`
 - Clone this repo and *cd* to the cloned repo
 - `cd clonedrepo/bot`
 - `docker build --tag rasachatbot:0.0.1 .` This would build a docker image for the rasa bot
 - `cd clonedrepo/router`
 - `docker build --tag rasachatrouter:0.0.1 .` This would build a docker image for the router that will integrate with Rasa bot
-- Push these images to a public repo so that you can reference the images from the prod.yml
+- Push these images to a public repo so that you can reference the images from the prod.yml. You can test locally without this step, but it is mandatory to push to a public repo if you have a multi-node swarm
 - Make the below changes in prod.yml 
     - Update the bot and router to images that you built above
-    - Update the path to the site.key, crt and cabundle. If you do not want https, comment the environment variables starting with HTTPS
+    - Update the path to the site.key, crt and cabundle.
+- Execute `docker stack deploy --compose-file prod.yml bot` and this will deploy all the services to the docker swarm. Run `docker swarm leave --force` to purge the swarm and services
 
 Run the below curl to check if the bot is up and running. A successful setup would return the following response **'Hi there! Please press 0 for menu.'**. 
 
