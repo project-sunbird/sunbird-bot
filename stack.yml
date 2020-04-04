@@ -1,5 +1,7 @@
 version: '3.5'
 services:
+  redis:
+    image: "redis:alpine"
   bot:    
     build: ./bot/.
     ports:
@@ -13,5 +15,3 @@ services:
     environment:
       - RASA_CORE_ENDPOINT=http://bot:5005/webhooks/rest/webhook
       - REDIS_HOST=redis
-  redis:
-    image: "redis:alpine"

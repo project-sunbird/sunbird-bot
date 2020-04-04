@@ -1,13 +1,21 @@
 version: '3.5'
 services:
+  redis:
+    image: "redis:alpine"
   bot:    
-    image: dockerhubacct/rasachatbot:0.0.1 
+    image: mathewjpallan/rasachatbot:0.0.1
+    deploy:
+      mode: replicated
+      replicas: 2
     ports:
       - "5005:5005"
     environment:
       - TMP=TMP
   router:    
-    image: dockerhubacct/rasachatrouter:0.0.2 
+    image: mathewjpallan/rasachatrouter:0.0.1
+    deploy:
+      mode: replicated
+      replicas: 2
     ports:
       - "4000:4000"
       - "8443:8443"
@@ -21,12 +29,10 @@ services:
       - site.key
       - site.crt
       - site.ca
-  redis:
-    image: "redis:alpine"
 secrets:
    site.key:
-     file: /path/to/site.key
+     file: /home/mathew/Desktop/tmp/site.key
    site.crt:
-     file: /path/to/site.crt
+     file: /home/mathew/Desktop/tmp/site.crt
    site.ca:
-     file: /path/to/site.ca     
+     file: /home/mathew/Desktop/tmp/site.ca     
