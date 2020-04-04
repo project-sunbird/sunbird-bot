@@ -26,6 +26,7 @@ appBot.use(bodyParser.urlencoded({ extended: false }))
 // this object tracks session. It needs to be moved to Redis
 var memory = {}
 var userData = {}; //  TODO Add interface for the data that is stored in the redis session
+var redis_client = createRedisClient();
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
@@ -37,7 +38,6 @@ appBot.post('/bot', function (req, res) {
 	LOG.info('context for: ' + sessionID)
 	LOG.info(memory[sessionID])
 	res.set('Content-Type', 'text/plain')
-	redis_client = createRedisClient();
 
 	//persisting incoming data to EDB
 	dataPersist = {'message': body, 'channel' : 'rest'}
@@ -200,8 +200,12 @@ if (config.HTTPS_PATH_KEY) {
 
 function createRedisClient() {
 	//configure redis client on port 6379
-	const port_redis = config.REDIS_PORT || 6379;
-	return redis.createClient(port_redis);
+	const redis_host = config.REDIS_HOST
+	const redis_port = config.REDIS_PORT;
+	return redis.createClient({
+		port      : redis_port,
+		host      : redis_host
+	});
 }
 
 function setRedisKeyValue(client, key, value, expireTime) {

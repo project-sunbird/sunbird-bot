@@ -1,0 +1,17 @@
+version: '3'
+services:
+  bot:    
+    build: ./bot/.
+    ports:
+      - "5005:5005"
+    environment:
+      - TMP=TMP
+  router:    
+    build: ./router/.
+    ports:
+      - "4000:4000"
+    environment:
+      - RASA_CORE_ENDPOINT=http://bot:5005/webhooks/rest/webhook
+      - REDIS_HOST=redis
+  redis:
+    image: "redis:alpine"

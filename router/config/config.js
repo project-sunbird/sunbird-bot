@@ -1,9 +1,8 @@
+const env = process.env
+
 var config = {};
-
-
-
 config.RASA_API_TIMEOUT              = 200000
-config.RASA_CORE_ENDPOINT            = 'http://localhost:5005/webhooks/rest/webhook'
+config.RASA_CORE_ENDPOINT            = env.RASA_CORE_ENDPOINT || 'http://localhost:5005/webhooks/rest/webhook'
 config.SOCKET_HTTP_PORT              = 4005
 config.REST_HTTP_PORT                = 4000
 config.SOCKET_HTTPS_PORT             = 4001
@@ -16,6 +15,7 @@ config.HTTPS_PATH_CA                 = ''
 
 
 config.REDIS_PORT					 = 6379
+config.REDIS_HOST					 = env.REDIS_HOST || 'localhost'
 config.ELASTIC_HOST                  = 'http://<user>:<password><IP>:<Port>'
 config.ELASTIC_INDEX_NAME            = 'indx_name'
 config.ELASTIC_INDEX_TYPE            = 'indx_type'

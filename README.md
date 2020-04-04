@@ -2,14 +2,10 @@
 Core dialogue engine for chatbots
 
 
-# Getting the chatbot running on docker
+# Getting the chatbot running on docker locally (docker-compose)
 - Install Docker
 - Clone this repo
-- `cd clonedrepo\bot`
-- `docker build --tag rasachatbot:0.0.1 .` This would build a docker image for the rasa bot
-- `cd clonedrepo\router`
-- `docker build --tag rasachatrouter:0.0.1 .` This would build a docker image for the router that will integrate with Rasa bot
-- `docker run --net=host rasachatrouter:0.0.1` and `docker run --net=host rasachatbot:0.0.1` to run the docker containers
+- `docker-compose -f dev.yml up` This command would build the bot and the router images and run them along with redis as a container.
 
 Run the below curl to check if the bot is up and running. A successful setup would return the following response **'Hi there! Please press 0 for menu.'**. 
 
@@ -22,7 +18,6 @@ Run the below curl to check if the bot is up and running. A successful setup wou
             "From": "123"
         }'
 ```
-
 # Getting the chatbot running on a VM
 
 ## Router Module (A node js application to interface between the chat client and bot server)
