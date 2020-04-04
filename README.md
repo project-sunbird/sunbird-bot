@@ -4,8 +4,8 @@ Core dialogue engine for chatbots
 
 # Getting the chatbot running on docker locally (docker-compose)
 - Install Docker
-- Clone this repo
-- `docker-compose -f stack.yml up` This command would build the bot and the router images and run them along with redis as a container.
+- Clone this repo and *cd* to the cloned repo
+- Execute the following command `docker-compose -f stack.yml up` This command would build the bot and the router images and run them along with redis as a container.
 
 Run the below curl to check if the bot is up and running. A successful setup would return the following response **'Hi there! Please press 0 for menu.'**. 
 
@@ -19,20 +19,23 @@ Run the below curl to check if the bot is up and running. A successful setup wou
         }'
 ```
 
-# Getting the chatbot running on docker in production (docker-compose)
-- Install Docker
-- Clone this repo
-- `cd clonedrepo\bot`
+# Getting the chatbot running on docker swarm in production
+- Install Docker and initialise a docker swarm by running `docker swarm init`
+- Clone this repo and *cd* to the cloned repo
+- `cd clonedrepo/bot`
 - `docker build --tag rasachatbot:0.0.1 .` This would build a docker image for the rasa bot
-- `cd clonedrepo\router`
+- `cd clonedrepo/router`
 - `docker build --tag rasachatrouter:0.0.1 .` This would build a docker image for the router that will integrate with Rasa bot
-- `docker run --net=host rasachatrouter:0.0.1` and `docker run --net=host rasachatbot:0.0.1` to run the docker containers
+- Push these images to a public repo so that you can reference the images from the prod.yml
+- Make the below changes in prod.yml 
+    - Update the bot and router to images that you built above
+    - Update the path to the site.key, crt and cabundle. If you do not want https, comment the environment variables starting with HTTPS
 
 Run the below curl to check if the bot is up and running. A successful setup would return the following response **'Hi there! Please press 0 for menu.'**. 
 
 ```
     curl -X POST \
-        http://localhost:4000/bot \
+        http://IP:4000/bot \
         -H 'content-type: application/json' \
         -d '{
             "Body": "Hi",

@@ -9,10 +9,9 @@ config.SOCKET_HTTPS_PORT             = 4001
 config.REST_HTTPS_PORT               = 8443
 config.TELEGRAM_HTTPS_PORT           = 4009
 
-config.HTTPS_PATH_KEY                = ''
-config.HTTPS_PATH_CERT               = ''
-config.HTTPS_PATH_CA                 = ''
-
+config.HTTPS_PATH_KEY                = env.HTTPS_PATH_KEY || ''
+config.HTTPS_PATH_CERT               = env.HTTPS_PATH_CERT || ''
+config.HTTPS_PATH_CA                 = env.HTTPS_PATH_CA || ''
 
 config.REDIS_PORT					 = 6379
 config.REDIS_HOST					 = env.REDIS_HOST || 'localhost'
@@ -21,6 +20,5 @@ config.ELASTIC_INDEX_NAME            = 'indx_name'
 config.ELASTIC_INDEX_TYPE            = 'indx_type'
 
 config.TELEGRAM_BOT_ENDPOINT         = 'https://api.telegram.org/bot<bot_secret_key>/sendMessage'
-
 
 module.exports = config;

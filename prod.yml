@@ -1,0 +1,32 @@
+version: '3.5'
+services:
+  bot:    
+    image: dockerhubacct/rasachatbot:0.0.1 
+    ports:
+      - "5005:5005"
+    environment:
+      - TMP=TMP
+  router:    
+    image: dockerhubacct/rasachatrouter:0.0.2 
+    ports:
+      - "4000:4000"
+      - "8443:8443"
+    environment:
+      - RASA_CORE_ENDPOINT=http://bot:5005/webhooks/rest/webhook
+      - REDIS_HOST=redis
+      - HTTPS_PATH_KEY=/run/secrets/site.key
+      - HTTPS_PATH_CERT=/run/secrets/site.crt
+      - HTTPS_PATH_CA=/run/secrets/site.ca
+    secrets:
+      - site.key
+      - site.crt
+      - site.ca
+  redis:
+    image: "redis:alpine"
+secrets:
+   site.key:
+     file: /path/to/site.key
+   site.crt:
+     file: /path/to/site.crt
+   site.ca:
+     file: /path/to/site.ca     

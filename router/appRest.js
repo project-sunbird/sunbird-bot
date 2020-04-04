@@ -179,6 +179,7 @@ http.createServer(appBot).listen(config.REST_HTTP_PORT, function (err) {
         LOG.info('Server started on port '+config.REST_HTTP_PORT)
 });
 
+LOG.info('HTTPS port value '+config.HTTPS_PATH_KEY)
 //https endpoint only started if you have updated the config with key/crt files
 if (config.HTTPS_PATH_KEY) {
 	//https certificate setup
