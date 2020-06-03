@@ -2,12 +2,10 @@ var winston = require('winston');
 
 var logger = winston.createLogger({
   transports: [
-    new (winston.transports.Console)({ json: false, timestamp: true }),
-    new winston.transports.File({ filename: __dirname + '/debug.log', json: false })
+    new (winston.transports.Console)({ json: false, timestamp: true })
   ],
   exceptionHandlers: [
-    new (winston.transports.Console)({ json: false, timestamp: true }),
-    new winston.transports.File({ filename: __dirname + '/exceptions.log', json: false })
+    new (winston.transports.Console)({ json: false, timestamp: true })
   ],
   exitOnError: false
 });
