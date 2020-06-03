@@ -11,7 +11,6 @@ var literals = require('./config/literals')
 var config = require('./config/config')
 var chatflow = require('./config/chatflow')
 var RasaCoreController = require('./controllers/rasaCoreController')
-var EDB = require('./api/elastic/connection')
 
 const appBot = express()
 
@@ -32,10 +31,6 @@ appBot.post('/bot', function (req, res) {
 	var userData = {};
 	data = { message: body, customData: { userId: sessionID } }
 	LOG.info('context for: ' + sessionID)
-
-	//persisting incoming data to EDB
-	//dataPersist = {'message': body, 'channel' : 'rest'}
-	//EDB.saveToEDB(dataPersist, 'user', sessionID,(err,response)=>{})
 
 	if (!sessionID) {
 		sendResponse(sessionID, res, "From attrib missing", 400);
