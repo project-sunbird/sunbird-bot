@@ -24,24 +24,14 @@ const chatflowConfig = chatflow.chatflow;
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
-	var data = {
-		deviceId: 'device-id-10',
-		channel: '1211122039445',
-		appId: 'staging.diksha.portal' + '.bot'
-	}
 	handler(req, res, 'botclient', data)
 })
 
 appBot.post('/bot/whatsapp', function (req, res) {
-	var data = {
-		deviceId: req.body.deviceId,
-		channel: req.body.channel, 
-		appId: 'whatsapp',
-	}
-	handler(req, res, 'whatsapp', data)
+	handler(req, res, 'whatsapp')
 })
 
-function handler(req, res, channel, requestData) {
+function handler(req, res, channel) {
 	var message = req.body.Body;
 	var deviceId = req.body.From;
 	var userId = req.body.userId ? req.body.userId : deviceId;
