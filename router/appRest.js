@@ -5,83 +5,123 @@ var https = require('https');
 var http = require('http');
 var fs = require('fs');
 var redis = require('redis');
-var origins = require('./config/corsList')
 var LOG = require('./log/logger')
 var literals = require('./config/literals')
 var config = require('./config/config')
 var chatflow = require('./config/chatflow')
 var RasaCoreController = require('./controllers/rasaCoreController')
-
 const appBot = express()
-
+var UUIDV4   = require('uuid')
 //cors handling
 appBot.use(cors());
-
 //body parsers for requests
 appBot.use(bodyParser.json());
 appBot.use(bodyParser.urlencoded({ extended: false }))
 
-// this object tracks session. It needs to be moved to Redis
-const redis_client = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
+// Redis is used as the session tracking store
+const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
 const chatflowConfig = chatflow.chatflow;
+
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
-	var body = req.body.Body
-	var sessionID = req.body.From;
-	var userData = {};
-	data = { message: body, customData: { userId: sessionID } }
-	LOG.info('context for: ' + sessionID)
+	var data = {
+		deviceId: 'device-id-10',
+		channel: '1211122039445',
+		appId: 'staging.diksha.portal' + '.bot'
+	}
+	handler(req, res, 'botclient', data)
+})
 
-	if (!sessionID) {
-		sendResponse(sessionID, res, "From attrib missing", 400);
+appBot.post('/bot/whatsapp', function (req, res) {
+	var data = {
+		deviceId: req.body.deviceId,
+		channel: req.body.channel, 
+		appId: 'whatsapp',
+	}
+	handler(req, res, 'whatsapp', data)
+})
+
+function handler(req, res, channel, requestData) {
+	var message = req.body.Body;
+	var deviceId = req.body.From;
+	var userId = req.body.userId ? req.body.userId : deviceId;
+	var userData = {};
+	data = { message: message, customData: { userId: userId } }
+	if (!deviceId) {
+		sendResponse(deviceId, res, "From attribute missing", 400);
 	} else {
-		redis_client.get(sessionID, (err, redisValue) => {
+		redisClient.get(deviceId, (err, redisValue) => { 
 			if (redisValue != null) {
 				// Key is already exist and hence assiging data which is already there at the posted key
 				userData = JSON.parse(redisValue);
 				// all non numeric user messages go to bot
-				if (isNaN(body)) {
+				if (isNaN(message)) {
 					///Bot interaction flow
-					RasaCoreController.processUserData(data, sessionID, (err, resp) => {
+					RasaCoreController.processUserData(data, deviceId, (err, resp) => {
+						var response = '';
 						if (err) {
-							sendResponse(sessionID, res, literals.message.SORRY)
+							sendChannelResponse(deviceId, res, 'SORRY', channel)
 						} else {
 							let responses = resp.res;
-							for (var i = 0; i < responses.length; i++) {
-								sendResponse(sessionID, res, responses[i].text)
+							if (responses && responses[0].text) {
+								response = responses[0].text;
+							} else {
+								response = literals.message[responseKey];
 							}
+							sendResponse(res, response)
 						}
-					})
+					});
 				} else {
 					var currentFlowStep = userData.currentFlowStep;
-					var respVarName = chatflowConfig[currentFlowStep].responseVariable;
-					userData[respVarName] = body;
-					currentFlowStep += '_' + body;
+					var possibleFlow = currentFlowStep + '_' + message;
+					if (chatflowConfig[possibleFlow]) {
+						var respVarName = chatflowConfig[currentFlowStep].responseVariable;
+						if (respVarName) {
+							userData[respVarName] = message;
+						}
+						currentFlowStep = possibleFlow;
+						responseKey = chatflowConfig[currentFlowStep].messageKey
+					} else if (message === '0') {
+						currentFlowStep = 'step1'
+						responseKey = chatflowConfig[currentFlowStep].messageKey
+					} else if (message === '99') {
+						if (currentFlowStep.lastIndexOf("_") > 0) {
+							currentFlowStep = currentFlowStep.substring (0, currentFlowStep.lastIndexOf("_"))
+							responseKey = chatflowConfig[currentFlowStep].messageKey
+						}
+					}
 					userData['currentFlowStep'] = currentFlowStep;
-					setRedisKeyValue(sessionID, userData);
-					sendResponse(sessionID, res, literals.message[chatflowConfig[currentFlowStep].messageKey]);
+					setRedisKeyValue(deviceId, userData);
+					sendChannelResponse(res, responseKey, channel);
 				}
-
 			} else {
 				// Implies new user. Adding data in redis for the key and also sending the WELCOME message
-				userData = { sessionId: sessionID, currentFlowStep: 'step1' };
-				setRedisKeyValue(sessionID, userData);
-				sendResponse(sessionID, res, literals.message.START);
+				var uuID = UUIDV4();
+				userData = { sessionID: uuID, currentFlowStep: 'step1' };
+				setRedisKeyValue(deviceId, userData);
+				sendChannelResponse(res, 'START', channel);
 			}
 		});
 	}
-})
+}
+ 
+function setRedisKeyValue(key, value) {
+	const expiryInterval = 3600;
+	redisClient.setex(key, expiryInterval, JSON.stringify(value));
+}
+
+function delRedisKey(key) {
+	redisClient.del(key);
+}
 
 //http endpoint
 http.createServer(appBot).listen(config.REST_HTTP_PORT, function (err) {
 	if (err) {
 		throw err
 	}
-
 	LOG.info('Server started on port ' + config.REST_HTTP_PORT)
 });
 
-LOG.info('HTTPS port value ' + config.HTTPS_PATH_KEY)
 //https endpoint only started if you have updated the config with key/crt files
 if (config.HTTPS_PATH_KEY) {
 	//https certificate setup
@@ -100,22 +140,20 @@ if (config.HTTPS_PATH_KEY) {
 
 }
 
-function setRedisKeyValue(key, value) {
-	const expiryInterval = 3600;
-	redis_client.setex(key, expiryInterval, JSON.stringify(value));
-}
-
-function delRedisKey(key) {
-	redis_client.del(key);
-}
-
 //send data to user
-function sendResponse(sessionID, response, responseBody, responseCode) {
-	//persisting outgoing data to EDB
-	//dataPersist = {'message': responseBody, 'channel' : 'rest'}
-	//EDB.saveToEDB(dataPersist, 'bot', sessionID,(err,response)=>{})
-	//emit to client
+function sendResponse(response, responseBody, responseCode) {
 	response.set('Content-Type', 'text/plain')
 	if (responseCode) response.status(responseCode)
 	response.send(responseBody)
+}
+
+function sendChannelResponse(response, responseKey, channel, responseCode) {
+	response.set('Content-Type', 'text/plain')
+	if (responseCode) response.status(responseCode)
+	var channelResponse = literals.message[responseKey + '_' + channel];
+	if (channelResponse) {
+		response.send(channelResponse)	
+	} else {
+		response.send(literals.message[responseKey])	
+	} 
 }
