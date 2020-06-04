@@ -24,7 +24,7 @@ const chatflowConfig = chatflow.chatflow;
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
-	handler(req, res, 'botclient', data)
+	handler(req, res, 'botclient')
 })
 
 appBot.post('/bot/whatsapp', function (req, res) {
