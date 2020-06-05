@@ -17,8 +17,8 @@ network:
   targetport: 8000
 strategy:
   type: RollingUpdate
-  maxsurge: {{ router_maxsurge|default('10%') }}
-  maxunavailable: {{ router_maxunavailable|default('10%') }} 
+  maxsurge: {{ router_maxsurge|default('50%') }}
+  maxunavailable: {{ router_maxunavailable|default('50%') }} 
 
 routerenv:
   RASA_CORE_ENDPOINT: http://bot-service:5005/webhooks/rest/webhook

@@ -17,7 +17,7 @@ network:
   targetport: 5005
 strategy:
   type: RollingUpdate
-  maxsurge: {{ bot_maxsurge|default('10%') }}
-  maxunavailable: {{ bot_maxunavailable|default('10%') }} 
+  maxsurge: {{ bot_maxsurge|default('50%') }}
+  maxunavailable: {{ bot_maxunavailable|default('50%') }} 
 
 

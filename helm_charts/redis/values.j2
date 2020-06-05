@@ -18,7 +18,7 @@ network:
   targetport: 6379
 strategy:
   type: RollingUpdate
-  maxsurge: {{ redis_maxsurge|default('10%') }}
-  maxunavailable: {{ redis_maxunavailable|default('10%') }} 
+  maxsurge: {{ redis_maxsurge|default('50%') }}
+  maxunavailable: {{ redis_maxunavailable|default('50%') }} 
 
 
