@@ -20,10 +20,6 @@ spec:
       labels:
         app: {{ .Chart.Name }}
     spec:
-#{{- if .Values.imagepullsecrets }}
-#      imagePullSecrets:
-#      - name: {{ .Values.imagepullsecrets }}
-#{{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: "redis:alpine"
