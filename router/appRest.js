@@ -10,8 +10,11 @@ var literals = require('./config/literals')
 var config = require('./config/config')
 var chatflow = require('./config/chatflow')
 var RasaCoreController = require('./controllers/rasaCoreController')
-const appBot = express()
+const telemetry = require('./api/telemetry/telemetry.js')
 var UUIDV4   = require('uuid')
+const parser = require('ua-parser-js')
+
+const appBot = express()
 //cors handling
 appBot.use(cors());
 //body parsers for requests
@@ -27,23 +30,34 @@ appBot.post('/bot', function (req, res) {
 	handler(req, res, 'botclient')
 })
 
-appBot.post('/bot/whatsapp', function (req, res) {
-	handler(req, res, 'whatsapp')
-})
-
 function handler(req, res, channel) {
+	var appId =  req.body.appId + '.bot';
 	var message = req.body.Body;
 	var deviceId = req.body.From;
+	var channelId = req.body.channel; 
 	var userId = req.body.userId ? req.body.userId : deviceId;
-	var userData = {};
-	data = { message: message, customData: { userId: userId } }
+	var uaspec = getUserSpec(req);
+	var redisSessionData = {};
+	data = { 
+		message: message, 
+		customData: { 
+			userId: userId,
+			deviceId: deviceId,
+			appId:appId,
+			sessionId : '',
+			channelId: channelId,
+			uaspec: uaspec
+		} 
+	}
 	if (!deviceId) {
 		sendResponse(deviceId, res, "From attribute missing", 400);
 	} else {
 		redisClient.get(deviceId, (err, redisValue) => { 
 			if (redisValue != null) {
 				// Key is already exist and hence assiging data which is already there at the posted key
-				userData = JSON.parse(redisValue);
+				redisSessionData = JSON.parse(redisValue);
+				data.customData.sessionId = redisSessionData.sessionID;
+				var telemetryData = {};
 				// all non numeric user messages go to bot
 				if (isNaN(message)) {
 					///Bot interaction flow
@@ -52,36 +66,48 @@ function handler(req, res, channel) {
 						if (err) {
 							sendChannelResponse(deviceId, res, 'SORRY', channel)
 						} else {
-							let responses = resp.res;
+							var responses = resp.res;
 							if (responses && responses[0].text) {
 								response = responses[0].text;
+								telemetryData = createInteractionData(responses[0], data.customData, true);
 							} else {
+								responseKey = getErrorMessageForInvalidInput(responses[0]);
 								response = literals.message[responseKey];
+								telemetryData = createInteractionData(responses[0], data.customData, true)
 							}
+							telemetry.logInteraction(telemetryData);
 							sendResponse(res, response)
 						}
 					});
 				} else {
-					var currentFlowStep = userData.currentFlowStep;
+					var currentFlowStep = redisSessionData.currentFlowStep;
 					var possibleFlow = currentFlowStep + '_' + message;
+					var responseKey = ''
 					if (chatflowConfig[possibleFlow]) {
 						var respVarName = chatflowConfig[currentFlowStep].responseVariable;
 						if (respVarName) {
-							userData[respVarName] = message;
+							redisSessionData[respVarName] = message;
 						}
 						currentFlowStep = possibleFlow;
 						responseKey = chatflowConfig[currentFlowStep].messageKey
+						telemetryData = createInteractionData({currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 					} else if (message === '0') {
 						currentFlowStep = 'step1'
 						responseKey = chatflowConfig[currentFlowStep].messageKey
+						telemetryData = createInteractionData({currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 					} else if (message === '99') {
 						if (currentFlowStep.lastIndexOf("_") > 0) {
 							currentFlowStep = currentFlowStep.substring (0, currentFlowStep.lastIndexOf("_"))
 							responseKey = chatflowConfig[currentFlowStep].messageKey
+							telemetryData = createInteractionData({currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 						}
+					} else {
+						responseKey = getErrorMessageForInvalidInput(currentFlowStep)
+						telemetryData = createInteractionData({currentStep: currentFlowStep +'_UNKNOWN_OPTION' }, data.customData, false)
 					}
-					userData['currentFlowStep'] = currentFlowStep;
-					setRedisKeyValue(deviceId, userData);
+					redisSessionData['currentFlowStep'] = currentFlowStep;
+					setRedisKeyValue(deviceId, redisSessionData);
+					telemetry.logInteraction(telemetryData)
 					sendChannelResponse(res, responseKey, channel);
 				}
 			} else {
@@ -89,6 +115,10 @@ function handler(req, res, channel) {
 				var uuID = UUIDV4();
 				userData = { sessionID: uuID, currentFlowStep: 'step1' };
 				setRedisKeyValue(deviceId, userData);
+				data.customData.sessionId = uuID;
+				telemetry.logSessionStart(data.customData);
+				telemetryData = createInteractionData({currentStep: 'step1', responseKey: 'START'}, data.customData, false)
+				telemetry.logInteraction(telemetryData)
 				sendChannelResponse(res, 'START', channel);
 			}
 		});
@@ -104,12 +134,29 @@ function delRedisKey(key) {
 	redisClient.del(key);
 }
 
+function getErrorMessageForInvalidInput(currentFlowStep){
+	if (chatflowConfig[currentFlowStep + '_error']) {
+		return chatflowConfig[currentFlowStep + '_error'].messageKey;
+	} else {
+		return chatflowConfig['step1_wrong_input'].messageKey
+	}
+}
+
 //http endpoint
 http.createServer(appBot).listen(config.REST_HTTP_PORT, function (err) {
 	if (err) {
 		throw err
 	}
 	LOG.info('Server started on port ' + config.REST_HTTP_PORT)
+	var telemetryConfig = {
+		batchSize: config.TELEMETRY_SYNC_BATCH_SIZE,
+		endPoint : config.TELEMETRY_ENDPOINT,
+		serviceUrl: config.TELEMETRY_SERVICE_URL,
+		apiToken: config.API_AUTH_TOKEN,
+		pid: config.TELEMETRY_DATA_PID,
+		ver: config.TELEMETRY_DATA_VERSION
+	};
+	telemetry.initializeTelemetry(telemetryConfig)
 });
 
 //https endpoint only started if you have updated the config with key/crt files
@@ -146,4 +193,40 @@ function sendChannelResponse(response, responseKey, channel, responseCode) {
 	} else {
 		response.send(literals.message[responseKey])	
 	} 
+}
+
+function createInteractionData(responseData, userData, isNonNumeric) {
+	if (isNonNumeric) {
+		return {
+			interactionData : { 
+				id: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
+				type: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
+				subtype: responseData.intent ? 'intent_detected' : 'intent_not_detected'
+			},
+			requestData: userData
+		}
+	} else {
+		return {
+			interactionData: {
+				id: responseData.currentStep,
+				type: responseData.responseKey ? responseData.responseKey : 'UNKNOWN_OPTION',
+				subtype: responseData.responseKey ? 'intent_detected' : 'intent_not_detected'
+			},
+			requestData : userData
+		}
+	}
+}
+
+/**
+* This function helps to get user spec
+*/
+function getUserSpec(req) {
+    var ua = parser(req.headers['user-agent'])
+    return {
+      'agent': ua['browser']['name'],
+      'ver': ua['browser']['version'],
+      'system': ua['os']['name'],
+      'platform': ua['engine']['name'],
+      'raw': ua['ua']
+    }
 }

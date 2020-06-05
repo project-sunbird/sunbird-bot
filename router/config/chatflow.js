@@ -10,6 +10,10 @@ var chatflow = {
     step1_1_1: {
         messageKey: "CHOOSE_BOARD",
         responseVariabl: "userBoard",
+    },
+    step1_wrong_input: {
+        messageKey: "SORRY",
+        responseVariable: ""
     }
 };
 
