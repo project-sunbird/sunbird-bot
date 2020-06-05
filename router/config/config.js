@@ -13,6 +13,13 @@ config.HTTPS_PATH_KEY                = env.HTTPS_PATH_KEY || ''
 config.HTTPS_PATH_CERT               = env.HTTPS_PATH_CERT || ''
 config.HTTPS_PATH_CA                 = env.HTTPS_PATH_CA || ''
 
+config.TELEMETRY_ENDPOINT          = env.telemetry_endpoint || 'v1/telemetry'
+config.TELEMETRY_SYNC_BATCH_SIZE   = env.telemetry_sync_batch_size || 1
+config.API_AUTH_TOKEN              = env.sunbird_api_auth_token || ''
+config.TELEMETRY_SERVICE_URL       = env.telemetry_service_url || ''
+config.TELEMETRY_DATA_VERSION      = env.telemetry_version || '1.1'
+config.TELEMETRY_DATA_PID          = env.telemetry_pid || 'dikshavani.botclient'
+
 config.REDIS_PORT					 = 6379
 config.REDIS_HOST					 = env.REDIS_HOST || 'localhost'
 config.ELASTIC_HOST                  = 'http://<user>:<password><IP>:<Port>'
