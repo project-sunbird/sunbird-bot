@@ -90,19 +90,23 @@ function handler(req, res, channel) {
 						}
 						currentFlowStep = possibleFlow;
 						responseKey = chatflowConfig[currentFlowStep].messageKey
+						// TODO : Don't call function inside each if/else if it should be called once.
 						telemetryData = createInteractionData({currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 					} else if (message === '0') {
 						currentFlowStep = 'step1'
 						responseKey = chatflowConfig[currentFlowStep].messageKey
+						// TODO : Don't call function inside each if/else if it should be called once.
 						telemetryData = createInteractionData({currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 					} else if (message === '99') {
 						if (currentFlowStep.lastIndexOf("_") > 0) {
 							currentFlowStep = currentFlowStep.substring (0, currentFlowStep.lastIndexOf("_"))
 							responseKey = chatflowConfig[currentFlowStep].messageKey
+							// TODO : Don't call function inside each if/else if it should be called once. 
 							telemetryData = createInteractionData({currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 						}
 					} else {
 						responseKey = getErrorMessageForInvalidInput(currentFlowStep)
+						// TODO : Don't call function inside each if/else if it should be called once.
 						telemetryData = createInteractionData({currentStep: currentFlowStep +'_UNKNOWN_OPTION' }, data.customData, false)
 					}
 					redisSessionData['currentFlowStep'] = currentFlowStep;
