@@ -1,0 +1,23 @@
+namespace: {{ namespace }}
+imagepullsecrets: {{ imagepullsecrets }}
+dockerhub: {{ dockerhub }}
+
+replicaCount: {{bot_replicacount|default(1)}}
+repository: {{bot_repository|default('bot')}}
+image_tag: {{image_tag}}
+resources:
+  requests:
+    cpu: {{bot_cpu_req|default('100m')}}
+    memory: {{bot_mem_req|default('100Mi')}}
+  limits:
+    cpu: {{bot_cpu_limit|default('1000m')}}
+    memory: {{bot_memory_limit|default('1024Mi')}}
+network:
+  port: 5005
+  targetport: 5005
+strategy:
+  type: RollingUpdate
+  maxsurge: {{ bot_maxsurge|default('50%') }}
+  maxunavailable: {{ bot_maxunavailable|default('50%') }} 
+
+
