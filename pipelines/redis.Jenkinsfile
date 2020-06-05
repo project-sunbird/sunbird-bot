@@ -23,8 +23,8 @@ node() {
             module = sh(returnStdout: true, script: "echo $JOB_NAME").split('/')[-2].trim()
             jobName = sh(returnStdout: true, script: "echo $JOB_NAME").split('/')[-1].trim()
             currentWs = sh(returnStdout: true, script: 'pwd').trim()
-            ansiblePlaybook = "$currentWs/devops/ansible/deploy-chatbot.yml"
-            ansibleExtraArgs = "--extra-vars \"chart_path=${currentWs}/devops/helm_charts/$jobName release_name=$jobName role_name=${params.role_name}\" --vault-password-file /var/lib/jenkins/secrets/vault-pass -v"
+            ansiblePlaybook = "$currentWs/ansible/deploy-chatbot.yml"
+            ansibleExtraArgs = "--extra-vars \"chart_path=${currentWs}/helm_charts/$jobName release_name=$jobName role_name=${params.role_name}\" --vault-password-file /var/lib/jenkins/secrets/vault-pass -v"
             values.put('currentWs', currentWs)
             values.put('env', envDir)
             values.put('module', module)
