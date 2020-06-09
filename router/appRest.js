@@ -36,7 +36,7 @@ function handler(req, res, channel) {
 	var channelId = req.body.channel; 
 	var userId = req.body.userId ? req.body.userId : deviceId;
 	var uaspec = getUserSpec(req);
-	const chatflowConfig = req.body.context ? chatflow[req.body.context] : chatflow.chatflow;
+	const chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context]: chatflow.chatflow : chatflow.chatflow;
 	var redisSessionData = {};
 	data = { 
 		message: message, 
