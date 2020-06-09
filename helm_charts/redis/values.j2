@@ -1,0 +1,24 @@
+namespace: {{ namespace }}
+imagepullsecrets: {{ imagepullsecrets }}
+dockerhub: {{ dockerhub }}
+
+replicaCount: {{redis_replicacount|default(1)}}
+#repository: {{redis_repository|default('redis')}}
+
+
+resources:
+  requests:
+    cpu: {{redis_cpu_req|default('100m')}}
+    memory: {{redis_mem_req|default('100Mi')}}
+  limits:
+    cpu: {{redis_cpu_limit|default('1000m')}}
+    memory: {{redis_memory_limit|default('1024Mi')}}
+network:
+  port: 6379
+  targetport: 6379
+strategy:
+  type: RollingUpdate
+  maxsurge: {{ redis_maxsurge|default('50%') }}
+  maxunavailable: {{ redis_maxunavailable|default('50%') }} 
+
+
