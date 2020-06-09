@@ -23,7 +23,6 @@ appBot.use(bodyParser.urlencoded({ extended: false }))
 
 // Redis is used as the session tracking store
 const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
-const chatflowConfig = chatflow.chatflow;
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
@@ -37,6 +36,7 @@ function handler(req, res, channel) {
 	var channelId = req.body.channel; 
 	var userId = req.body.userId ? req.body.userId : deviceId;
 	var uaspec = getUserSpec(req);
+	const chatflowConfig = req.body.context ? chatflow[req.body.context] : chatflow.chatflow;
 	var redisSessionData = {};
 	data = { 
 		message: message, 
@@ -71,7 +71,7 @@ function handler(req, res, channel) {
 								response = responses[0].text;
 								telemetryData = createInteractionData(responses[0], data.customData, true);
 							} else {
-								responseKey = getErrorMessageForInvalidInput(responses[0]);
+								responseKey = getErrorMessageForInvalidInput(responses[0], chatflowConfig);
 								response = literals.message[responseKey];
 								telemetryData = createInteractionData(responses[0], data.customData, true)
 							}
@@ -105,7 +105,7 @@ function handler(req, res, channel) {
 							telemetryData = createInteractionData({currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 						}
 					} else {
-						responseKey = getErrorMessageForInvalidInput(currentFlowStep)
+						responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig)
 						// TODO : Don't call function inside each if/else if it should be called once.
 						telemetryData = createInteractionData({currentStep: currentFlowStep +'_UNKNOWN_OPTION' }, data.customData, false)
 					}
@@ -138,7 +138,7 @@ function delRedisKey(key) {
 	redisClient.del(key);
 }
 
-function getErrorMessageForInvalidInput(currentFlowStep){
+function getErrorMessageForInvalidInput(currentFlowStep,chatflowConfig){
 	if (chatflowConfig[currentFlowStep + '_error']) {
 		return chatflowConfig[currentFlowStep + '_error'].messageKey;
 	} else {
