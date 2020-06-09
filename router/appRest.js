@@ -121,9 +121,9 @@ function handler(req, res, channel) {
 				setRedisKeyValue(deviceId, userData);
 				data.customData.sessionId = uuID;
 				telemetry.logSessionStart(data.customData);
-				telemetryData = createInteractionData({currentStep: 'step1', responseKey: 'START'}, data.customData, false)
+				telemetryData = createInteractionData({currentStep: 'step1', responseKey: chatflowConfig['step1']['messageKey']}, data.customData, false)
 				telemetry.logInteraction(telemetryData)
-				sendChannelResponse(res, 'START', channel);
+				sendChannelResponse(res, chatflowConfig['step1']['messageKey'], channel);
 			}
 		});
 	}
