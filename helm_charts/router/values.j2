@@ -22,7 +22,7 @@ strategy:
 
 routerenv:
   RASA_CORE_ENDPOINT: http://bot-service:5005/webhooks/rest/webhook
-  REDIS_HOST: redis
+  REDIS_HOST: "{{ dedup_redis_host }}"
   telemetry_endpoint: v1/telemetry
   sunbird_api_auth_token: "{{ sunbird_api_auth_token_bot }}"
   telemetry_service_url: "https://{{ domain_name }}/api/data/"
