@@ -13,7 +13,7 @@ var RasaCoreController = require('./controllers/rasaCoreController')
 const telemetry = require('./api/telemetry/telemetry.js')
 var UUIDV4   = require('uuid')
 const parser = require('ua-parser-js')
-
+const REDIS_KEY_PREFIX = "bot_";
 const appBot = express()
 //cors handling
 appBot.use(cors());
@@ -52,7 +52,7 @@ function handler(req, res, channel) {
 	if (!deviceId) {
 		sendResponse(deviceId, res, "From attribute missing", 400);
 	} else {
-		redisClient.get(deviceId, (err, redisValue) => { 
+		redisClient.get(REDIS_KEY_PREFIX + deviceId, (err, redisValue) => { 
 			if (redisValue != null) {
 				// Key is already exist and hence assiging data which is already there at the posted key
 				redisSessionData = JSON.parse(redisValue);
@@ -131,7 +131,7 @@ function handler(req, res, channel) {
  
 function setRedisKeyValue(key, value) {
 	const expiryInterval = 3600;
-	redisClient.setex(key, expiryInterval, JSON.stringify(value));
+	redisClient.setex(REDIS_KEY_PREFIX + key, expiryInterval, JSON.stringify(value));
 }
 
 function delRedisKey(key) {
