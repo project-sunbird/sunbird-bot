@@ -1,1 +1,0 @@
-dedup_redis_host: "{{ groups['dp-redis'][0] }}"
