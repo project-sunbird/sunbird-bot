@@ -21,7 +21,7 @@ node() {
             values = [:]
             envDir = sh(returnStdout: true, script: "echo $JOB_NAME").split('/')[-3].trim()
             module = sh(returnStdout: true, script: "echo $JOB_NAME").split('/')[-2].trim()
-            jobName = sh(returnStdout: true, script: "echo $JOB_NAME").split('/')[-1].trim()
+            jobName = sh(returnStdout: true, script: "echo $JOB_NAME").split('/')[-1].trim().toLowerCase()
             currentWs = sh(returnStdout: true, script: 'pwd').trim()
             ansiblePlaybook = "$currentWs/ansible/deploy-chatbot.yml"
             ansibleExtraArgs = "--extra-vars \"chart_path=${currentWs}/helm_charts/$jobName release_name=$jobName role_name=${params.role_name}\" --vault-password-file /var/lib/jenkins/secrets/vault-pass -v"

@@ -30,15 +30,15 @@ node('build-slave') {
                 }
 
                 echo "build_tag: " + build_tag
-
+                bot_repo_url = params.diksha_bot_repo
                 dir('bot_repo') {
                     if (params.diksha_bot_tag == "") {
                        def scmVars = checkout scm
-                       checkout scm: ([$class: 'GitSCM', branches: [[name: "refs/heads/master"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'private_repo_credentials', url: 'https://github.com/DIKSHA-NCTE/Diksha-Bot.git']]])
+                       checkout scm: ([$class: 'GitSCM', branches: [[name: "refs/heads/master"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'private_repo_credentials', url: "$bot_repo_url"]]])
                     } 
                     else {
                        def scmVars = checkout scm
-                       checkout scm: ([$class: 'GitSCM', branches: [[name: "refs/tags/params.diksha_bot_tag"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'private_repo_credentials', url: 'https://github.com/DIKSHA-NCTE/Diksha-Bot.git']]])
+                       checkout scm: ([$class: 'GitSCM', branches: [[name: "refs/tags/params.diksha_bot_tag"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'private_repo_credentials', url: "$bot_repo_url"]]])
                     }
                 } 
             }
