@@ -19,25 +19,27 @@ node('build-slave') {
                     checkout scm
                     commit_hash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     branch_name = sh(script: 'git name-rev --name-only HEAD | rev | cut -d "/" -f1| rev', returnStdout: true).trim()
-                    build_tag = branch_name + "_" + commit_hash
+                    public_repo_commit_hash = branch_name + "_" + commit_hash
                     println(ANSI_BOLD + ANSI_YELLOW + "github_release_tag not specified, using the latest commit hash: " + commit_hash + ANSI_NORMAL)
                 }
                 else {
                     def scmVars = checkout scm
                     checkout scm: [$class: 'GitSCM', branches: [[name: "refs/tags/$params.github_release_tag"]], userRemoteConfigs: [[url: scmVars.GIT_URL]]]
-                    build_tag = params.github_release_tag
+                    public_repo_commit_hash = params.github_release_tag
                     println(ANSI_BOLD + ANSI_YELLOW + "github_release_tag specified, building from github_release_tag: " + params.github_release_tag + ANSI_NORMAL)
                 }
-                echo "build_tag: " + build_tag
+                echo "public_repo_commit_hash: " + public_repo_commit_hash
                 bot_repo_url = params.diksha_bot_repo 
                 dir('bot_repo') {
                     if (params.diksha_bot_tag == "") {
                        def scmVars = checkout scm
                        checkout scm: ([$class: 'GitSCM', branches: [[name: "refs/heads/master"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'private_repo_credentials', url: "$bot_repo_url"]]])
-                    } 
+                       private_repo_commit_hash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    }
                     else {
                        def scmVars = checkout scm
                        checkout scm: ([$class: 'GitSCM', branches: [[name: "refs/tags/params.diksha_bot_tag"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'private_repo_credentials', url: "$bot_repo_url"]]])
+                       private_repo_commit_hash = params.diksha_bot_tag
                     }
                 }    
             }
@@ -45,6 +47,7 @@ node('build-slave') {
             stage('Build') {
                 env.NODE_ENV = "build"
                 print "Environment will be : ${env.NODE_ENV}"
+                build_tag = public_repo_commit_hash + "_" + private_repo_commit_hash + "_" + env.BUILD_NUMBER
                 sh('cp -r bot_repo/* .')
                 dir('bot') {
                 sh('chmod 777 build.sh')
