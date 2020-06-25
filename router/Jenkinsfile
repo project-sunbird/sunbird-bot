@@ -48,7 +48,7 @@ node('build-slave') {
             stage('Build') {
                 env.NODE_ENV = "build"
                 print "Environment will be : ${env.NODE_ENV}"
-                build_tag = public_repo_commit_hash + "_" + private_repo_commit_hash + "_" + env.BUILD_NUMBER
+                build_tag = public_repo_commit_hash + "_" + private_repo_commit_hash + "_" + env.BUILD_NUMBER + "_router"
                 sh('cp -r bot_repo/* .')
                 dir('router') {
                 sh('chmod 777 build.sh')
