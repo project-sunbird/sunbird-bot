@@ -189,8 +189,10 @@ function sendResponse(response, responseBody, responseCode) {
 }
 
 function sendChannelResponse(response, responseKey, channel, responseCode) {
-	response.set('Content-Type', 'text/plain')
+	response.set('Content-Type', 'application/json')
 	if (responseCode) response.status(responseCode)
+
+	//version check
 	var channelResponse = literals.message[responseKey + '_' + channel];
 	if (channelResponse) {
 		response.send(channelResponse)	
