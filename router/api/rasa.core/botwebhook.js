@@ -132,9 +132,6 @@ function getRasaEndpoint(type) {
 }
 
 exports.BOTWebHookAPI = function (data, clientId, cb) {
-  LOG.info("data.endpoint-->",data.endpoint)
-  LOG.info("data.text, ",data.text)
-  LOG.info( "clientId-->",clientId)
   axios.create(getCustomHeaders(APP_CONFIG.RASA_API_TIMEOUT))
     .post(getRasaEndpoint(data.endpoint), getBody(data.text, clientId), getHeaders())
     .then(res => {
