@@ -7,8 +7,6 @@ function processResponse(res, cb) {
     let quick_replies = []
     let intent = ''
     let resp = res.data.map((item) => {
-      LOG.info('item@processResponse@botwebhook:')
-      LOG.info(JSON.stringify(item))
 
       if (item.text) {
         if (item.text.split('-----').length > 1) {
@@ -44,7 +42,7 @@ function processResponse(res, cb) {
           if (item.custom.blocks[0] && item.custom.blocks[0].entities) {
             entities = item.custom.blocks[0].entities
           }
-
+          LOG.info("intent: ", intent)
           return {
             "text": text,
             "quick_replies": quick_replies,
@@ -58,8 +56,6 @@ function processResponse(res, cb) {
           text = item.text
           type = ''
           entities = []
-          LOG.info(item.custom[0])
-          LOG.info(item.custom[0].intent)
           if (item.custom[0].intent) {
             intent = item.custom[0].intent
           }
@@ -80,24 +76,6 @@ function processResponse(res, cb) {
             "entities": entities
           }
 
-        }
-        quick_replies = item.custom
-        text = item.text
-        type = ''
-        if (item.custom.blocks[0].intent) {
-          intent = item.custom.blocks[0].intent
-        }
-        if (item.custom.blocks[0].text) {
-          text = item.custom.blocks[0].text
-        }
-        if (item.custom.blocks[0].type) {
-          type = item.custom.blocks[0].type
-        }
-        return {
-          "text": text,
-          "quick_replies": quick_replies,
-          "intent": intent,
-          "type": type
         }
       } else {
         if (item.button) {
