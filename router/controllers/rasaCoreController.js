@@ -31,9 +31,6 @@ function processUserData(data, clientId, cb) {
  * @param arg3: cb, callback function
  */
 function sendDataToUser(client, data, cb) {
-        LOG.info('data@sendDataToUser:')
-        LOG.info(data)
-        LOG.info(`uttering to bot ${JSON.stringify(data)}`)
 
         client.emit('bot_uttered', data, (err, res) => {
                 if (err) {

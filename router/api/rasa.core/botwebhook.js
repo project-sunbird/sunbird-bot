@@ -7,8 +7,6 @@ function processResponse(res, cb) {
     let quick_replies = []
     let intent = ''
     let resp = res.data.map((item) => {
-      LOG.info('item@processResponse@botwebhook:')
-      LOG.info(JSON.stringify(item))
 
       if (item.text) {
         if (item.text.split('-----').length > 1) {
