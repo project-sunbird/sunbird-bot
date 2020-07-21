@@ -11,7 +11,7 @@ var config = require('./config/config')
 var chatflow = require('./config/chatflow')
 var RasaCoreController = require('./controllers/rasaCoreController')
 const telemetry = require('./api/telemetry/telemetry.js')
-var UUIDV4   = require('uuid')
+var UUIDV4 = require('uuid')
 const parser = require('ua-parser-js')
 const REDIS_KEY_PREFIX = "bot_";
 const appBot = express()
@@ -30,32 +30,32 @@ appBot.post('/bot', function (req, res) {
 })
 
 function handler(req, res, channel) {
-	var appId =  req.body.appId + '.bot';
+	var appId = req.body.appId + '.bot';
 	var message = req.body.Body;
 	var deviceId = req.body.From;
-	var channelId = req.body.channel; 
+	var channelId = req.body.channel;
 	var userId = req.body.userId ? req.body.userId : deviceId;
 	var uaspec = getUserSpec(req);
-	const chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context]: chatflow.chatflow : chatflow.chatflow;
+	const chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context] : chatflow.chatflow : chatflow.chatflow;
 	var redisSessionData = {};
-	data = { 
-		message: message, 
-		customData: { 
+	data = {
+		message: message,
+		customData: {
 			userId: userId,
 			deviceId: deviceId,
-			appId:appId,
-			sessionId : '',
+			appId: appId,
+			sessionId: '',
 			channelId: channelId,
 			uaspec: uaspec
-		} 
+		}
 	}
 	if (!deviceId) {
 		sendResponse(deviceId, res, "From attribute missing", 400);
 	} else {
-		LOG.info("UseId: ",userId)
+		LOG.info("UseId: ", userId)
 		LOG.info("DeviceId: ", deviceId)
 		LOG.info("UserQuery: ", message)
-		redisClient.get(REDIS_KEY_PREFIX + deviceId, (err, redisValue) => { 
+		redisClient.get(REDIS_KEY_PREFIX + deviceId, (err, redisValue) => {
 			if (redisValue != null) {
 				// Key is already exist and hence assiging data which is already there at the posted key
 				redisSessionData = JSON.parse(redisValue);
@@ -94,23 +94,23 @@ function handler(req, res, channel) {
 						currentFlowStep = possibleFlow;
 						responseKey = chatflowConfig[currentFlowStep].messageKey
 						// TODO : Don't call function inside each if/else if it should be called once.
-						telemetryData = createInteractionData({currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
+						telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 					} else if (message === '0') {
 						currentFlowStep = 'step1'
 						responseKey = chatflowConfig[currentFlowStep].messageKey
 						// TODO : Don't call function inside each if/else if it should be called once.
-						telemetryData = createInteractionData({currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
+						telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 					} else if (message === '99') {
 						if (currentFlowStep.lastIndexOf("_") > 0) {
-							currentFlowStep = currentFlowStep.substring (0, currentFlowStep.lastIndexOf("_"))
+							currentFlowStep = currentFlowStep.substring(0, currentFlowStep.lastIndexOf("_"))
 							responseKey = chatflowConfig[currentFlowStep].messageKey
 							// TODO : Don't call function inside each if/else if it should be called once. 
-							telemetryData = createInteractionData({currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
+							telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 						}
 					} else {
 						responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig)
 						// TODO : Don't call function inside each if/else if it should be called once.
-						telemetryData = createInteractionData({currentStep: currentFlowStep +'_UNKNOWN_OPTION' }, data.customData, false)
+						telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false)
 					}
 					redisSessionData['currentFlowStep'] = currentFlowStep;
 					setRedisKeyValue(deviceId, redisSessionData);
@@ -124,14 +124,14 @@ function handler(req, res, channel) {
 				setRedisKeyValue(deviceId, userData);
 				data.customData.sessionId = uuID;
 				telemetry.logSessionStart(data.customData);
-				telemetryData = createInteractionData({currentStep: 'step1', responseKey: chatflowConfig['step1']['messageKey']}, data.customData, false)
+				telemetryData = createInteractionData({ currentStep: 'step1', responseKey: chatflowConfig['step1']['messageKey'] }, data.customData, false)
 				telemetry.logInteraction(telemetryData)
 				sendChannelResponse(res, chatflowConfig['step1']['messageKey'], channel);
 			}
 		});
 	}
 }
- 
+
 function setRedisKeyValue(key, value) {
 	const expiryInterval = 3600;
 	redisClient.setex(REDIS_KEY_PREFIX + key, expiryInterval, JSON.stringify(value));
@@ -141,7 +141,7 @@ function delRedisKey(key) {
 	redisClient.del(key);
 }
 
-function getErrorMessageForInvalidInput(currentFlowStep,chatflowConfig){
+function getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig) {
 	if (chatflowConfig[currentFlowStep + '_error']) {
 		return chatflowConfig[currentFlowStep + '_error'].messageKey;
 	} else {
@@ -157,7 +157,7 @@ http.createServer(appBot).listen(config.REST_HTTP_PORT, function (err) {
 	LOG.info('Server started on port ' + config.REST_HTTP_PORT)
 	var telemetryConfig = {
 		batchSize: config.TELEMETRY_SYNC_BATCH_SIZE,
-		endPoint : config.TELEMETRY_ENDPOINT,
+		endPoint: config.TELEMETRY_ENDPOINT,
 		serviceUrl: config.TELEMETRY_SERVICE_URL,
 		apiToken: config.API_AUTH_TOKEN,
 		pid: config.TELEMETRY_DATA_PID,
@@ -197,18 +197,18 @@ function sendChannelResponse(response, responseKey, channel, responseCode) {
 
 	//version check
 	var channelResponse = literals.message[responseKey + '_' + channel];
-	LOG.info("BOT response: ",channelResponse)
+	LOG.info("BOT response: ", channelResponse)
 	if (channelResponse) {
-		response.send(channelResponse)	
+		response.send(channelResponse)
 	} else {
-		response.send(literals.message[responseKey])	
-	} 
+		response.send(literals.message[responseKey])
+	}
 }
 
 function createInteractionData(responseData, userData, isNonNumeric) {
 	if (isNonNumeric) {
 		return {
-			interactionData : { 
+			interactionData: {
 				id: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
 				type: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
 				subtype: responseData.intent ? 'intent_detected' : 'intent_not_detected'
@@ -222,7 +222,7 @@ function createInteractionData(responseData, userData, isNonNumeric) {
 				type: responseData.responseKey ? responseData.responseKey : 'UNKNOWN_OPTION',
 				subtype: responseData.responseKey ? 'intent_detected' : 'intent_not_detected'
 			},
-			requestData : userData
+			requestData: userData
 		}
 	}
 }
@@ -231,12 +231,12 @@ function createInteractionData(responseData, userData, isNonNumeric) {
 * This function helps to get user spec
 */
 function getUserSpec(req) {
-    var ua = parser(req.headers['user-agent'])
-    return {
-      'agent': ua['browser']['name'],
-      'ver': ua['browser']['version'],
-      'system': ua['os']['name'],
-      'platform': ua['engine']['name'],
-      'raw': ua['ua']
-    }
+	var ua = parser(req.headers['user-agent'])
+	return {
+		'agent': ua['browser']['name'],
+		'ver': ua['browser']['version'],
+		'system': ua['os']['name'],
+		'platform': ua['engine']['name'],
+		'raw': ua['ua']
+	}
 }

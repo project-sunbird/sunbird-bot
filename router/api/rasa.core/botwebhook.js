@@ -37,7 +37,7 @@ function processResponse(res, cb) {
           }
           if (item.custom.blocks[0] && item.custom.blocks[0].text) {
             text = {
-              "data" : {
+              "data": {
                 "text": item.custom.blocks[0].text
               }
             }
@@ -48,7 +48,7 @@ function processResponse(res, cb) {
           if (item.custom.blocks[0] && item.custom.blocks[0].entities) {
             entities = item.custom.blocks[0].entities
           }
-          LOG.info("intent: ",intent)
+          LOG.info("intent: ", intent)
           return {
             "text": text,
             "quick_replies": quick_replies,
