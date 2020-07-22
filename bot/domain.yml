@@ -34,6 +34,7 @@ actions:
 - utter_author_credit
 - utter_worksheet
 - utter_content_suggestions
+- utter_get_started
 
 responses:
   utter_greet:

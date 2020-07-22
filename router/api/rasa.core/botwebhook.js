@@ -34,7 +34,11 @@ function processResponse(res, cb) {
             intent = item.custom.blocks[0].intent
           }
           if (item.custom.blocks[0] && item.custom.blocks[0].text) {
-            text = item.custom.blocks[0].text
+            text = {
+              "data": {
+                "text": item.custom.blocks[0].text
+              }
+            }
           }
           if (item.custom.blocks[0] && item.custom.blocks[0].type) {
             type = item.custom.blocks[0].type
