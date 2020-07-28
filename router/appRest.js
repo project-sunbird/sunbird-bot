@@ -52,7 +52,7 @@ function handler(req, res, channel) {
 	if (!deviceId) {
 		sendResponse(deviceId, res, "From attribute missing", 400);
 	} else {
-		LOG.info("UseId: ", userId, " DeviceId: ", deviceId, " UserQuery: ", message)
+		LOG.info("UserId: "+ userId+ " DeviceId: "+deviceId+ " UserQuery: "+ message)
 		redisClient.get(REDIS_KEY_PREFIX + deviceId, (err, redisValue) => {
 			if (redisValue != null) {
 				// Key is already exist and hence assiging data which is already there at the posted key
@@ -195,11 +195,13 @@ function sendChannelResponse(response, responseKey, channel, responseCode) {
 
 	//version check
 	var channelResponse = literals.message[responseKey + '_' + channel];
-	LOG.info("BOT response: ", channelResponse)
+	
 	if (channelResponse) {
 		response.send(channelResponse)
+		LOG.info("BOT response: ", channelResponse)
 	} else {
 		response.send(literals.message[responseKey])
+		LOG.info("BOT response: ", literals.message[responseKey])
 	}
 }
 
