@@ -7,8 +7,12 @@ function processResponse(res, cb) {
     let quick_replies = []
     let intent = ''
     let resp = res.data.map((item) => {
-      LOG.info('item@processResponse@botwebhook:', JSON.stringify(item))
+      LOG.info('item@processResponse@botwebhook:')
+      LOG.info(JSON.stringify(item))
+      LOG.info("item-->",item)
+      LOG.info("item.text",item.text)
       if (item.text) {
+        LOG.info('inside item.text')
         if (item.text.split('-----').length > 1) {
           intent = item.text.split('-----')[1]
           item.text = item.text.split('-----')[0]
@@ -25,7 +29,9 @@ function processResponse(res, cb) {
           "intent": intent
         }
       } else if (item.custom) {
+        console.log("inside item.custom")
         if (item.custom.blocks) {
+          console.log("inside item.custom.blocks")
           quick_replies = item.custom
           text = item.text
           type = ''
@@ -56,13 +62,27 @@ function processResponse(res, cb) {
           }
         }
         else {
+          console.log("inside else item.custom")
           quick_replies = item.custom
+
+          console.log("item.custom[0]-->",item.custom[0])
+          console.log("item.custom[0].blocks[0].text-->",item.custom[0].blocks[0].text)
+
           text = item.text
           type = ''
           entities = []
           if (item.custom[0].intent) {
             intent = item.custom[0].intent
           }
+          if (item.custom[0].blocks[0] && item.custom[0].blocks[0].text) {
+            console.log("inside item.custom[0].blocks[0]")
+            text = {
+              "data": {
+                "text": item.custom[0].blocks[0].text
+              }
+            }
+          }
+
           if (item.custom[0].text) {
             text = item.custom[0].text
           }
@@ -82,6 +102,7 @@ function processResponse(res, cb) {
 
         }
       } else {
+        console.log("inside else ")
         if (item.button) {
           quick_replies.push(item.button)
         }

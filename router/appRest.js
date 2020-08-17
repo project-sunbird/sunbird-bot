@@ -62,12 +62,14 @@ function handler(req, res, channel) {
 				// all non numeric user messages go to bot
 				if (isNaN(message)) {
 					///Bot interaction flow
+					// add userid
 					RasaCoreController.processUserData(data, deviceId, (err, resp) => {
 						var response = '';
 						if (err) {
 							sendChannelResponse(deviceId, res, 'SORRY', channel)
 						} else {
 							var responses = resp.res;
+							console.log("responses-->",responses)
 							if (responses && responses[0].text) {
 								response = responses[0].text;
 								telemetryData = createInteractionData(responses[0], data.customData, true);
@@ -92,25 +94,31 @@ function handler(req, res, channel) {
 						currentFlowStep = possibleFlow;
 						responseKey = chatflowConfig[currentFlowStep].messageKey
 						// TODO : Don't call function inside each if/else if it should be called once.
+						//log for known
 						telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 					} else if (message === '0') {
 						currentFlowStep = 'step1'
 						responseKey = chatflowConfig[currentFlowStep].messageKey
 						// TODO : Don't call function inside each if/else if it should be called once.
+						//log for known
 						telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 					} else if (message === '99') {
 						if (currentFlowStep.lastIndexOf("_") > 0) {
 							currentFlowStep = currentFlowStep.substring(0, currentFlowStep.lastIndexOf("_"))
 							responseKey = chatflowConfig[currentFlowStep].messageKey
 							// TODO : Don't call function inside each if/else if it should be called once. 
+							//log for known - flag set
 							telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 						}
 					} else {
 						responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig)
 						// TODO : Don't call function inside each if/else if it should be called once.
+						//log for unknown - flag set
 						telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false)
 					}
 					redisSessionData['currentFlowStep'] = currentFlowStep;
+					// botresponse = currentFlowStep
+					// log method
 					setRedisKeyValue(deviceId, redisSessionData);
 					telemetry.logInteraction(telemetryData)
 					sendChannelResponse(res, responseKey, channel);

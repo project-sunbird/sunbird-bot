@@ -8,11 +8,14 @@ const _ = require("lodash")
  * @param arg2: clientId, client id allocated to the connected session
  * @param arg3: cb, callback function
  */
+
+ //useid has to be added in params
 function processUserData(data, clientId, cb) {
         webHookData = {
                 text: data["message"],
                 endpoint: data["endpoint"]
         }
+        //pass useid in params
         API.BOTWebHookAPI(webHookData, clientId, (err, res) => {
                 if (err) {
                         LOG.error(`BOTWebHookAPI failed: ${err}`)
