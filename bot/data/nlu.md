@@ -143,6 +143,15 @@
 - I am from [Marathi](medium) medium
 - I am in [third](grade) standard and I want to learn [maths](subject)
 - I want to learn [science](subject) of [bihar](board) board 
+- [kannada](medium)
+- [tenth](grade)
+- I am from [hindi](medium) medium
+- I am from [class 10](grade)
+- i want to learn [class 5](grade) syllabus
+- [class 5](grade)
+- [tenth](grade)
+- [karnataka](board)
+- [english](medium)
   
 ## lookup:board
 data/boards.txt
