@@ -36,6 +36,7 @@ function handler(req, res, channel) {
 	var channelId = req.body.channel;
 	var userId = req.body.userId ? req.body.userId : deviceId;
 	var uaspec = getUserSpec(req);
+	var menuIntentKnown = false
 	const chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context] : chatflow.chatflow : chatflow.chatflow;
 	var redisSessionData = {};
 	data = {
@@ -52,7 +53,6 @@ function handler(req, res, channel) {
 	if (!deviceId) {
 		sendResponse(deviceId, res, "From attribute missing", 400);
 	} else {
-		LOG.info("UserId: "+ userId+ " DeviceId: "+deviceId+ " UserQuery: "+ message)
 		redisClient.get(REDIS_KEY_PREFIX + deviceId, (err, redisValue) => {
 			if (redisValue != null) {
 				// Key is already exist and hence assiging data which is already there at the posted key
@@ -62,8 +62,7 @@ function handler(req, res, channel) {
 				// all non numeric user messages go to bot
 				if (isNaN(message)) {
 					///Bot interaction flow
-					// add userid
-					RasaCoreController.processUserData(data, deviceId, (err, resp) => {
+					RasaCoreController.processUserData(data, userId, deviceId, (err, resp) => {
 						var response = '';
 						if (err) {
 							sendChannelResponse(deviceId, res, 'SORRY', channel)
@@ -94,11 +93,12 @@ function handler(req, res, channel) {
 						currentFlowStep = possibleFlow;
 						responseKey = chatflowConfig[currentFlowStep].messageKey
 						// TODO : Don't call function inside each if/else if it should be called once.
-						//log for known
+						menuIntentKnown = true
 						telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 					} else if (message === '0') {
 						currentFlowStep = 'step1'
 						responseKey = chatflowConfig[currentFlowStep].messageKey
+						menuIntentKnown = true
 						// TODO : Don't call function inside each if/else if it should be called once.
 						//log for known
 						telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
@@ -106,19 +106,20 @@ function handler(req, res, channel) {
 						if (currentFlowStep.lastIndexOf("_") > 0) {
 							currentFlowStep = currentFlowStep.substring(0, currentFlowStep.lastIndexOf("_"))
 							responseKey = chatflowConfig[currentFlowStep].messageKey
+							menuIntentKnown = true
 							// TODO : Don't call function inside each if/else if it should be called once. 
 							//log for known - flag set
 							telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
 						}
 					} else {
 						responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig)
+						menuIntentKnown = false
 						// TODO : Don't call function inside each if/else if it should be called once.
 						//log for unknown - flag set
 						telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false)
 					}
 					redisSessionData['currentFlowStep'] = currentFlowStep;
-					// botresponse = currentFlowStep
-					// log method
+					consolidatedLog(userId, deviceId,message,responseKey,menuIntentKnown);
 					setRedisKeyValue(deviceId, redisSessionData);
 					telemetry.logInteraction(telemetryData)
 					sendChannelResponse(res, responseKey, channel);
@@ -136,6 +137,18 @@ function handler(req, res, channel) {
 			}
 		});
 	}
+}
+
+function consolidatedLog(userId, deviceId,message,responseKey,menuIntentKnown) {
+	var intent
+	if (menuIntentKnown) {
+		intent= "Menu_intent_detected"
+	}
+	else {
+		responseKey = "unknown_option"
+		intent = "Menu_intent_not_detected"
+	}
+	LOG.info("UserId: "+ userId+","+ " DeviceId: "+deviceId+","+ " UserQuery: "+ message+","+" Bot_Response_identifier: "+ intent+"," +" BotResponse: "+ responseKey)
 }
 
 function setRedisKeyValue(key, value) {
@@ -206,10 +219,8 @@ function sendChannelResponse(response, responseKey, channel, responseCode) {
 	
 	if (channelResponse) {
 		response.send(channelResponse)
-		LOG.info("BOT response: ", channelResponse)
 	} else {
 		response.send(literals.message[responseKey])
-		LOG.info("BOT response: ", literals.message[responseKey])
 	}
 }
 

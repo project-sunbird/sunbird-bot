@@ -2,15 +2,14 @@ var axios = require("axios")
 var APP_CONFIG = require('../../config/config')
 var LOG = require('../../log/logger')
 
-function processResponse(res, cb) {
+
+function processResponse(res,userId, clientId, message, cb) {
+  var botRes = 'unknown_option_freeFlow'
+  var knownIntent = ''
   if (res && res.data && res.data.length > 0) {
     let quick_replies = []
     let intent = ''
     let resp = res.data.map((item) => {
-      LOG.info('item@processResponse@botwebhook:')
-      LOG.info(JSON.stringify(item))
-      LOG.info("item-->",item)
-      LOG.info("item.text",item.text)
       if (item.text) {
         LOG.info('inside item.text')
         if (item.text.split('-----').length > 1) {
@@ -23,6 +22,7 @@ function processResponse(res, cb) {
           }
           quick_replies = item.buttons
         }
+        knownIntent = intent
         return {
           "text": item.text,
           "quick_replies": quick_replies,
@@ -52,7 +52,7 @@ function processResponse(res, cb) {
           if (item.custom.blocks[0] && item.custom.blocks[0].entities) {
             entities = item.custom.blocks[0].entities
           }
-          LOG.info("intent: ", intent)
+          knownIntent = intent
           return {
             "text": text,
             "quick_replies": quick_replies,
@@ -92,6 +92,7 @@ function processResponse(res, cb) {
           if (item.custom[0].entities) {
             entities = item.custom[0].entities
           }
+          knownIntent = intent
           return {
             "text": text,
             "quick_replies": quick_replies,
@@ -106,13 +107,16 @@ function processResponse(res, cb) {
         if (item.button) {
           quick_replies.push(item.button)
         }
+        knownIntent = intent
         return {
           "text": '',
           "quick_replies": (item.button ? [] : []),
           "intent": intent
         }
       }
+      
     })
+    consolidatedLog(userId, clientId, message, knownIntent)
     return cb(null, {
       res: resp
     })
@@ -124,6 +128,18 @@ function processResponse(res, cb) {
     }]
   })
 
+}
+
+function consolidatedLog(userId, clientId, message, knownIntent) {
+  var botResponseIdentifier
+  if(knownIntent == "low_confidence"){
+    knownIntent = "unknown_option_freeFlow"
+    botResponseIdentifier = "Free_flow_intent_ not_detected"
+  }
+  else {
+    botResponseIdentifier = "Free_flow_intent_detected"
+  }
+  LOG.info("UserId: "+ userId+","+ " DeviceId: "+clientId+","+ " UserQuery: "+ message+","+" Bot_Response_identifier: "+ botResponseIdentifier+"," +" BotResponse: "+ knownIntent)
 }
 
 
@@ -150,11 +166,11 @@ function getRasaEndpoint(type) {
   return APP_CONFIG.RASA_CORE_ENDPOINT;
 }
 
-exports.BOTWebHookAPI = function (data, clientId, cb) {
+exports.BOTWebHookAPI = function (data,userId, clientId, cb) {
   axios.create(getCustomHeaders(APP_CONFIG.RASA_API_TIMEOUT))
     .post(getRasaEndpoint(data.endpoint), getBody(data.text, clientId), getHeaders())
     .then(res => {
-      processResponse(res, (err, resp) => {
+      processResponse(res,userId, clientId, data.text, (err, resp) => {
         if (err) {
           LOG.error('error in call to bot')
           cb(err, null)
