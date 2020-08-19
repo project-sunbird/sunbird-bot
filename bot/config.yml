@@ -17,6 +17,7 @@ pipeline:
 # https://rasa.com/docs/rasa/core/policies/
 policies:
   - name: MemoizationPolicy
+  - name: FormPolicy
   - name: KerasPolicy
   - name: MappingPolicy
   - name: FallbackPolicy

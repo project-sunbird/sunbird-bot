@@ -6,6 +6,10 @@ five
 six
 seven
 eight
+nine
+ten
+eleven
+twelve
 first
 second
 third
@@ -14,6 +18,10 @@ fifth
 sixth
 seventh
 eighth
+ninth
+tenth
+eleventh
+twelveth
 1st
 2nd
 3rd
@@ -22,6 +30,10 @@ eighth
 6th
 7th
 8th
+9th
+10th
+11th
+12th
 1
 2
 3
@@ -30,3 +42,7 @@ eighth
 6
 7
 8
+9
+10
+11
+12

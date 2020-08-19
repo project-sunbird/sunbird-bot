@@ -126,13 +126,33 @@
 
 ## intent:content_suggestions
 - I want to learn [CBSE](board) content
+- I want to learn in [English](medium) medium
 - I'm a student from [Maharashtra](board) and want to learn from home
 - Do you have any content from [Karnataka](board) state board
-- Show me class [one](grade) content from [Tamil Nadu](board)
+- Show me class [one](grade) content from [TamilNadu](board)
 - Please show [second](grade) standard content
 - I want to do [maths](subject) revision
 - I want to learn [fourth](grade) standard [physics](subject)
-
+- I am a student of [karnataka](board) board and want to read [history](subject) books for [fifth](grade) standard
+- can you suggest [mathematics](subject) books for [ninth](grade) class [cbse](board) board
+- I want to learn [CBSE](board) board [second](grade) standard [physics](subject).
+- I want to learn [CBSE](board) board [third](grade)standard in [English](medium).
+- I am from [fourth](grade) standard
+- I am from [tenth](grade) grade
+- I want to learn [history](subject)
+- I am from [Marathi](medium) medium
+- I am in [third](grade) standard and I want to learn [maths](subject)
+- I want to learn [science](subject) of [bihar](board) board 
+- [kannada](medium)
+- [tenth](grade)
+- I am from [hindi](medium) medium
+- I am from [class 10](grade)
+- i want to learn [class 5](grade) syllabus
+- [class 5](grade)
+- [tenth](grade)
+- [karnataka](board)
+- [english](medium)
+  
 ## lookup:board
 data/boards.txt
 
@@ -144,4 +164,3 @@ data/subjects.txt
 
 ## lookup:medium
 data/mediums.txt
-  
