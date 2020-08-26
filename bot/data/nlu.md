@@ -148,7 +148,7 @@
 - I am from [hindi](medium) medium
 - I am from [class 10](grade)
 - i want to learn [class 5](grade) syllabus
-- [class 5](grade)
+- [Class 5](grade)
 - [tenth](grade)
 - [karnataka](board)
 - [english](medium)

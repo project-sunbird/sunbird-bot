@@ -28,8 +28,13 @@ const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
 appBot.post('/bot', function (req, res) {
 	handler(req, res, 'botclient')
 })
+// /whatsapp
+// method to handle req
+// function whatsapp_handler
+
 
 function handler(req, res, channel) {
+
 	var appId = req.body.appId + '.bot';
 	var message = req.body.Body;
 	var deviceId = req.body.From;

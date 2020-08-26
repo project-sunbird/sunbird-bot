@@ -13,6 +13,8 @@ from rasa_sdk.events import SlotSet
 import json
 import os.path
 import requests
+import datetime
+import time
 #
 #
 nlp = spacy.load('en_core_web_sm')
@@ -31,8 +33,6 @@ class ActionSubjectCourses(Action):
          elements = [{"type": "subject_courses", "entities": tracker.latest_message.get(
              'entities'), "intent": "subject_courses"}]
          dispatcher.utter_message(json_message=elements)
-         #dispatcher.utter_custom_message(*elements)
-         #dispatcher.utter_custom_json(elements)
          return []
 
 
@@ -51,13 +51,90 @@ class FallbackAction(Action):
           if token.pos_ == 'ADJ':
                adjs.append(token.text)
       if len(intent_ranking) > 0:
-            elements = [{"type": "low_confidence", "entities": nouns,
-                         "adj": adjs, "intent": "low_confidence"}]
-            dispatcher.utter_message(json_message=elements)
-      else:
+         # elements = [{
+         #   "blocks": [{
+         #          "intent": "low_confidence",
+         #          "text": "Sorry, I could not understand you. Please press 0 for menu.",
+         #          "type": "low_confidence"
+         #       }]
+         #   }]
          elements = [{"type": "low_confidence", "entities": nouns,
                       "adj": adjs, "intent": "low_confidence"}]
          dispatcher.utter_message(json_message=elements)
+      else:
+         # elements = [{
+         #    "blocks": [{
+         #       "intent": "low_confidence",
+         #       "text": "Sorry, I could not understand you. Please press 0 for menu.",
+         #       "type": "low_confidence"
+         #   }]
+         # }]
+         elements = [{"type": "low_confidence", "entities": nouns,
+                      "adj": adjs, "intent": "low_confidence"}]
+         dispatcher.utter_message(json_message=elements)
+
+
+class FrameworkApi:
+   channel_data = {}
+   framework_data = {}
+   channel_counter=0
+   framework_counter =0 
+   ttl = 7200000
+
+   def fetch_channel_data(self, board):
+      obj = {}
+      obj['time'] = int(round(time.time() * 1000))
+      # =call the framework api
+      # counter = 0
+      print("call the api-channel",self.channel_counter+1)
+      channel_res = requests.get(
+            "https://staging.ntp.net.in/api/channel/v1/read/0126632859575746566") 
+      print("channel_res",channel_res)
+      obj['payload'] = channel_res
+      print("obj-->",obj, type(obj))
+      self.channel_data[board] = obj
+      return self.channel_data[board]['payload']
+
+   def fetch_framework_data(self, board_identifier):
+      obj = {}
+      obj['time'] = int(round(time.time() * 1000))
+      # counter = 0
+      # =call the framework api
+      print("call the api-framework", self.framework_counter+1)
+      grade_mdium_url = "https://staging.ntp.net.in/api/framework/v1/read/" + \
+            board_identifier + "?categories=board,medium,gradeLevel,subject" 
+      framework_res = requests.get(grade_mdium_url)
+      print("framework_res-->",framework_res)
+      obj['payload'] = framework_res
+      print("obj-->",obj, type(obj))
+      self.framework_data[board_identifier] = obj
+      return self.framework_data[board_identifier]['payload']
+
+   def check_ttl_get_data(self, channel_data, board,framework_data,board_identifier):
+      if bool(board):
+         print("inside check_ttl_get_data board")
+         last_time = channel_data[board]['time']
+      else :
+         print("inside check_ttl_get_data else")
+         last_time = framework_data[board_identifier]['time']
+
+      # last_time = channel_data[board]['time']
+     
+      time_compare = last_time+self.ttl
+      current_time = int(round(time.time() * 1000))
+      if current_time < current_time:
+         if bool(board):
+            self.fetch_channel_data(board)
+         else:
+            self.fetch_framework_data(board_identifier)
+
+         #  self.fetch_channel_data(board)
+      if bool(board):
+         return self.channel_data[board]['payload']
+      else : 
+         return self.framework_data[board_identifier]['payload']
+
+      
 
 
 class ActionContentForm(FormAction):
@@ -69,11 +146,32 @@ class ActionContentForm(FormAction):
         return ["board", "medium", "grade"]
 
      def board_db(self, value):
+        global channel_response
+
+        a = FrameworkApi()
+        
+        print("a.channel_data-->",a.channel_data)
+
+        if not bool(a.channel_data):
+           channel_response = a.fetch_channel_data(value)
+           print("method1-->",channel_response)
+        else:
+           cached_boards = a.channel_data.keys()
+           print("cached_boards-->",cached_boards)
+           print("comparing value in cached_boards",value)
+           if value in cached_boards :
+              channel_response = a.check_ttl_get_data(a.channel_data,value,"","")
+              print("method2-->",channel_response)
+              
+           else:
+              channel_response = a.fetch_channel_data(value)
+              print("method1-->",channel_response)
+          
         print("inside board_db ", value)
         board_list = []
-        global channel_response
-        channel_response = requests.get(
-            "https://staging.ntp.net.in/api/channel/v1/read/0126632859575746566")
+        
+      #   channel_response = requests.get(
+      #       "https://staging.ntp.net.in/api/channel/v1/read/0126632859575746566")
 
         res_json = channel_response.json()
 
@@ -89,9 +187,35 @@ class ActionContentForm(FormAction):
         global grade_list
         grade_list = []
         global medium_grade_categories
-        grade_mdium_url = "https://staging.ntp.net.in/api/framework/v1/read/" + \
-            board_identifier + "?categories=board,medium,gradeLevel,subject"
-        grade_medium_api_response = requests.get(grade_mdium_url)
+    
+        global framework_response
+
+        a = FrameworkApi()
+        
+        print("a.channel_data-->",a.framework_data)
+
+        if not bool(a.framework_data):
+           grade_medium_api_response = a.fetch_framework_data(board_identifier)
+           print("method3-->",grade_medium_api_response)
+        else:
+           cached_mediums = a.framework_data.keys()
+           print("cached_mediums-->",cached_mediums)
+           print("comparing value in cached_mediums",board_identifier)
+           if board_identifier in cached_mediums :
+            #   
+              grade_medium_api_response = a.check_ttl_get_data("","",a.framework_data,board_identifier)
+              print("grade_medium_api_response method2-->",grade_medium_api_response)
+              
+           else:
+              grade_medium_api_response = a.fetch_framework_data(board_identifier)
+              print("grade_medium_api_response method1-->",grade_medium_api_response)  
+
+
+
+      #   grade_mdium_url = "https://staging.ntp.net.in/api/framework/v1/read/" + \
+      #       board_identifier + "?categories=board,medium,gradeLevel,subject"
+      #   grade_medium_api_response = fetch_framework_data(board_identifier)
+      #   grade_medium_api_response = requests.get(grade_mdium_url)
         res_framwork = grade_medium_api_response.json()
         medium_grade_categories = res_framwork['result']['framework']['categories']
 
@@ -132,13 +256,18 @@ class ActionContentForm(FormAction):
            board_identifier = api_matching_board
            return value
         else:
-           get_reafactored_board = []
-           get_reafactored_board = self.get_reafactored_board_mapped(
+           reafactored_board_list = []
+           reafactored_board_list = self.get_reafactored_board_mapped(
                board_list)
+           board_buttons = []
+           for board in reafactored_board_list:
+              board_buttons.append({"text": board, "value": board})
+           print("board_buttons-->", board_buttons)
            elements = [{
                "blocks": [{
                    "intent": "greet",
-                   "text": "Available boards are {board} : <br> ".format(board=get_reafactored_board),
+                   "text": "Available boards are : <br> ",
+                   "buttons": board_buttons,
                    "type": "response"
                }]
            }]
@@ -156,14 +285,20 @@ class ActionContentForm(FormAction):
         if (api_matching_medium in medium_list):
            return value
         else:
+           medium_buttons = []
+           for medium in medium_list:
+              medium_buttons.append({"text": medium, "value": medium})
+           print("medium_buttons-->", medium_buttons)
+
            elements = [{
                "blocks": [{
                    "intent": "greet",
-                   "text": "Available mediums for {board} board are : <br> {medium}".format(
-                       board=tracker.get_slot('board'), medium=medium_list),
+                   "text": "Available mediums for {board} board are : <br>".format(board=tracker.get_slot('board')),
+                   "buttons": medium_buttons,
                    "type": "response"
                }]
            }]
+
            dispatcher.utter_message(json_message=elements)
            return None
 
@@ -177,11 +312,16 @@ class ActionContentForm(FormAction):
         if (api_matching_grade in grades):
            return value
         else:
+           grade_buttons = []
+           for grade in grade_list:
+              grade_buttons.append({"text": grade, "value": grade})
+           print("grade_buttons-->", grade_buttons)
            elements = [{
                "blocks": [{
                    "intent": "greet",
-                   "text": "Available grades for {medium} medium in {board} board are : <br> {grades}".format(
-                       medium=tracker.get_slot('medium'), board=tracker.get_slot('board'), grades=grade_list),
+                   "text": "Available grades for {medium} medium in {board} board are : <br> ".format(
+                       medium=tracker.get_slot('medium'), board=tracker.get_slot('board')),
+                   "buttons": grade_buttons,
                    "type": "response"
                }]
            }]

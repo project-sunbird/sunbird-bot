@@ -3,7 +3,7 @@ var APP_CONFIG = require('../../config/config')
 var LOG = require('../../log/logger')
 
 
-function processResponse(res,userId, clientId, message, cb) {
+function processResponse(res, userId, clientId, message, cb) {
   var botRes = 'unknown_option_freeFlow'
   var knownIntent = ''
   if (res && res.data && res.data.length > 0) {
@@ -65,8 +65,8 @@ function processResponse(res,userId, clientId, message, cb) {
           console.log("inside else item.custom")
           quick_replies = item.custom
 
-          console.log("item.custom[0]-->",item.custom[0])
-          console.log("item.custom[0].blocks[0].text-->",item.custom[0].blocks[0].text)
+          console.log("item.custom[0]-->", item.custom[0])
+          console.log("item.custom[0].blocks[0].text-->", item.custom[0].blocks[0].text)
 
           text = item.text
           type = ''
@@ -76,10 +76,21 @@ function processResponse(res,userId, clientId, message, cb) {
           }
           if (item.custom[0].blocks[0] && item.custom[0].blocks[0].text) {
             console.log("inside item.custom[0].blocks[0]")
+            buttons = item.custom[0].blocks[0].buttons? item.custom[0].blocks[0].buttons : ''
             text = {
               "data": {
-                "text": item.custom[0].blocks[0].text
+                "text": item.custom[0].blocks[0].text,
+                "buttons": item.custom[0].blocks[0].buttons
               }
+            }
+            if (item.custom[0].blocks[0].buttons) {
+              console.log("item.custom.blocks[0].buttons-->", item.custom[0].blocks[0].buttons)
+              // text = {
+              //   "data": {
+              //     "text": item.custom[0].blocks[0].text,
+              //     "buttons": item.custom[0].blocks[0].buttons
+              //   }
+              // }
             }
           }
 
@@ -98,7 +109,8 @@ function processResponse(res,userId, clientId, message, cb) {
             "quick_replies": quick_replies,
             "intent": intent,
             "type": type,
-            "entities": entities
+            "entities": entities,
+            // "buttons": buttons
           }
 
         }
@@ -114,7 +126,7 @@ function processResponse(res,userId, clientId, message, cb) {
           "intent": intent
         }
       }
-      
+
     })
     consolidatedLog(userId, clientId, message, knownIntent)
     return cb(null, {
@@ -132,14 +144,14 @@ function processResponse(res,userId, clientId, message, cb) {
 
 function consolidatedLog(userId, clientId, message, knownIntent) {
   var botResponseIdentifier
-  if(knownIntent == "low_confidence"){
+  if (knownIntent == "low_confidence") {
     knownIntent = "unknown_option_freeFlow"
     botResponseIdentifier = "Free_flow_intent_ not_detected"
   }
   else {
     botResponseIdentifier = "Free_flow_intent_detected"
   }
-  LOG.info("UserId: "+ userId+","+ " DeviceId: "+clientId+","+ " UserQuery: "+ message+","+" Bot_Response_identifier: "+ botResponseIdentifier+"," +" BotResponse: "+ knownIntent)
+  LOG.info("UserId: " + userId + "," + " DeviceId: " + clientId + "," + " UserQuery: " + message + "," + " Bot_Response_identifier: " + botResponseIdentifier + "," + " BotResponse: " + knownIntent)
 }
 
 
@@ -166,11 +178,11 @@ function getRasaEndpoint(type) {
   return APP_CONFIG.RASA_CORE_ENDPOINT;
 }
 
-exports.BOTWebHookAPI = function (data,userId, clientId, cb) {
+exports.BOTWebHookAPI = function (data, userId, clientId, cb) {
   axios.create(getCustomHeaders(APP_CONFIG.RASA_API_TIMEOUT))
     .post(getRasaEndpoint(data.endpoint), getBody(data.text, clientId), getHeaders())
     .then(res => {
-      processResponse(res,userId, clientId, data.text, (err, resp) => {
+      processResponse(res, userId, clientId, data.text, (err, resp) => {
         if (err) {
           LOG.error('error in call to bot')
           cb(err, null)
