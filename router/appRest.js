@@ -29,6 +29,77 @@ appBot.post('/bot', function (req, res) {
 	handler(req, res, 'botclient')
 })
 
+appBot.post('/bot', function (req, res) {
+	handler(req, res, 'botclient')
+})
+
+appBot.post('/whatsapp', function (req, res) {
+	LOG.info(req.body)
+	console.log("message in request-->", req.body.message)
+	//        LOG.info(req.body.message.incoming_message)
+	LOG.info("incoming message-->", req.body.message.incoming_message[0])
+	//        LOG.info(req.body.message)
+
+	data = {
+		message: message,
+		customData: {
+			userId: userId,
+			deviceId: deviceId,
+			appId: appId,
+			sessionId: '',
+			channelId: channelId,
+			uaspec: uaspec
+		}
+	}
+
+
+	var options = {
+		method: 'POST',
+		url: 'https://waapi.pepipost.com/api/v2/message/',
+		headers:
+		{
+			authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuZXRjb3Jlc2FsZXNleHAiLCJleHAiOjI0MjUxMDI1MjZ9.ljC4Tvgz031i6DsKr2ILgCJsc9C_hxdo2Kw8iZp9tsVcCaKbIOXaFoXmpU7Yo7ob4P6fBtNtdNBQv_NSMq_Q8w',
+			'content-type': 'application/json'
+		},
+		body:
+		{
+			message:
+				[{
+					recipient_whatsapp: req.body.message.incoming_message[0].from,
+					message_type: 'text',
+					recipient_type: 'individual',
+					source: '461089f9-1000-4211-b182-c7f0291f3d45',
+					'x-apiheader': 'custom_data',
+					type_text: [{ preview_url: 'false', content: 'hello ' + req.body.message.incoming_message[0].from + '. message received :>' + req.body.message.incoming_message[0].text_type.text }]
+				}]
+		},
+		json: true
+	};
+
+	request(options, function (error, response, body) {
+		if (error) throw new Error(error);
+
+		console.log(body);
+	});
+})
+function whatsappHandler(req, res, channel) {
+	// var appId = req.body.appId + '.bot';
+	var message = req.body.message.incoming_message[0];
+	var deviceId = req.body.message.incoming_message[0].from;
+	// var channelId = req.body.channel;
+	var userId = req.body.message.incoming_message[0].from;
+	// var uaspec = getUserSpec(req);
+	var menuIntentKnown = false
+	const chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context] : chatflow.chatflow : chatflow.chatflow;
+	var redisSessionData = {};
+	data = {
+		message: message,
+		customData: {
+			userId: userId,
+			deviceId: deviceId,
+		}
+	}
+}
 function handler(req, res, channel) {
 	var appId = req.body.appId + '.bot';
 	var message = req.body.Body;
@@ -115,7 +186,7 @@ function handler(req, res, channel) {
 						telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false)
 					}
 					redisSessionData['currentFlowStep'] = currentFlowStep;
-					consolidatedLog(userId, deviceId,message,responseKey,menuIntentKnown);
+					consolidatedLog(userId, deviceId, message, responseKey, menuIntentKnown);
 					setRedisKeyValue(deviceId, redisSessionData);
 					telemetry.logInteraction(telemetryData)
 					sendChannelResponse(res, responseKey, channel);
@@ -135,16 +206,16 @@ function handler(req, res, channel) {
 	}
 }
 
-function consolidatedLog(userId, deviceId,message,responseKey,menuIntentKnown) {
+function consolidatedLog(userId, deviceId, message, responseKey, menuIntentKnown) {
 	var intent
 	if (menuIntentKnown) {
-		intent= "Menu_intent_detected"
+		intent = "Menu_intent_detected"
 	}
 	else {
 		responseKey = "unknown_option"
 		intent = "Menu_intent_not_detected"
 	}
-	LOG.info("UserId: "+ userId+","+ " DeviceId: "+deviceId+","+ " UserQuery: "+ message+","+" Bot_Response_identifier: "+ intent+"," +" BotResponse: "+ responseKey)
+	LOG.info("UserId: " + userId + "," + " DeviceId: " + deviceId + "," + " UserQuery: " + message + "," + " Bot_Response_identifier: " + intent + "," + " BotResponse: " + responseKey)
 }
 
 function setRedisKeyValue(key, value) {
@@ -212,7 +283,7 @@ function sendChannelResponse(response, responseKey, channel, responseCode) {
 
 	//version check
 	var channelResponse = literals.message[responseKey + '_' + channel];
-	
+
 	if (channelResponse) {
 		response.send(channelResponse)
 	} else {
