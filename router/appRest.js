@@ -121,6 +121,9 @@ function handler(req, res, channel) {
 			uaspec: uaspec
 		}
 	}
+	console.log("data-->",data)
+	console.log("chatflowConfig-->",chatflowConfig)
+
 	if (!deviceId) {
 		sendResponse(deviceId, res, "From attribute missing", 400);
 	} else {
