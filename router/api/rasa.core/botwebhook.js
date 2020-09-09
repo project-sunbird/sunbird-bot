@@ -3,7 +3,7 @@ var APP_CONFIG = require('../../config/config')
 var LOG = require('../../log/logger')
 
 
-function processResponse(res,userId, clientId, message, cb) {
+function processResponse(res,userId, clientId, message,channel, cb) {
   var botRes = 'unknown_option_freeFlow'
   var knownIntent = ''
   if (res && res.data && res.data.length > 0) {
@@ -37,11 +37,22 @@ function processResponse(res,userId, clientId, message, cb) {
             intent = item.custom.blocks[0].intent
           }
           if (item.custom.blocks[0] && item.custom.blocks[0].text) {
-            text = {
-              "data": {
-                "text": item.custom.blocks[0].text
+            if(channel == 'whatsapp') {
+              console.log('inside botwebhook whatsapp -->',item.custom.blocks[0].text_whatsapp)
+              text = {
+                "data": {
+                  "text": item.custom.blocks[0].text_whatsapp
+                }
               }
+            } else {
+              text = {
+                "data": {
+                  "text": item.custom.blocks[0].text
+                }
+              }
+
             }
+            
           }
           if (item.custom.blocks[0] && item.custom.blocks[0].type) {
             type = item.custom.blocks[0].type
@@ -148,11 +159,11 @@ function getRasaEndpoint(type) {
   return APP_CONFIG.RASA_CORE_ENDPOINT;
 }
 
-exports.BOTWebHookAPI = function (data,userId, clientId, cb) {
+exports.BOTWebHookAPI = function (data,userId, clientId, channel, cb) {
   axios.create(getCustomHeaders(APP_CONFIG.RASA_API_TIMEOUT))
     .post(getRasaEndpoint(data.endpoint), getBody(data.text, clientId), getHeaders())
-    .then(res => {
-      processResponse(res,userId, clientId, data.text, (err, resp) => {
+    .then(res => { 
+      processResponse(res,userId, clientId, data.text,channel, (err, resp) => {
         if (err) {
           LOG.error('error in call to bot')
           cb(err, null)

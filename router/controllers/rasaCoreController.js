@@ -14,7 +14,7 @@ function processUserData(data,userId, clientId, cb) {
                 text: data["message"],
                 endpoint: data["endpoint"]
         }
-        API.BOTWebHookAPI(webHookData,userId, clientId, (err, res) => {
+        API.BOTWebHookAPI(webHookData,userId, clientId, data.customData.channelId , (err, res) => {
                 if (err) {
                         LOG.error(`BOTWebHookAPI failed: ${err}`)
                         return cb(err, null)
