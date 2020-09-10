@@ -137,7 +137,7 @@ function handler(req, res, channel) {
 }
 
 function freeFlowLogic (data, res, channel, chatflowConfig) {
-	RasaCoreController.processUserData(data, data.customData.userId, data.customData.deviceId, (err, resp) => {
+	RasaCoreController.processUserData(data, data.customData.userId, data.customData.deviceId, channel, (err, resp) => {
 		var response = '';
 		if (err) {
 
