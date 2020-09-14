@@ -22,6 +22,7 @@ appBot.use(cors());
 appBot.use(bodyParser.json());
 appBot.use(bodyParser.urlencoded({ extended: false }))
 var request = require("request");
+var crypto = require('crypto');
 const { data } = require('./log/logger');
 
 
@@ -30,31 +31,39 @@ const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
-	handler(req, res, 'botclient')
+	var userId = req.body.userId ? req.body.userId : deviceId;
+	handler(req, res, userId, 'botclient')
 })
 
 
 console.log("time vefore calling /whatsapp", new Date().getTime())
 appBot.post('/whatsapp', function (req, res) {
 	console.log("time inside /whatsapp", new Date().getTime())
-	handler(req, res, 'whatsapp')
+	LOG.info(req.body)
+	LOG.info("incoming message-->", req.body.incoming_message[0])
+	var userId = req.body.incoming_message[0].from;
+	handler(req, res, userId, 'whatsapp')
 })
 
 
 function setData(req, res, channel) {
 	if (channel == 'whatsapp') {
+		var appId = 'diksha.whatsapp'
 		var message = req.body.incoming_message[0].text_type.text;
-		var deviceId = req.body.incoming_message[0].from;
+		//              var deviceId = req.body.incoming_message[0].from;
 		var channelId = channel;
 		var userId = req.body.incoming_message[0].from;
-
+		//              var userId = crypto.createHash('md5').update(req.body.incoming_message[0].from).digest("hex");
+		var deviceId = userId
 		var uaspec = getUserSpec(req);
 		return {
 			message: message,
 			customData: {
-				userId: userId,
-				deviceId: deviceId,
+				userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+				deviceId: crypto.createHash('sha256').update(deviceId).digest("hex"),
 				channelId: channelId,
+				sessionId: '',
+				appId: appId,
 				uaspec: uaspec
 			}
 		}
@@ -66,6 +75,7 @@ function setData(req, res, channel) {
 		var userId = req.body.userId ? req.body.userId : deviceId;
 		var uaspec = getUserSpec(req);
 
+		console.log("appId -->",appId)
 		return {
 			message: message,
 			customData: {
@@ -81,13 +91,14 @@ function setData(req, res, channel) {
 	}
 }
 
-function handler(req, res, channel) {
+function handler(req, res, userId, channel) {
 
 
 	var chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context] : chatflow.chatflow : chatflow.chatflow;
 	redisSessionData = {};
 
 	const data = setData(req, res, channel)
+	console.log("setdata -->", data)
 
 
 
@@ -95,126 +106,165 @@ function handler(req, res, channel) {
 		sendResponse(data.customData.deviceId, res, "From attribute missing", 400);
 	} else {
 		redisClient.get(REDIS_KEY_PREFIX + data.customData.deviceId, (err, redisValue) => {
+			console.log("redisValue -->", redisValue)
+
 			if (redisValue != null) {
+
 				// Key is already exist and hence assiging data which is already there at the posted key
 				redisSessionData = JSON.parse(redisValue);
 				data.customData.sessionId = redisSessionData.sessionID;
 				var telemetryData = {};
 				// all non numeric user messages go to bot
+				console.log("type of message-->" + typeof (data.message) + " message-->" + data.message)
+				console.log("channel in bot -->", channel)
 				if (isNaN(data.message)) {
 					///Bot interaction flow
-					freeFlowLogic (data, res, channel, chatflowConfig)
-					
+					freeFlowLogic(data, res, channel, chatflowConfig, userId)
+
 				} else {
-					menuDrivenLogic(data, res, channel, chatflowConfig )
+					menuDrivenLogic(data, res, channel, chatflowConfig, userId)
 				}
 			} else {
 
 				// Implies new user. Adding data in redis for the key and also sending the WELCOME message
-				
-					var uuID = UUIDV4();
-					userData = { sessionID: uuID, currentFlowStep: 'step1' };
-					setRedisKeyValue(data.customData.deviceId, userData);
-					data.customData.sessionId = uuID;
-					telemetry.logSessionStart(data.customData);
+
+				var uuID = UUIDV4();
+				userData = { sessionID: uuID, currentFlowStep: 'step1' };
+				setRedisKeyValue(data.customData.deviceId, userData);
+				data.customData.sessionId = uuID;
+				telemetry.logSessionStart(data.customData);
 				if (channel == "botclient") {
 					telemetryData = createInteractionData({ currentStep: 'step1', responseKey: chatflowConfig['step1']['messageKey'] }, data.customData, false)
 					telemetry.logInteraction(telemetryData)
-					sendChannelResponse(res, chatflowConfig['step1']['messageKey'], channel, data.customData.userId);
+					sendChannelResponse(res, chatflowConfig['step1']['messageKey'], channel, userId);
 
 				} else {
 					if (isNaN(data.message)) {
 						///Bot interaction flow
-						freeFlowLogic (data, res, channel)
-						
+						freeFlowLogic(data, res, channel, chatflowConfig, userId)
+
 					} else {
-						menuDrivenLogic(data, res, channel, chatflowConfig )
+						menuDrivenLogic(data, res, channel, chatflowConfig, userId)
 					}
+
 				}
 			}
 		});
 	}
 }
 
-function freeFlowLogic (data, res, channel, chatflowConfig) {
+function freeFlowLogic(data, res, channel, chatflowConfig, userId) {
 	RasaCoreController.processUserData(data, data.customData.userId, data.customData.deviceId, channel, (err, resp) => {
 		var response = '';
 		if (err) {
 
-			sendChannelResponse(data.customData.deviceId, res, channel, data.customData.userId, 'SORRY')
+			sendChannelResponse(data.customData.deviceId, res, channel, userId, 'SORRY')
 		} else {
 			var responses = resp.res;
-			if (responses && responses[0].text) {
+			console.log("responses in freeFlowLogic-->", responses)
+			if (responses && responses[0].text && responses[0].text != '') {
+				console.log("inside if")
 				response = responses[0].text;
+				console.log("response -->", response)
 				telemetryData = createInteractionData(responses[0], data.customData, true);
 			} else {
-				responseKey = getErrorMessageForInvalidInput(responses[0], chatflowConfig);
-				response = literals.message[responseKey];
+				console.log("inside else")
+				responseKey = getErrorMessageForInvalidInput(responses[0], chatflowConfig, channel, false);
+				//                              errorResponse = literals.message[responseKey+"_whatsapp"];
+				if (channel == 'whatsapp') {
+					errorResponse = literals.message[responseKey + "_whatsapp"];
+					response = {
+						"data":
+							{ "text": errorResponse }
+					}
+					console.log("errorMessage -->", response)
+				} else {
+					console.log("responseKey-->",responseKey)
+					response = literals.message[responseKey];
+					console.log("response for bot-->",response)
+				}
+				consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, '');
 				telemetryData = createInteractionData(responses[0], data.customData, true)
 			}
 			telemetry.logInteraction(telemetryData);
+			console.log("channel before comparing-->", channel)
 			if (channel == 'whatsapp') {
-				sendResponseWhatsapp(response, data.customData.userId, "freeFlow")
+				console.log("channel is whatsapp")
+				console.log("userId -->", userId)
+				sendResponseWhatsapp(response, userId, "freeFlow")
 			} else {
 				sendResponse(res, response)
 			}
 
 		}
 	});
-	
+
 }
 
-function menuDrivenLogic (data, res, channel, chatflowConfig){
+function menuDrivenLogic(data, res, channel, chatflowConfig, userId) {
 	var menuIntentKnown = false
 	var currentFlowStep = redisSessionData.currentFlowStep;
-					var possibleFlow = currentFlowStep + '_' + data.message;
-					var responseKey = ''
-					if (chatflowConfig[possibleFlow]) {
-						var respVarName = chatflowConfig[currentFlowStep].responseVariable;
-						if (respVarName) {
-							redisSessionData[respVarName] = data.message;
-						}
-						currentFlowStep = possibleFlow;
-						responseKey = chatflowConfig[currentFlowStep].messageKey
-						// TODO : Don't call function inside each if/else if it should be called once.
-						menuIntentKnown = true
-						telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
-					} else if (data.message === '0') {
-						currentFlowStep = 'step1'
-						responseKey = chatflowConfig[currentFlowStep].messageKey
-						menuIntentKnown = true
-						// TODO : Don't call function inside each if/else if it should be called once.
-						telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
-					} else if (data.message === '99') {
-						if (currentFlowStep.lastIndexOf("_") > 0) {
-							currentFlowStep = currentFlowStep.substring(0, currentFlowStep.lastIndexOf("_"))
-							responseKey = chatflowConfig[currentFlowStep].messageKey
-							menuIntentKnown = true
-							// TODO : Don't call function inside each if/else if it should be called once. 
-							telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
-						}
-					} else {
-						responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig)
-						menuIntentKnown = false
-						// TODO : Don't call function inside each if/else if it should be called once.
-						telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false)
-					}
-					redisSessionData['currentFlowStep'] = currentFlowStep;
-					consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, menuIntentKnown);
-					setRedisKeyValue(data.customData.deviceId, redisSessionData);
-					telemetry.logInteraction(telemetryData)
-					sendChannelResponse(res, responseKey, channel, data.customData.userId);
-	
+	var possibleFlow = currentFlowStep + '_' + data.message;
+	var responseKey = ''
+	if (chatflowConfig[possibleFlow]) {
+		console.log("possibleFlow-->", possibleFlow)
+		var respVarName = chatflowConfig[currentFlowStep].responseVariable;
+		console.log("respVarName-->", respVarName)
+		if (respVarName) {
+			redisSessionData[respVarName] = data.message;
+		}
+		currentFlowStep = possibleFlow;
+		responseKey = chatflowConfig[currentFlowStep].messageKey
+		console.log("responseKey-->", responseKey)
+		// TODO : Don't call function inside each if/else if it should be called once.
+		menuIntentKnown = true
+		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
+	} else if (data.message === '0') {
+		currentFlowStep = 'step1'
+		responseKey = chatflowConfig[currentFlowStep].messageKey
+		menuIntentKnown = true
+		// TODO : Don't call function inside each if/else if it should be called once.
+		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
+	} else if (data.message === '99') {
+		if (currentFlowStep.lastIndexOf("_") > 0) {
+			currentFlowStep = currentFlowStep.substring(0, currentFlowStep.lastIndexOf("_"))
+			responseKey = chatflowConfig[currentFlowStep].messageKey
+			menuIntentKnown = true
+			// TODO : Don't call function inside each if/else if it should be called once. 
+			telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
+		}
+	} else {
+		responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, channel, true)
+		menuIntentKnown = false
+		// TODO : Don't call function inside each if/else if it should be called once.
+		telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false)
+	}
+	redisSessionData['currentFlowStep'] = currentFlowStep;
+	console.log("redisSessionData-->", redisSessionData)
+	consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, menuIntentKnown);
+	setRedisKeyValue(data.customData.deviceId, redisSessionData);
+	telemetry.logInteraction(telemetryData)
+	sendChannelResponse(res, responseKey, channel, userId);
+
 }
 
-function consolidatedLog(userId, deviceId, message, responseKey, menuIntentKnown) {
+function consolidatedLog(userId, deviceId, message, responseKey, channel, menuIntentKnown) {
 	var intent
 	if (menuIntentKnown) {
-		intent = "Menu_intent_detected"
+		if (channel == 'whatsapp') {
+			intent = "whtsapp_Menu_intent_detected"
+		} else {
+			intent = "Menu_intent_detected"
+		}
 	}
 	else {
 		responseKey = "unknown_option"
-		intent = "Menu_intent_not_detected"
+		if (channel == 'whatsapp') {
+			intent = "whtsapp_Free_flow__intent_not_detected"
+		} else {
+			intent = "Free_flow__intent_not_detected"
+		}
+
 	}
 	LOG.info("UserId: " + userId + "," + " DeviceId: " + deviceId + "," + " UserQuery: " + message + "," + " Bot_Response_identifier: " + intent + "," + " BotResponse: " + responseKey)
 }
@@ -228,10 +278,16 @@ function delRedisKey(key) {
 	redisClient.del(key);
 }
 
-function getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig) {
-	if (chatflowConfig[currentFlowStep + '_error']) {
+function getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, channel, isNumeric) {
+	console.log("inside getErrorMessageForInvalidInput")
+	//      if (chatflowConfig[currentFlowStep + '_error']) {
+	if (isNumeric) {
+		console.log("inside if chatflowConfig")
+		console.log("currentFlowStep -->",currentFlowStep)
 		return chatflowConfig[currentFlowStep + '_error'].messageKey;
 	} else {
+		//              return chatflowConfig['step1_wrong_input'].messageKey
+		console.log("else getErrorMessageForInvalidInput")
 		return chatflowConfig['step1_wrong_input'].messageKey
 	}
 }
@@ -281,7 +337,13 @@ function sendResponse(response, responseBody, responseCode) {
 //send data to user
 function sendResponseWhatsapp(responseBody, recipient, textContent) {
 	console.log("inside sendResponseWhatsapp")
+	// response.set('Content-Type', 'text/plain')
+	// if (responseCode) response.status(responseCode)
+	// response.send(responseBody)
 	var rsponseText = ''
+	console.log("calling whatsapp API")
+	console.log("responseBody-->", responseBody)
+	// console.log("responseBody.data.text-->", responseBody.data.text)
 	if (textContent == "freeFlow") {
 		rsponseText = responseBody.data.text
 	} else {
@@ -310,6 +372,8 @@ function sendResponseWhatsapp(responseBody, recipient, textContent) {
 		},
 		json: true
 	};
+	console.log("respose body-->", options.body)
+	console.log("time after api call-->",)
 	request(options, function (error, response, body) {
 		if (error) throw new Error(error);
 
@@ -318,18 +382,22 @@ function sendResponseWhatsapp(responseBody, recipient, textContent) {
 	});
 
 }
+// sendChannelResponse(deviceId, res, 'SORRY', channel, userId)
 
 function sendChannelResponse(response, responseKey, channel, userId, responseCode) {
 	response.set('Content-Type', 'application/json')
 	if (responseCode) response.status(responseCode)
 
 	//version check
+	console.log("responseKey + '_' + channel-->", responseKey + '_' + channel)
 	var channelResponse = literals.message[responseKey + '_' + channel];
+	console.log("channelResponse in sendChannelResponse -->", channelResponse)
 
 	if (channelResponse) {
 		sendResponseWhatsapp(channelResponse, userId, "menu driven")
 		response.send(channelResponse)
 	} else {
+		console.log("literals.message[responseKey]-->", literals.message[responseKey])
 		response.send(literals.message[responseKey])
 	}
 }
@@ -369,3 +437,10 @@ function getUserSpec(req) {
 		'raw': ua['ua']
 	}
 }
+
+
+
+
+
+
+
