@@ -11,7 +11,6 @@ function processResponse(res,userId, clientId, message, channel, cb) {
     let intent = ''
     let resp = res.data.map((item) => {
       if (item.text) {
-        console.log("inside item.custom")
         if (item.text.split('-----').length > 1) {
           intent = item.text.split('-----')[1]
           item.text = item.text.split('-----')[0]
@@ -29,7 +28,6 @@ function processResponse(res,userId, clientId, message, channel, cb) {
           "intent": intent
         }
       } else if (item.custom) {
-        console.log("inside item.custom")
         if (item.custom.blocks) {
           quick_replies = item.custom
           text = item.text
@@ -40,7 +38,6 @@ function processResponse(res,userId, clientId, message, channel, cb) {
           }
           if (item.custom.blocks[0] && item.custom.blocks[0].text) {
             if(channel == 'whatsapp') {
-              console.log('inside botwebhook whatsapp -->',item.custom.blocks[0].text_whatsapp)
               text = {
                 "data": {
                   "text": item.custom.blocks[0].text_whatsapp
@@ -72,8 +69,6 @@ function processResponse(res,userId, clientId, message, channel, cb) {
           }
         }
         else {
-          console.log("inside else")
-          console.log("item.text -->", item)
           quick_replies = item.custom
           text = item.text
           type = ''
@@ -91,7 +86,6 @@ function processResponse(res,userId, clientId, message, channel, cb) {
             entities = item.custom[0].entities
           }
           knownIntent = intent
-          console.log("text before return-->",text)
           return {
             "text": text,
             "quick_replies": quick_replies,
@@ -140,7 +134,12 @@ function consolidatedLog(userId, clientId, message, knownIntent, channel) {
 		}	
   }
   else {
-    botResponseIdentifier = "whatsapp_Free_flow_intent_detected"
+    if (channel == 'whatsapp') {
+      botResponseIdentifier = "whatsapp_Free_flow_intent_detected"
+		} else {
+      botResponseIdentifier = "Free_flow_intent_detected"
+		}	
+    
   }
   LOG.info("UserId: "+ userId+","+ " DeviceId: "+clientId+","+ " UserQuery: "+ message+","+" Bot_Response_identifier: "+ botResponseIdentifier+"," +" BotResponse: "+ knownIntent)
 }
@@ -174,7 +173,6 @@ exports.BOTWebHookAPI = function (data,userId, clientId, channel, cb) {
     .post(getRasaEndpoint(data.endpoint), getBody(data.text, clientId), getHeaders())
     .then(res => { 
       processResponse(res,userId, clientId, data.text,channel, (err, resp) => {
-        console.log("resp-->",resp)
         if (err) {
           LOG.error('error in call to bot')
           cb(err, null)

@@ -12,11 +12,12 @@ module.exports = {
   logSessionStart: function (sessionData) {
     var channelId = sessionData.channelId
     var appId = sessionData.appId
+    var env = sessionData.env
     const edata = telemetry.startEventData('botsession')
     edata.uaspec = sessionData.uaspec;
     // var pdata = { id: appId, ver: config.TELEMETRY_DATA_VERSION, pid: 'dikshavani.botclient' };
     var pdata = {id: appId, ver:this.ver, pid:this.pid}
-    const context = telemetry.getContextData({ channel: channelId, env: appId, pdata: pdata})
+    const context = telemetry.getContextData({ channel: channelId, env: env, pdata: pdata})
     context.sid = sessionData.sessionId
     context.did = sessionData.deviceId
     context.rollup = telemetry.getRollUpData([])
@@ -38,11 +39,13 @@ module.exports = {
    */
   logInteraction: function (data) {
     try {
+      console.log("inside try-->")
       var channelId = data.requestData.channelId
       var appId = data.requestData.appId
+      var env = data.requestData.env
       // var pdata = { id: appId, ver: config.TELEMETRY_DATA_VERSION, pid: 'dikshavani.botclient' };
       var pdata = {id: appId, ver: this.ver, pid: this.pid}
-      const context = telemetry.getContextData({ channel: channelId, env: appId, pdata: pdata})
+      const context = telemetry.getContextData({ channel: channelId, env: env, pdata: pdata})
       context.sid = data.requestData.sessionId;
       context.did = data.requestData.deviceId;
       context.rollup = telemetry.getRollUpData([])

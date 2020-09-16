@@ -19,6 +19,12 @@ config.API_AUTH_TOKEN              = env.sunbird_api_auth_token || ''
 config.TELEMETRY_SERVICE_URL       = env.telemetry_service_url || ''
 config.TELEMETRY_DATA_VERSION      = env.telemetry_version || '1.1'
 config.TELEMETRY_DATA_PID          = env.telemetry_pid || 'dikshavani.botclient'
+config.TELEMETRY_DATA_PID_WHATSAPP = env.telemetry_pid || 'whatsapp'
+config.TELEMETRY_DATA_ENV_WHATSAPP = env.telemetry_pid || 'diksha.whatsapp'
+config.TELEMETRY_DATA_CHANNELID_WHATSAPP = 'ORG.CHANNELID'
+
+config.TELEMETRY_ENDPOINT          = env.telemetry_endpoint || 'v1/telemetry'
+config.TELEMETRY_SERVICE_URL       = env.telemetry_service_url || 'http://localhost:8000/'   //use the router port here
 
 config.REDIS_PORT					 = 6379
 config.REDIS_HOST					 = env.REDIS_HOST || 'localhost'

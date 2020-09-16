@@ -36,24 +36,26 @@ appBot.post('/bot', function (req, res) {
 })
 
 
-console.log("time vefore calling /whatsapp", new Date().getTime())
+console.log("time before calling /whatsapp", new Date().getTime())
 appBot.post('/whatsapp', function (req, res) {
-	console.log("time inside /whatsapp", new Date().getTime())
-	LOG.info(req.body)
-	LOG.info("incoming message-->", req.body.incoming_message[0])
 	var userId = req.body.incoming_message[0].from;
 	handler(req, res, userId, 'whatsapp')
 })
 
+appBot.post("/v1/telemetry", (req, res, next) => {
+	console.log("inside telemetry")
+    console.log("Logging telemetry event");
+    console.log(JSON.stringify(req.body));
+    res.status(200).send('hello');
+});
 
 function setData(req, res, channel) {
 	if (channel == 'whatsapp') {
-		var appId = 'diksha.whatsapp'
+		var appId = config.TELEMETRY_DATA_PID_WHATSAPP 
+		var env = config.TELEMETRY_DATA_ENV_WHATSAPP
 		var message = req.body.incoming_message[0].text_type.text;
-		//              var deviceId = req.body.incoming_message[0].from;
-		var channelId = channel;
+		var channelId = config.TELEMETRY_DATA_CHANNELID_WHATSAPP;
 		var userId = req.body.incoming_message[0].from;
-		//              var userId = crypto.createHash('md5').update(req.body.incoming_message[0].from).digest("hex");
 		var deviceId = userId
 		var uaspec = getUserSpec(req);
 		return {
@@ -61,6 +63,8 @@ function setData(req, res, channel) {
 			customData: {
 				userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
 				deviceId: crypto.createHash('sha256').update(deviceId).digest("hex"),
+				appId: appId,
+				env: env,
 				channelId: channelId,
 				sessionId: '',
 				appId: appId,
@@ -82,6 +86,7 @@ function setData(req, res, channel) {
 				userId: userId,
 				deviceId: deviceId,
 				appId: appId,
+				env: appId,
 				sessionId: '',
 				channelId: channelId,
 				uaspec: uaspec
@@ -98,7 +103,6 @@ function handler(req, res, userId, channel) {
 	redisSessionData = {};
 
 	const data = setData(req, res, channel)
-	console.log("setdata -->", data)
 
 
 
@@ -106,7 +110,6 @@ function handler(req, res, userId, channel) {
 		sendResponse(data.customData.deviceId, res, "From attribute missing", 400);
 	} else {
 		redisClient.get(REDIS_KEY_PREFIX + data.customData.deviceId, (err, redisValue) => {
-			console.log("redisValue -->", redisValue)
 
 			if (redisValue != null) {
 
@@ -115,8 +118,6 @@ function handler(req, res, userId, channel) {
 				data.customData.sessionId = redisSessionData.sessionID;
 				var telemetryData = {};
 				// all non numeric user messages go to bot
-				console.log("type of message-->" + typeof (data.message) + " message-->" + data.message)
-				console.log("channel in bot -->", channel)
 				if (isNaN(data.message)) {
 					///Bot interaction flow
 					freeFlowLogic(data, res, channel, chatflowConfig, userId)
@@ -134,7 +135,7 @@ function handler(req, res, userId, channel) {
 				data.customData.sessionId = uuID;
 				telemetry.logSessionStart(data.customData);
 				if (channel == "botclient") {
-					telemetryData = createInteractionData({ currentStep: 'step1', responseKey: chatflowConfig['step1']['messageKey'] }, data.customData, false)
+					telemetryData = createInteractionData({ currentStep: 'step1', responseKey: chatflowConfig['step1']['messageKey'] }, data.customData, false, channel)
 					telemetry.logInteraction(telemetryData)
 					sendChannelResponse(res, chatflowConfig['step1']['messageKey'], channel, userId);
 
@@ -161,36 +162,25 @@ function freeFlowLogic(data, res, channel, chatflowConfig, userId) {
 			sendChannelResponse(data.customData.deviceId, res, channel, userId, 'SORRY')
 		} else {
 			var responses = resp.res;
-			console.log("responses in freeFlowLogic-->", responses)
 			if (responses && responses[0].text && responses[0].text != '') {
-				console.log("inside if")
 				response = responses[0].text;
-				console.log("response -->", response)
-				telemetryData = createInteractionData(responses[0], data.customData, true);
+				telemetryData = createInteractionData(responses[0], data.customData, true, channel);
 			} else {
-				console.log("inside else")
 				responseKey = getErrorMessageForInvalidInput(responses[0], chatflowConfig, channel, false);
-				//                              errorResponse = literals.message[responseKey+"_whatsapp"];
 				if (channel == 'whatsapp') {
 					errorResponse = literals.message[responseKey + "_whatsapp"];
 					response = {
 						"data":
 							{ "text": errorResponse }
 					}
-					console.log("errorMessage -->", response)
 				} else {
-					console.log("responseKey-->",responseKey)
 					response = literals.message[responseKey];
-					console.log("response for bot-->",response)
 				}
 				consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, '');
-				telemetryData = createInteractionData(responses[0], data.customData, true)
+				telemetryData = createInteractionData(responses[0], data.customData, true, channel)
 			}
 			telemetry.logInteraction(telemetryData);
-			console.log("channel before comparing-->", channel)
 			if (channel == 'whatsapp') {
-				console.log("channel is whatsapp")
-				console.log("userId -->", userId)
 				sendResponseWhatsapp(response, userId, "freeFlow")
 			} else {
 				sendResponse(res, response)
@@ -207,40 +197,37 @@ function menuDrivenLogic(data, res, channel, chatflowConfig, userId) {
 	var possibleFlow = currentFlowStep + '_' + data.message;
 	var responseKey = ''
 	if (chatflowConfig[possibleFlow]) {
-		console.log("possibleFlow-->", possibleFlow)
 		var respVarName = chatflowConfig[currentFlowStep].responseVariable;
-		console.log("respVarName-->", respVarName)
 		if (respVarName) {
 			redisSessionData[respVarName] = data.message;
 		}
 		currentFlowStep = possibleFlow;
 		responseKey = chatflowConfig[currentFlowStep].messageKey
-		console.log("responseKey-->", responseKey)
 		// TODO : Don't call function inside each if/else if it should be called once.
 		menuIntentKnown = true
-		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
+		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false, channel)
 	} else if (data.message === '0') {
 		currentFlowStep = 'step1'
 		responseKey = chatflowConfig[currentFlowStep].messageKey
 		menuIntentKnown = true
 		// TODO : Don't call function inside each if/else if it should be called once.
-		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
+		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false, channel)
 	} else if (data.message === '99') {
 		if (currentFlowStep.lastIndexOf("_") > 0) {
 			currentFlowStep = currentFlowStep.substring(0, currentFlowStep.lastIndexOf("_"))
 			responseKey = chatflowConfig[currentFlowStep].messageKey
 			menuIntentKnown = true
 			// TODO : Don't call function inside each if/else if it should be called once. 
-			telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false)
+			telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false, channel)
 		}
 	} else {
 		responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, channel, true)
 		menuIntentKnown = false
 		// TODO : Don't call function inside each if/else if it should be called once.
-		telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false)
+		telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false, channel)
 	}
 	redisSessionData['currentFlowStep'] = currentFlowStep;
-	console.log("redisSessionData-->", redisSessionData)
+	// console.log("redisSessionData-->", redisSessionData)
 	consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, menuIntentKnown);
 	setRedisKeyValue(data.customData.deviceId, redisSessionData);
 	telemetry.logInteraction(telemetryData)
@@ -260,9 +247,9 @@ function consolidatedLog(userId, deviceId, message, responseKey, channel, menuIn
 	else {
 		responseKey = "unknown_option"
 		if (channel == 'whatsapp') {
-			intent = "whtsapp_Free_flow__intent_not_detected"
+			intent = "whtsapp_Free_flow_intent_not_detected"
 		} else {
-			intent = "Free_flow__intent_not_detected"
+			intent = "Free_flow_intent_not_detected"
 		}
 
 	}
@@ -279,15 +266,9 @@ function delRedisKey(key) {
 }
 
 function getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, channel, isNumeric) {
-	console.log("inside getErrorMessageForInvalidInput")
-	//      if (chatflowConfig[currentFlowStep + '_error']) {
 	if (isNumeric) {
-		console.log("inside if chatflowConfig")
-		console.log("currentFlowStep -->",currentFlowStep)
 		return chatflowConfig[currentFlowStep + '_error'].messageKey;
 	} else {
-		//              return chatflowConfig['step1_wrong_input'].messageKey
-		console.log("else getErrorMessageForInvalidInput")
 		return chatflowConfig['step1_wrong_input'].messageKey
 	}
 }
@@ -336,20 +317,12 @@ function sendResponse(response, responseBody, responseCode) {
 
 //send data to user
 function sendResponseWhatsapp(responseBody, recipient, textContent) {
-	console.log("inside sendResponseWhatsapp")
-	// response.set('Content-Type', 'text/plain')
-	// if (responseCode) response.status(responseCode)
-	// response.send(responseBody)
 	var rsponseText = ''
-	console.log("calling whatsapp API")
-	console.log("responseBody-->", responseBody)
-	// console.log("responseBody.data.text-->", responseBody.data.text)
 	if (textContent == "freeFlow") {
 		rsponseText = responseBody.data.text
 	} else {
 		rsponseText = responseBody
 	}
-	console.log("time before calling api", new Date().getTime())
 	var options = {
 		method: 'POST',
 		url: 'https://waapi.pepipost.com/api/v2/message/',
@@ -372,52 +345,56 @@ function sendResponseWhatsapp(responseBody, recipient, textContent) {
 		},
 		json: true
 	};
-	console.log("respose body-->", options.body)
-	console.log("time after api call-->",)
 	request(options, function (error, response, body) {
 		if (error) throw new Error(error);
 
-		console.log(body);
-		console.log("time after calling api", new Date().getTime())
 	});
 
 }
-// sendChannelResponse(deviceId, res, 'SORRY', channel, userId)
 
 function sendChannelResponse(response, responseKey, channel, userId, responseCode) {
 	response.set('Content-Type', 'application/json')
 	if (responseCode) response.status(responseCode)
 
 	//version check
-	console.log("responseKey + '_' + channel-->", responseKey + '_' + channel)
 	var channelResponse = literals.message[responseKey + '_' + channel];
-	console.log("channelResponse in sendChannelResponse -->", channelResponse)
 
 	if (channelResponse) {
 		sendResponseWhatsapp(channelResponse, userId, "menu driven")
 		response.send(channelResponse)
 	} else {
-		console.log("literals.message[responseKey]-->", literals.message[responseKey])
 		response.send(literals.message[responseKey])
 	}
 }
 
-function createInteractionData(responseData, userData, isNonNumeric) {
+function createInteractionData(responseData, userData, isNonNumeric, channel) {
+	subtypeVar = ''
 	if (isNonNumeric) {
+		if (channel == 'whatsapp'){
+			subtypeVar = responseData.intent ? 'whtsapp_Free_flow_intent_detected' : 'whtsapp_Free_flow_intent_not_detected'
+		} else {
+			subtypeVar = responseData.intent ? 'Free_flow_intent_detected' : 'Free_flow_intent_not_detected'
+		}
 		return {
 			interactionData: {
 				id: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
 				type: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
-				subtype: responseData.intent ? 'intent_detected' : 'intent_not_detected'
+				subtype: subtypeVar
+				
 			},
 			requestData: userData
 		}
 	} else {
+		if (channel == 'whatsapp'){
+			subtypeVar = responseData.intent ? 'whtsapp_intent_detected' : 'whtsapp_intent_not_detected'
+		} else {
+			subtypeVar = responseData.intent ? 'intent_detected' : 'intent_not_detected'
+		}
 		return {
 			interactionData: {
 				id: responseData.currentStep,
 				type: responseData.responseKey ? responseData.responseKey : 'UNKNOWN_OPTION',
-				subtype: responseData.responseKey ? 'intent_detected' : 'intent_not_detected'
+				subtype: subtypeVar
 			},
 			requestData: userData
 		}
