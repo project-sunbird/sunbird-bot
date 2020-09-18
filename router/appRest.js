@@ -36,18 +36,10 @@ appBot.post('/bot', function (req, res) {
 })
 
 
-console.log("time before calling /whatsapp", new Date().getTime())
 appBot.post('/whatsapp', function (req, res) {
 	var userId = req.body.incoming_message[0].from;
 	handler(req, res, userId, 'whatsapp')
 })
-
-appBot.post("/v1/telemetry", (req, res, next) => {
-	console.log("inside telemetry")
-    console.log("Logging telemetry event");
-    console.log(JSON.stringify(req.body));
-    res.status(200).send('hello');
-});
 
 function setData(req, res, channel) {
 	if (channel == 'whatsapp') {
@@ -79,7 +71,6 @@ function setData(req, res, channel) {
 		var userId = req.body.userId ? req.body.userId : deviceId;
 		var uaspec = getUserSpec(req);
 
-		console.log("appId -->",appId)
 		return {
 			message: message,
 			customData: {
@@ -227,7 +218,6 @@ function menuDrivenLogic(data, res, channel, chatflowConfig, userId) {
 		telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false, channel)
 	}
 	redisSessionData['currentFlowStep'] = currentFlowStep;
-	// console.log("redisSessionData-->", redisSessionData)
 	consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, menuIntentKnown);
 	setRedisKeyValue(data.customData.deviceId, redisSessionData);
 	telemetry.logInteraction(telemetryData)
