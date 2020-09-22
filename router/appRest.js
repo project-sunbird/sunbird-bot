@@ -164,10 +164,12 @@ function freeFlowLogic(data, res, channel, chatflowConfig, userId) {
 						"data":
 							{ "text": errorResponse }
 					}
+					// isFreeFow = true
 				} else {
 					response = literals.message[responseKey];
+					// isFreeFow = false
 				}
-				consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, '');
+				consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, '', false);
 				telemetryData = createInteractionData(responses[0], data.customData, true, channel)
 			}
 			telemetry.logInteraction(telemetryData);
@@ -218,31 +220,41 @@ function menuDrivenLogic(data, res, channel, chatflowConfig, userId) {
 		telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false, channel)
 	}
 	redisSessionData['currentFlowStep'] = currentFlowStep;
-	consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, menuIntentKnown);
+	consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, menuIntentKnown, true);
 	setRedisKeyValue(data.customData.deviceId, redisSessionData);
 	telemetry.logInteraction(telemetryData)
 	sendChannelResponse(res, responseKey, channel, userId);
 
 }
 
-function consolidatedLog(userId, deviceId, message, responseKey, channel, menuIntentKnown) {
+function consolidatedLog(userId, deviceId, message, responseKey, channel, menuIntentKnown, isMenuDriven) {
 	var intent
-	if (menuIntentKnown) {
-		if (channel == 'whatsapp') {
-			intent = "whtsapp_Menu_intent_detected"
-		} else {
-			intent = "Menu_intent_detected"
+	if (isMenuDriven) {
+		if (menuIntentKnown) {
+			if (channel == 'whatsapp') {
+				intent = "whtsapp_Menu_intent_detected"
+			} else {
+				intent = "Menu_intent_detected"
+			}
 		}
-	}
-	else {
-		responseKey = "unknown_option"
+		else {
+			responseKey = "unknown_option"
+			if (channel == 'whatsapp') {
+				intent = "whtsapp_Menu_intent_not_detected"
+			} else {
+				intent = "Menu_intent_not_detected"
+			}
+		}
+	} else {
 		if (channel == 'whatsapp') {
+			responseKey = "whatsapp_unknown_option_freeFlow"
 			intent = "whtsapp_Free_flow_intent_not_detected"
 		} else {
+			responseKey = "unknown_option_freeFlow"
 			intent = "Free_flow_intent_not_detected"
 		}
-
 	}
+	
 	LOG.info("UserId: " + userId + "," + " DeviceId: " + deviceId + "," + " UserQuery: " + message + "," + " Bot_Response_identifier: " + intent + "," + " BotResponse: " + responseKey)
 }
 

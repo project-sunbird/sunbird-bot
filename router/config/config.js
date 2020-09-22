@@ -1,6 +1,5 @@
 const env = process.env
 
-console.log("env-->"+JSON.stringify(env))
 var config = {};
 config.RASA_API_TIMEOUT              = 200000
 config.RASA_CORE_ENDPOINT            = env.RASA_CORE_ENDPOINT || 'http://localhost:5005/webhooks/rest/webhook'
@@ -24,8 +23,6 @@ config.TELEMETRY_DATA_PID_WHATSAPP = env.telemetry_pid || 'whatsapp'
 config.TELEMETRY_DATA_ENV_WHATSAPP = env.telemetry_pid || 'diksha.whatsapp'
 config.TELEMETRY_DATA_CHANNELID_WHATSAPP = env.telemetry_channelId || 'DEFAULT_ORG.CHANNELID'
 
-config.TELEMETRY_ENDPOINT          = env.telemetry_endpoint || 'v1/telemetry'
-config.TELEMETRY_SERVICE_URL       = env.telemetry_service_url || 'http://localhost:8000/'   //use the router port here
 
 config.REDIS_PORT					 = 6379
 config.REDIS_HOST					 = env.REDIS_HOST || 'localhost'

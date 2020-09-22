@@ -39,7 +39,6 @@ module.exports = {
    */
   logInteraction: function (data) {
     try {
-      console.log("inside try-->")
       var channelId = data.requestData.channelId
       var appId = data.requestData.appId
       var env = data.requestData.env
