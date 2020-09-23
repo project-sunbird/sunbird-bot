@@ -42,7 +42,8 @@ function processResponse(res, userId, clientId, message, cb) {
           if (item.custom.blocks[0] && item.custom.blocks[0].text) {
             text = {
               "data": {
-                "text": item.custom.blocks[0].text
+                "text": item.custom.blocks[0].text,
+                "buttons": item.custom.blocks[0].buttons
               }
             }
           }
@@ -77,6 +78,7 @@ function processResponse(res, userId, clientId, message, cb) {
           if (item.custom[0].blocks[0] && item.custom[0].blocks[0].text) {
             console.log("inside item.custom[0].blocks[0]")
             buttons = item.custom[0].blocks[0].buttons? item.custom[0].blocks[0].buttons : ''
+            console.log("fetching buttons from domain-->")
             text = {
               "data": {
                 "text": item.custom[0].blocks[0].text,

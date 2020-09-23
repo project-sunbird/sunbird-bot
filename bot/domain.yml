@@ -169,6 +169,91 @@ templates:
      blocks:
      - type: "response"
        text: "Please select the valid board"
+       buttons: [{
+            "text": "CBSE",
+            "value": "CBSE",
+        },
+        {
+            "text": "ICSE",
+            "value": "ICSE",
+        },
+        {
+            "text": "Maharashtra",
+            "value": "maharashtra",
+        },
+        {
+            "text": "Karnataka",
+            "value": "karnataka",
+        },
+        {
+            "text": "Tamil Nadu",
+            "value": "Tamil Nadu",
+        },
+        {
+            "text": "Punjab",
+            "value": "punjab",
+        },
+        {
+            "text": "Rajasthan",
+            "value": "rajasthan",
+        },
+        {
+            "text": "manipur",
+            "value": "manipur",
+        },
+        {
+            "text": "chhattisgarh",
+            "value": "chhattisgarh",
+        },
+        {
+            "text": "assam",
+            "value": "assam",
+        },
+        {
+            "text": "madhyapradesh",
+            "value": "madhyapradesh",
+        },
+        {
+            "text": "haryana",
+            "value": "haryana",
+        },
+        {
+            "text": "telangana",
+            "value": "telangana",
+        },
+        {
+            "text": "sikkim",
+            "value": "sikkim",
+        },
+        {
+            "text": "chandigarh",
+            "value": "chandigarh",
+        },
+        {
+            "text": "bihar",
+            "value": "bihar",
+        },
+        {
+            "text": "odisha",
+            "value": "odisha",
+        },
+        {
+            "text": "nagaland",
+            "value": "nagaland",
+        },
+        {
+            "text": "goa",
+            "value": "goa",
+        },
+        {
+            "text": "jharkhand",
+            "value": "jharkhand",
+        },
+        {
+            "text": "igot",
+            "value": "igot",
+        }
+        ]
        intent: "which_board"
 
   utter_ask_grade:
@@ -176,6 +261,55 @@ templates:
      blocks:
      - type: "response"
        text: "Which standard content would you like to browse?"
+       buttons: [{
+            "text": "first",
+            "value": "first",
+        },
+        {
+            "text": "second",
+            "value": "second",
+        },
+        {
+            "text": "third",
+            "value": "third",
+        },
+        {
+            "text": "fourth",
+            "value": "fourth",
+        },
+        {
+            "text": "fifth",
+            "value": "fifth",
+        },
+        {
+            "text": "sixth",
+            "value": "sixth",
+        },
+        {
+            "text": "seventh",
+            "value": "seventh",
+        },
+        {
+            "text": "eighth",
+            "value": "eighth",
+        },
+        {
+            "text": "nineth",
+            "value": "nineth",
+        },
+        {
+            "text": "tenth",
+            "value": "tenth",
+        },
+        {
+            "text": "eleventh",
+            "value": "eleventh",
+        },
+        {
+            "text": "twelveth",
+            "value": "twelveth",
+        }
+        ]
        intent: "which_grade"
 
   utter_ask_subject:
@@ -204,6 +338,55 @@ templates:
      blocks:
      - type: "response"
        text: "Please enter the valid medium"
+       buttons: [{
+            "text": "English",
+            "value": "English",
+        },
+        {
+            "text": "Marathi",
+            "value": "Marathi",
+        },
+        {
+            "text": "Urdu",
+            "value": "Urdu",
+        },
+        {
+            "text": "Hindi",
+            "value": "Hindi",
+        },
+        {
+            "text": "Kannada",
+            "value": "Kannada",
+        },
+        {
+            "text": "Telugu",
+            "value": "Telugu",
+        },
+        {
+            "text": "Gujarati",
+            "value": "Gujarati",
+        },
+        {
+            "text": "Bengali",
+            "value": "Bengali",
+        },
+        {
+            "text": "Sindhi",
+            "value": "Sindhi",
+        },
+        {
+            "text": "Tamil",
+            "value": "Tamil",
+        },
+        {
+            "text": "Assamese",
+            "value": "Assamese",
+        },
+        {
+            "text": "Sanskrit",
+            "value": "Sanskrit",
+        }
+        ]
        intent: "content_suggestions"
 
 forms:

@@ -250,6 +250,7 @@ class ActionContentForm(FormAction):
                         tracker: Tracker,
                         domain: Dict[Text, Any]) -> Text:
         global board_identifier
+        print("value in validate_board -->",value)
         board_list, res_json = self.board_db(value)
         api_matching_board = self.get_board_api_mapped(value.lower())
         if(api_matching_board in board_list):
