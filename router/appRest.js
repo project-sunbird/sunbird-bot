@@ -31,71 +31,46 @@ const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
-	var userId = req.body.userId ? req.body.userId : deviceId;
-	handler(req, res, userId, 'botclient')
+	var userId = req.body.userId ? req.body.userId : req.body.From;
+	var data = {
+		message: req.body.Body,
+		customData: {
+			userId: userId,
+			deviceId: req.body.From,
+			appId: req.body.appId + '.bot',
+			env: req.body.appId + '.bot',
+			sessionId: '',
+			channelId: req.body.channel,
+			uaspec: getUserSpec(req)
+		}
+	}
+	handler(req, res, data, userId, 'botclient')
 })
 
 
 appBot.post('/whatsapp', function (req, res) {
 	var userId = req.body.incoming_message[0].from;
-	handler(req, res, userId, 'whatsapp')
+	var data = {
+		message: req.body.incoming_message[0].text_type.text,
+		customData: {
+			userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+			deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+			appId: config.TELEMETRY_DATA_PID_WHATSAPP,
+			env: config.TELEMETRY_DATA_ENV_WHATSAPP,
+			channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
+			sessionId: '',
+			appId: appId,
+			uaspec: getUserSpec(req)
+		}
+	}
+	handler(req, res, data, userId, 'whatsapp')
 })
 
-function setData(req, res, channel) {
-	if (channel == 'whatsapp') {
-		var appId = config.TELEMETRY_DATA_PID_WHATSAPP 
-		var env = config.TELEMETRY_DATA_ENV_WHATSAPP
-		var message = req.body.incoming_message[0].text_type.text;
-		var channelId = config.TELEMETRY_DATA_CHANNELID_WHATSAPP;
-		var userId = req.body.incoming_message[0].from;
-		var deviceId = userId
-		var uaspec = getUserSpec(req);
-		return {
-			message: message,
-			customData: {
-				userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-				deviceId: crypto.createHash('sha256').update(deviceId).digest("hex"),
-				appId: appId,
-				env: env,
-				channelId: channelId,
-				sessionId: '',
-				appId: appId,
-				uaspec: uaspec
-			}
-		}
-	} else {
-		var appId = req.body.appId + '.bot';
-		var message = req.body.Body;
-		var deviceId = req.body.From;
-		var channelId = req.body.channel;
-		var userId = req.body.userId ? req.body.userId : deviceId;
-		var uaspec = getUserSpec(req);
-
-		return {
-			message: message,
-			customData: {
-				userId: userId,
-				deviceId: deviceId,
-				appId: appId,
-				env: appId,
-				sessionId: '',
-				channelId: channelId,
-				uaspec: uaspec
-			}
-		}
-
-	}
-}
-
-function handler(req, res, userId, channel) {
+function handler(req, res, data, userId, channel ) {
 
 
 	var chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context] : chatflow.chatflow : chatflow.chatflow;
 	redisSessionData = {};
-
-	const data = setData(req, res, channel)
-
-
 
 	if (!data.customData.deviceId) {
 		sendResponse(data.customData.deviceId, res, "From attribute missing", 400);
