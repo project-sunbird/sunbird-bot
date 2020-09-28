@@ -25,20 +25,20 @@ var request = require("request");
 var crypto = require('crypto');
 const { data } = require('./log/logger');
 const url = require('url');
-
+const querystring = require('querystring');
 
 // Redis is used as the session tracking store
 const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
-	
+
 	var userId = req.body.userId ? req.body.userId : req.body.From;
 	var data = {
 		message: req.body.Body,
-		recipient : userId,
-		channel : 'botclient',
-			customData: {
+		recipient: userId,
+		channel: 'botclient',
+		customData: {
 			userId: userId,
 			deviceId: req.body.From,
 			appId: req.body.appId + '.bot',
@@ -53,30 +53,31 @@ appBot.post('/bot', function (req, res) {
 
 
 appBot.post('/whatsapp', function (req, res) {
-	// const queryObject = url.parse(req.url,true).query;
-	// console.log("url param -->",queryObject+ " and "+ typeof(queryObject))
-	// if(queryObject.client_key == config.SECRET_KEY){
-	// 	console.log("inside if queryObject")
-	// }
-	var userId = req.body.incoming_message[0].from;
-	var data = {
-		message: req.body.incoming_message[0].text_type.text,
-		recipient : userId,
-		channel : config.WHATSAPP,
-		customData: {
-			userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-			deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-			appId: config.TELEMETRY_DATA_PID_WHATSAPP,
-			env: config.TELEMETRY_DATA_ENV_WHATSAPP,
-			channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
-			sessionId: '',
-			uaspec: getUserSpec(req)
+	console.log("rea.query-->" + req.query)
+	console.log("client_key -->" + req.query.client_key)
+	if (req.query.client_key == config.SECRET_KEY) {
+		console.log("inside if queryObject")
+		var userId = req.body.incoming_message[0].from;
+		var data = {
+			message: req.body.incoming_message[0].text_type.text,
+			recipient: userId,
+			channel: config.WHATSAPP,
+			customData: {
+				userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+				deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+				appId: config.TELEMETRY_DATA_PID_WHATSAPP,
+				env: config.TELEMETRY_DATA_ENV_WHATSAPP,
+				channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
+				sessionId: '',
+				uaspec: getUserSpec(req)
+			}
 		}
+		handler(req, res, data)
 	}
-	handler(req, res, data)
+
 })
 
-function handler(req, res, data ) {
+function handler(req, res, data) {
 
 
 	var chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context] : chatflow.chatflow : chatflow.chatflow;
@@ -238,7 +239,7 @@ function consolidatedLog(userId, deviceId, message, responseKey, channel, menuIn
 			intent = config.FREEFLOW_INTENT_NOT_DETECTED
 		}
 	}
-	
+
 	LOG.info("UserId: " + userId + "," + " DeviceId: " + deviceId + "," + " UserQuery: " + message + "," + " Bot_Response_identifier: " + intent + "," + " BotResponse: " + responseKey)
 }
 
@@ -356,7 +357,7 @@ function sendChannelResponse(response, responseKey, channel, userId, responseCod
 function createInteractionData(responseData, userData, isNonNumeric, channel) {
 	subtypeVar = ''
 	if (isNonNumeric) {
-		if (channel == config.WHATSAPP){
+		if (channel == config.WHATSAPP) {
 			subtypeVar = responseData.intent ? config.WHATSAPP_FREEFLOW_INTENT_DETECTED : config.WHATSAPP_FREEFLOW_INTENT_NOT_DETECTED
 		} else {
 			subtypeVar = responseData.intent ? config.FREEFLOW_INTENT_DETECTED : config.FREEFLOW_INTENT_NOT_DETECTED
@@ -366,12 +367,12 @@ function createInteractionData(responseData, userData, isNonNumeric, channel) {
 				id: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
 				type: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
 				subtype: subtypeVar
-				
+
 			},
 			requestData: userData
 		}
 	} else {
-		if (channel == config.WHATSAPP){
+		if (channel == config.WHATSAPP) {
 			subtypeVar = responseData.intent ? config.WHATSAPP_INTENT_DETECTED : config.WHATSAPP_INTENT_NOT_DETECTED
 		} else {
 			subtypeVar = responseData.intent ? config.INTENT_DETECTED : config.INTENT_NOT_DETECTED
