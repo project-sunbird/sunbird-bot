@@ -58,7 +58,9 @@ function handler(req, res, channel) {
 	if (!deviceId) {
 		sendResponse(deviceId, res, "From attribute missing", 400);
 	} else {
+		// console.log("redisClient -->",redisClient)
 		redisClient.get(REDIS_KEY_PREFIX + deviceId, (err, redisValue) => {
+			// console.log("redisValue --> ",)
 			if (redisValue != null) {
 				// Key is already exist and hence assiging data which is already there at the posted key
 				redisSessionData = JSON.parse(redisValue);
