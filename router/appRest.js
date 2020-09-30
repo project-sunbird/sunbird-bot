@@ -24,16 +24,20 @@ appBot.use(bodyParser.urlencoded({ extended: false }))
 var request = require("request");
 var crypto = require('crypto');
 const { data } = require('./log/logger');
-
+const url = require('url');
+const querystring = require('querystring');
 
 // Redis is used as the session tracking store
 const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
+
 	var userId = req.body.userId ? req.body.userId : req.body.From;
 	var data = {
 		message: req.body.Body,
+		recipient: userId,
+		channel: 'botclient',
 		customData: {
 			userId: userId,
 			deviceId: req.body.From,
@@ -44,29 +48,33 @@ appBot.post('/bot', function (req, res) {
 			uaspec: getUserSpec(req)
 		}
 	}
-	handler(req, res, data, userId, 'botclient')
+	handler(req, res, data)
 })
 
 
 appBot.post('/whatsapp', function (req, res) {
-	var userId = req.body.incoming_message[0].from;
-	var data = {
-		message: req.body.incoming_message[0].text_type.text,
-		customData: {
-			userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-			deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-			appId: config.TELEMETRY_DATA_PID_WHATSAPP,
-			env: config.TELEMETRY_DATA_ENV_WHATSAPP,
-			channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
-			sessionId: '',
-			appId: appId,
-			uaspec: getUserSpec(req)
+	if (req.query.client_key == config.SECRET_KEY) {
+		var userId = req.body.incoming_message[0].from;
+		var data = {
+			message: req.body.incoming_message[0].text_type.text,
+			recipient: userId,
+			channel: config.WHATSAPP,
+			customData: {
+				userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+				deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+				appId: config.TELEMETRY_DATA_PID_WHATSAPP,
+				env: config.TELEMETRY_DATA_ENV_WHATSAPP,
+				channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
+				sessionId: '',
+				uaspec: getUserSpec(req)
+			}
 		}
+		handler(req, res, data)
 	}
-	handler(req, res, data, userId, 'whatsapp')
+
 })
 
-function handler(req, res, data, userId, channel ) {
+function handler(req, res, data) {
 
 
 	var chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context] : chatflow.chatflow : chatflow.chatflow;
@@ -86,10 +94,10 @@ function handler(req, res, data, userId, channel ) {
 				// all non numeric user messages go to bot
 				if (isNaN(data.message)) {
 					///Bot interaction flow
-					freeFlowLogic(data, res, channel, chatflowConfig, userId)
+					freeFlowLogic(data, res,chatflowConfig)
 
 				} else {
-					menuDrivenLogic(data, res, channel, chatflowConfig, userId)
+					menuDrivenLogic(data, res, chatflowConfig)
 				}
 			} else {
 
@@ -100,18 +108,18 @@ function handler(req, res, data, userId, channel ) {
 				setRedisKeyValue(data.customData.deviceId, userData);
 				data.customData.sessionId = uuID;
 				telemetry.logSessionStart(data.customData);
-				if (channel == "botclient") {
-					telemetryData = createInteractionData({ currentStep: 'step1', responseKey: chatflowConfig['step1']['messageKey'] }, data.customData, false, channel)
+				if (data.channel == "botclient") {
+					telemetryData = createInteractionData({ currentStep: 'step1', responseKey: chatflowConfig['step1']['messageKey'] }, data, false)
 					telemetry.logInteraction(telemetryData)
-					sendChannelResponse(res, chatflowConfig['step1']['messageKey'], channel, userId);
+					sendChannelResponse(res, chatflowConfig['step1']['messageKey'], data);
 
 				} else {
 					if (isNaN(data.message)) {
 						///Bot interaction flow
-						freeFlowLogic(data, res, channel, chatflowConfig, userId)
+						freeFlowLogic(data, res, chatflowConfig)
 
 					} else {
-						menuDrivenLogic(data, res, channel, chatflowConfig, userId)
+						menuDrivenLogic(data, res, chatflowConfig)
 					}
 
 				}
@@ -120,36 +128,35 @@ function handler(req, res, data, userId, channel ) {
 	}
 }
 
-function freeFlowLogic(data, res, channel, chatflowConfig, userId) {
-	RasaCoreController.processUserData(data, data.customData.userId, data.customData.deviceId, channel, (err, resp) => {
+function freeFlowLogic(data, res, chatflowConfig) {
+	RasaCoreController.processUserData(data, (err, resp) => {
 		var response = '';
 		if (err) {
-
-			sendChannelResponse(data.customData.deviceId, res, channel, userId, 'SORRY')
+			console.log("inside err -->")
+			sendChannelResponse(data.customData.deviceId, res, data, 'SORRY')
 		} else {
 			var responses = resp.res;
+			console.log("responses-->",responses)
 			if (responses && responses[0].text && responses[0].text != '') {
 				response = responses[0].text;
-				telemetryData = createInteractionData(responses[0], data.customData, true, channel);
+				telemetryData = createInteractionData(responses[0], data, true);
 			} else {
-				responseKey = getErrorMessageForInvalidInput(responses[0], chatflowConfig, channel, false);
-				if (channel == 'whatsapp') {
-					errorResponse = literals.message[responseKey + "_whatsapp"];
+				responseKey = getErrorMessageForInvalidInput(responses[0], chatflowConfig, false);
+				if (data.channel == config.WHATSAPP) {
+					errorResponse = literals.message[responseKey + config._WHATSAPP];
 					response = {
 						"data":
 							{ "text": errorResponse }
 					}
-					// isFreeFow = true
 				} else {
 					response = literals.message[responseKey];
-					// isFreeFow = false
 				}
-				consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, '', false);
-				telemetryData = createInteractionData(responses[0], data.customData, true, channel)
+				consolidatedLog(data, responseKey, '', false);
+				telemetryData = createInteractionData(responses[0], data, true)
 			}
 			telemetry.logInteraction(telemetryData);
-			if (channel == 'whatsapp') {
-				sendResponseWhatsapp(response, userId, "freeFlow")
+			if (data.channel == config.WHATSAPP) {
+				sendResponseWhatsapp(response, data.recipient, "freeFlow")
 			} else {
 				sendResponse(res, response)
 			}
@@ -159,7 +166,7 @@ function freeFlowLogic(data, res, channel, chatflowConfig, userId) {
 
 }
 
-function menuDrivenLogic(data, res, channel, chatflowConfig, userId) {
+function menuDrivenLogic(data, res, chatflowConfig) {
 	var menuIntentKnown = false
 	var currentFlowStep = redisSessionData.currentFlowStep;
 	var possibleFlow = currentFlowStep + '_' + data.message;
@@ -173,64 +180,65 @@ function menuDrivenLogic(data, res, channel, chatflowConfig, userId) {
 		responseKey = chatflowConfig[currentFlowStep].messageKey
 		// TODO : Don't call function inside each if/else if it should be called once.
 		menuIntentKnown = true
-		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false, channel)
+		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
 	} else if (data.message === '0') {
 		currentFlowStep = 'step1'
 		responseKey = chatflowConfig[currentFlowStep].messageKey
 		menuIntentKnown = true
 		// TODO : Don't call function inside each if/else if it should be called once.
-		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false, channel)
+		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
 	} else if (data.message === '99') {
 		if (currentFlowStep.lastIndexOf("_") > 0) {
 			currentFlowStep = currentFlowStep.substring(0, currentFlowStep.lastIndexOf("_"))
 			responseKey = chatflowConfig[currentFlowStep].messageKey
 			menuIntentKnown = true
 			// TODO : Don't call function inside each if/else if it should be called once. 
-			telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data.customData, false, channel)
+			telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
 		}
 	} else {
-		responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, channel, true)
+		responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, true)
 		menuIntentKnown = false
 		// TODO : Don't call function inside each if/else if it should be called once.
-		telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data.customData, false, channel)
+		telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data, false)
 	}
 	redisSessionData['currentFlowStep'] = currentFlowStep;
-	consolidatedLog(data.customData.userId, data.customData.deviceId, data.message, responseKey, channel, menuIntentKnown, true);
+	consolidatedLog(data, responseKey, menuIntentKnown, true);
 	setRedisKeyValue(data.customData.deviceId, redisSessionData);
 	telemetry.logInteraction(telemetryData)
-	sendChannelResponse(res, responseKey, channel, userId);
+	sendChannelResponse(res, responseKey, data);
 
 }
 
-function consolidatedLog(userId, deviceId, message, responseKey, channel, menuIntentKnown, isMenuDriven) {
+// for free flow error only response is handled here other is handled in botwebhook
+function consolidatedLog(data, responseKey, menuIntentKnown, isMenuDriven) {
 	var intent
 	if (isMenuDriven) {
 		if (menuIntentKnown) {
-			if (channel == 'whatsapp') {
-				intent = "whtsapp_Menu_intent_detected"
+			if (data.channel == config.WHATSAPP) {
+				intent = config.WHATSAPP_MENU_INTENT_DETECTED
 			} else {
-				intent = "Menu_intent_detected"
+				intent = config.MENU_INTENT_DETECTED
 			}
 		}
 		else {
-			responseKey = "unknown_option"
-			if (channel == 'whatsapp') {
-				intent = "whtsapp_Menu_intent_not_detected"
+			responseKey = config.UNKNOWN_OPTION
+			if (data.channel == config.WHATSAPP) {
+				intent = config.WHATSAPP_MENU_INTENT_NOT_DETECTED
 			} else {
-				intent = "Menu_intent_not_detected"
+				intent = config.MENU_INTENT_NOT_DETECTED
 			}
 		}
 	} else {
-		if (channel == 'whatsapp') {
-			responseKey = "whatsapp_unknown_option_freeFlow"
-			intent = "whtsapp_Free_flow_intent_not_detected"
+		if (data.channel == config.WHATSAPP) {
+			responseKey = config.WHATSAPP_UNKNOWN_OPTION_FREEFLOW
+			intent = config.WHATSAPP_FREEFLOW_INTENT_NOT_DETECTED
 		} else {
-			responseKey = "unknown_option_freeFlow"
-			intent = "Free_flow_intent_not_detected"
+			responseKey = config.UNKNOWN_OPTION_FREEFLOW
+			intent = config.FREEFLOW_INTENT_NOT_DETECTED
 		}
 	}
-	
-	LOG.info("UserId: " + userId + "," + " DeviceId: " + deviceId + "," + " UserQuery: " + message + "," + " Bot_Response_identifier: " + intent + "," + " BotResponse: " + responseKey)
+
+	LOG.info("UserId: " + data.customData.userId + "," + " DeviceId: " + data.customData.deviceId + "," + " UserQuery: " + data.message + "," + " Bot_Response_identifier: " + intent + "," + " BotResponse: " + responseKey)
 }
 
 function setRedisKeyValue(key, value) {
@@ -242,7 +250,7 @@ function delRedisKey(key) {
 	redisClient.del(key);
 }
 
-function getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, channel, isNumeric) {
+function getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, isNumeric) {
 	if (isNumeric) {
 		return chatflowConfig[currentFlowStep + '_error'].messageKey;
 	} else {
@@ -302,10 +310,10 @@ function sendResponseWhatsapp(responseBody, recipient, textContent) {
 	}
 	var options = {
 		method: 'POST',
-		url: 'https://waapi.pepipost.com/api/v2/message/',
+		url: config.WHATSAPP_URL,
 		headers:
 		{
-			authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuZXRjb3Jlc2FsZXNleHAiLCJleHAiOjI0MjUxMDI1MjZ9.ljC4Tvgz031i6DsKr2ILgCJsc9C_hxdo2Kw8iZp9tsVcCaKbIOXaFoXmpU7Yo7ob4P6fBtNtdNBQv_NSMq_Q8w',
+			authorization: config.WHATSAPP_AUTHORIZATION,
 			'content-type': 'application/json'
 		},
 		body:
@@ -313,10 +321,10 @@ function sendResponseWhatsapp(responseBody, recipient, textContent) {
 			message:
 				[{
 					recipient_whatsapp: recipient,
-					message_type: 'text',
-					recipient_type: 'individual',
-					source: '461089f9-1000-4211-b182-c7f0291f3d45',
-					'x-apiheader': 'custom_data',
+					message_type: config.WHATSAPP_MESSAGE_TYPE,
+					recipient_type: config.WHATSAPP_RECIPIENT_TYPE,
+					source: config.WHATSAPP_SOURCE,
+					'x-apiheader': config.WHATSAPP_API_HEADER,
 					type_text: [{ preview_url: 'false', content: rsponseText }]
 				}]
 		},
@@ -328,44 +336,42 @@ function sendResponseWhatsapp(responseBody, recipient, textContent) {
 	});
 
 }
-
-function sendChannelResponse(response, responseKey, channel, userId, responseCode) {
+function sendChannelResponse(response, responseKey, data, responseCode) {
 	response.set('Content-Type', 'application/json')
 	if (responseCode) response.status(responseCode)
 
 	//version check
-	var channelResponse = literals.message[responseKey + '_' + channel];
+	var channelResponse = literals.message[responseKey + '_' + data.channel];
 
 	if (channelResponse) {
-		sendResponseWhatsapp(channelResponse, userId, "menu driven")
+		sendResponseWhatsapp(channelResponse, data.recipient, "menu driven")
 		response.send(channelResponse)
 	} else {
 		response.send(literals.message[responseKey])
 	}
 }
-
-function createInteractionData(responseData, userData, isNonNumeric, channel) {
+function createInteractionData(responseData, data, isNonNumeric) {
 	subtypeVar = ''
 	if (isNonNumeric) {
-		if (channel == 'whatsapp'){
-			subtypeVar = responseData.intent ? 'whtsapp_Free_flow_intent_detected' : 'whtsapp_Free_flow_intent_not_detected'
+		if (data.channel == config.WHATSAPP) {
+			subtypeVar = responseData.intent ? config.WHATSAPP_FREEFLOW_INTENT_DETECTED : config.WHATSAPP_FREEFLOW_INTENT_NOT_DETECTED
 		} else {
-			subtypeVar = responseData.intent ? 'Free_flow_intent_detected' : 'Free_flow_intent_not_detected'
+			subtypeVar = responseData.intent ? config.FREEFLOW_INTENT_DETECTED : config.FREEFLOW_INTENT_NOT_DETECTED
 		}
 		return {
 			interactionData: {
 				id: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
 				type: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
 				subtype: subtypeVar
-				
+
 			},
-			requestData: userData
+			requestData: data.customData
 		}
 	} else {
-		if (channel == 'whatsapp'){
-			subtypeVar = responseData.intent ? 'whtsapp_intent_detected' : 'whtsapp_intent_not_detected'
+		if (data.channel == config.WHATSAPP) {
+			subtypeVar = responseData.intent ? config.WHATSAPP_INTENT_DETECTED : config.WHATSAPP_INTENT_NOT_DETECTED
 		} else {
-			subtypeVar = responseData.intent ? 'intent_detected' : 'intent_not_detected'
+			subtypeVar = responseData.intent ? config.INTENT_DETECTED : config.INTENT_NOT_DETECTED
 		}
 		return {
 			interactionData: {
@@ -373,7 +379,7 @@ function createInteractionData(responseData, userData, isNonNumeric, channel) {
 				type: responseData.responseKey ? responseData.responseKey : 'UNKNOWN_OPTION',
 				subtype: subtypeVar
 			},
-			requestData: userData
+			requestData: data.customData
 		}
 	}
 }
