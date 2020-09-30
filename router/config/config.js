@@ -31,7 +31,7 @@ config.ELASTIC_INDEX_NAME            = 'indx_name'
 config.ELASTIC_INDEX_TYPE            = 'indx_type'
 
 config.WHATSAPP_URL                = 'https://waapi.pepipost.com/api/v2/message/'
-config.WHATSAPP_AUTHORIZATION      = env.WHATSAPP_KEY
+config.WHATSAPP_AUTHORIZATION      = env.WHATSAPP_AUTH_TOKEN
 config.WHATSAPP_MESSAGE_TYPE       = 'text'
 config.WHATSAPP_SOURCE             = '461089f9-1000-4211-b182-c7f0291f3d45'
 config.WHATSAPP_RECIPIENT_TYPE     = 'individual'
