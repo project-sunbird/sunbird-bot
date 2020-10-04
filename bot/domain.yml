@@ -261,54 +261,7 @@ templates:
      blocks:
      - type: "response"
        text: "Which standard content would you like to browse?"
-       buttons: [{
-            "text": "first",
-            "value": "first",
-        },
-        {
-            "text": "second",
-            "value": "second",
-        },
-        {
-            "text": "third",
-            "value": "third",
-        },
-        {
-            "text": "fourth",
-            "value": "fourth",
-        },
-        {
-            "text": "fifth",
-            "value": "fifth",
-        },
-        {
-            "text": "sixth",
-            "value": "sixth",
-        },
-        {
-            "text": "seventh",
-            "value": "seventh",
-        },
-        {
-            "text": "eighth",
-            "value": "eighth",
-        },
-        {
-            "text": "nineth",
-            "value": "nineth",
-        },
-        {
-            "text": "tenth",
-            "value": "tenth",
-        },
-        {
-            "text": "eleventh",
-            "value": "eleventh",
-        },
-        {
-            "text": "twelveth",
-            "value": "twelveth",
-        }
+       buttons: [
         ]
        intent: "which_grade"
 
@@ -338,54 +291,7 @@ templates:
      blocks:
      - type: "response"
        text: "Please enter the valid medium"
-       buttons: [{
-            "text": "English",
-            "value": "English",
-        },
-        {
-            "text": "Marathi",
-            "value": "Marathi",
-        },
-        {
-            "text": "Urdu",
-            "value": "Urdu",
-        },
-        {
-            "text": "Hindi",
-            "value": "Hindi",
-        },
-        {
-            "text": "Kannada",
-            "value": "Kannada",
-        },
-        {
-            "text": "Telugu",
-            "value": "Telugu",
-        },
-        {
-            "text": "Gujarati",
-            "value": "Gujarati",
-        },
-        {
-            "text": "Bengali",
-            "value": "Bengali",
-        },
-        {
-            "text": "Sindhi",
-            "value": "Sindhi",
-        },
-        {
-            "text": "Tamil",
-            "value": "Tamil",
-        },
-        {
-            "text": "Assamese",
-            "value": "Assamese",
-        },
-        {
-            "text": "Sanskrit",
-            "value": "Sanskrit",
-        }
+       buttons: [
         ]
        intent: "content_suggestions"
 

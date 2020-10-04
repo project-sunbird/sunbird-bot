@@ -10,10 +10,11 @@ services:
       - "5005:5005"
     environment:
       - TMP=TMP
+
   action:
     build:
       dockerfile: Dockerfile
-      context: ./bot/actions/.
+      context: ./actions/.
     ports:
       - "5056:5056"
 
