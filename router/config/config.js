@@ -21,8 +21,8 @@ config.TELEMETRY_DATA_VERSION      = env.telemetry_version || '1.1'
 config.TELEMETRY_DATA_PID          = env.telemetry_pid || 'dikshavani.botclient'
 config.TELEMETRY_DATA_PID_WHATSAPP = env.telemetry_pid || 'whatsapp'
 config.TELEMETRY_DATA_ENV_WHATSAPP = env.telemetry_pid || 'diksha.whatsapp'
-config.TELEMETRY_DATA_CHANNELID_WHATSAPP = env.telemetry_whatsapp_channelId || 'DEFAULT_ORG.CHANNELID'
-config.SECRET_KEY                  = env.WHATSAPP_SECRET_KEY
+config.TELEMETRY_DATA_CHANNELID_WHATSAPP = env.WHATSAPP_TELEMETRY_CHANNEL || 'DEFAULT_ORG.CHANNELID'
+config.SECRET_KEY                  = env.WHATSAPP_SECRET_KEY || 'secretkey'
 
 config.REDIS_PORT					 = 6379
 config.REDIS_HOST					 = env.REDIS_HOST || 'localhost'
@@ -31,9 +31,9 @@ config.ELASTIC_INDEX_NAME            = 'indx_name'
 config.ELASTIC_INDEX_TYPE            = 'indx_type'
 
 config.WHATSAPP_URL                = 'https://waapi.pepipost.com/api/v2/message/'
-config.WHATSAPP_AUTHORIZATION      = env.WHATSAPP_AUTH_TOKEN
+config.WHATSAPP_AUTHORIZATION      = env.WHATSAPP_AUTH_TOKEN || 'authtoken'
 config.WHATSAPP_MESSAGE_TYPE       = 'text'
-config.WHATSAPP_SOURCE             = '461089f9-1000-4211-b182-c7f0291f3d45'
+config.WHATSAPP_SOURCE             = env.WHATSAPP_SOURCE || 'source'
 config.WHATSAPP_RECIPIENT_TYPE     = 'individual'
 config.WHATSAPP_API_HEADER         = 'custom_data'
 
