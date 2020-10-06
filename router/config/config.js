@@ -21,7 +21,7 @@ config.TELEMETRY_DATA_VERSION      = env.telemetry_version || '1.1'
 config.TELEMETRY_DATA_PID          = env.telemetry_pid || 'dikshavani.botclient'
 config.TELEMETRY_DATA_PID_WHATSAPP = env.telemetry_pid || 'whatsapp'
 config.TELEMETRY_DATA_ENV_WHATSAPP = env.telemetry_pid || 'diksha.whatsapp'
-config.TELEMETRY_DATA_CHANNELID_WHATSAPP = env.telemetry_channelId || 'DEFAULT_ORG.CHANNELID'
+config.TELEMETRY_DATA_CHANNELID_WHATSAPP = env.telemetry_whatsapp_channelId || 'DEFAULT_ORG.CHANNELID'
 config.SECRET_KEY                  = env.WHATSAPP_SECRET_KEY
 
 config.REDIS_PORT					 = 6379
