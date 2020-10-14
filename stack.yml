@@ -16,13 +16,13 @@ services:
       dockerfile: Dockerfile
       context: ./actions/.
     ports:
-      - "5056:5056"
+      - "5055:5055"
 
   router:    
     build: ./router/.
     ports:
-      - "4000:4000"
+      - "8000:8000"
     environment:
       - RASA_CORE_ENDPOINT=http://bot:5005/webhooks/rest/webhook
       - REDIS_HOST=redis
-      - HTTP_PORT=4000
+      - HTTP_PORT=8000
