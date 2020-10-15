@@ -16,6 +16,7 @@ import requests
 import datetime
 import time
 import redis
+import constant
 from configparser import ConfigParser
 
 config = ConfigParser()
@@ -23,6 +24,10 @@ nlp = spacy.load('en_core_web_sm')
 
 redisClient = redis.Redis(host= "localhost" , port = 6379)
 redisSessionData = {}
+# data_file = "baspath/bot/router/config.js"
+# configFile = os.path.join(dirname, 'config/config.js')
+#         with open(configFile) as config_values:
+#            config = json.load(config_values)
 
 class ActionSubjectCourses(Action):
      def name(self) -> Text:
@@ -75,8 +80,7 @@ class FrameworkApi:
       obj = {}
       obj['time'] = int(round(time.time() * 1000))
       print("call the api-channel",self.channel_counter+1)
-      channel_res = requests.get(
-            "https://staging.ntp.net.in/api/channel/v1/read/0126632859575746566") 
+      channel_res = requests.get(constant.CHANNEL_API) 
       print("channel_res",channel_res)
       obj['payload'] = channel_res
       print("obj-->",obj, type(obj))
@@ -87,8 +91,8 @@ class FrameworkApi:
       obj = {}
       obj['time'] = int(round(time.time() * 1000))
       print("call the api-framework", self.framework_counter+1)
-      grade_mdium_url = "https://staging.ntp.net.in/api/framework/v1/read/" + \
-            board_identifier + "?categories=board,medium,gradeLevel,subject" 
+      grade_mdium_url = constant.FRAMEWORK_API + \
+            board_identifier + constant.FRAMEWORK_FILTER
       framework_res = requests.get(grade_mdium_url)
       print("framework_res-->",framework_res)
       obj['payload'] = framework_res

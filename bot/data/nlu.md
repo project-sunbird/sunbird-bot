@@ -161,6 +161,7 @@
 - [karnataka](board)
 - [english](medium)
 - [Hindi](medium)
+- [Sindhi](medium)
 - [Gujarati](medium)
 - [Urdu](medium)
 - [Telugu](medium)
