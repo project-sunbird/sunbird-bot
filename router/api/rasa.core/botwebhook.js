@@ -154,18 +154,6 @@ function processResponse(res, userId, clientId, message, channel, cb) {
 
 }
 
-<<<<<<< HEAD
-function consolidatedLog(userId, clientId, message, knownIntent) {
-  var botResponseIdentifier
-  if (knownIntent == "low_confidence") {
-    knownIntent = "unknown_option_freeFlow"
-    botResponseIdentifier = "Free_flow_intent_ not_detected"
-  }
-  else {
-    botResponseIdentifier = "Free_flow_intent_detected"
-  }
-  LOG.info("UserId: " + userId + "," + " DeviceId: " + clientId + "," + " UserQuery: " + message + "," + " Bot_Response_identifier: " + botResponseIdentifier + "," + " BotResponse: " + knownIntent)
-=======
 function consolidatedLog(userId, clientId, message, knownIntent, channel) {
   if (knownIntent != "low_confidence") {
     if (channel == 'whatsapp') {
@@ -176,7 +164,6 @@ function consolidatedLog(userId, clientId, message, knownIntent, channel) {
     LOG.info("UserId: " + userId + "," + " DeviceId: " + clientId + "," + " UserQuery: " + message + "," + " Bot_Response_identifier: " + botResponseIdentifier + "," + " BotResponse: " + knownIntent)
 
   }
->>>>>>> 54d8585909c8e3eb8ae3b84b5ad9b2bebfad36c4
 }
 
 
@@ -203,19 +190,11 @@ function getRasaEndpoint(type) {
   return APP_CONFIG.RASA_CORE_ENDPOINT;
 }
 
-<<<<<<< HEAD
-exports.BOTWebHookAPI = function (data, userId, clientId, cb) {
-  axios.create(getCustomHeaders(APP_CONFIG.RASA_API_TIMEOUT))
-    .post(getRasaEndpoint(data.endpoint), getBody(data.text, clientId), getHeaders())
-    .then(res => {
-      processResponse(res, userId, clientId, data.text, (err, resp) => {
-=======
 exports.BOTWebHookAPI = function (data, userId, clientId, channel, cb) {
   axios.create(getCustomHeaders(APP_CONFIG.RASA_API_TIMEOUT))
     .post(getRasaEndpoint(data.endpoint), getBody(data.text, clientId), getHeaders())
     .then(res => {
       processResponse(res, userId, clientId, data.text, channel, (err, resp) => {
->>>>>>> 54d8585909c8e3eb8ae3b84b5ad9b2bebfad36c4
         if (err) {
           LOG.error('error in call to bot')
           cb(err, null)
