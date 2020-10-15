@@ -19,9 +19,6 @@ import redis
 from configparser import ConfigParser
 
 config = ConfigParser()
-# config.read()
-#
-#
 nlp = spacy.load('en_core_web_sm')
 
 redisClient = redis.Redis(host= "localhost" , port = 6379)
@@ -58,24 +55,10 @@ class FallbackAction(Action):
           if token.pos_ == 'ADJ':
                adjs.append(token.text)
       if len(intent_ranking) > 0:
-         # elements = [{
-         #   "blocks": [{
-         #          "intent": "low_confidence",
-         #          "text": "Sorry, I could not understand you. Please press 0 for menu.",
-         #          "type": "low_confidence"
-         #       }]
-         #   }]
          elements = [{"type": "low_confidence", "entities": nouns,
                       "adj": adjs, "intent": "low_confidence"}]
          dispatcher.utter_message(json_message=elements)
       else:
-         # elements = [{
-         #    "blocks": [{
-         #       "intent": "low_confidence",
-         #       "text": "Sorry, I could not understand you. Please press 0 for menu.",
-         #       "type": "low_confidence"
-         #   }]
-         # }]
          elements = [{"type": "low_confidence", "entities": nouns,
                       "adj": adjs, "intent": "low_confidence"}]
          dispatcher.utter_message(json_message=elements)
@@ -103,8 +86,6 @@ class FrameworkApi:
    def fetch_framework_data(self, board_identifier):
       obj = {}
       obj['time'] = int(round(time.time() * 1000))
-      # counter = 0
-      # =call the framework api
       print("call the api-framework", self.framework_counter+1)
       grade_mdium_url = "https://staging.ntp.net.in/api/framework/v1/read/" + \
             board_identifier + "?categories=board,medium,gradeLevel,subject" 
@@ -123,8 +104,6 @@ class FrameworkApi:
          print("inside check_ttl_get_data else")
          last_time = framework_data[board_identifier]['time']
 
-      # last_time = channel_data[board]['time']
-     
       time_compare = last_time+self.ttl
       print("time_compare-->",time_compare)
       print("self.ttl-->",self.ttl)
@@ -137,7 +116,6 @@ class FrameworkApi:
          else:
             self.fetch_framework_data(board_identifier)
 
-         #  self.fetch_channel_data(board)
       if bool(board):
          print("inside time if")
          return self.channel_data[board]['payload']
@@ -148,19 +126,13 @@ class FrameworkApi:
 
 
 class ActionContentForm(FormAction):
-   #   print("redisClient in python --> ",redisClient)
-   #   redisClient.get 
      def name(self) -> Text:
         return "content_form"
 
      @staticmethod
      def required_slots(tracker: Tracker) -> List[Text]:
-      #   print("tracker --> ", tracker)
         return ["board", "medium", "grade"]
       
-     # initialize the redis connection pool
-      #  rs = redis.Redis(host='localhost', port=6379)
-   #   redisGet = redis.get("bot_" + deviceId)
      def board_db(self, value):
         global channel_response
 
@@ -187,12 +159,8 @@ class ActionContentForm(FormAction):
         print("inside board_db ", value)
         board_list = []
         
-      #   channel_response = requests.get(
-      #       "https://staging.ntp.net.in/api/channel/v1/read/0126632859575746566")
-
         res_json = channel_response.json()
 
-      #   api_matching_board = self.get_board_api_mapped(value)
         channels = res_json['result']['channel']['frameworks']
         for channel in channels:
          board_list.append(channel['identifier'])
@@ -207,23 +175,16 @@ class ActionContentForm(FormAction):
     
         a = FrameworkApi()
         
-      #   print("a.channel_data-->",a.framework_data)
-
         if not bool(a.framework_data):
            grade_medium_api_response = a.fetch_framework_data(board_identifier)
-         #   print("method3-->",grade_medium_api_response)
         else:
            cached_mediums = a.framework_data.keys()
-         #   print("cached_mediums-->",cached_mediums)
-         #   print("comparing value in cached_mediums",board_identifier)
            if board_identifier in cached_mediums :
             #   
               grade_medium_api_response = a.check_ttl_get_data("","",a.framework_data,board_identifier)
-            #   print("grade_medium_api_response method2-->",grade_medium_api_response)
               
            else:
               grade_medium_api_response = a.fetch_framework_data(board_identifier)
-            #   print("grade_medium_api_response method1-->",grade_medium_api_response)  
         res_framwork = grade_medium_api_response.json()
         medium_grade_categories = res_framwork['result']['framework']['categories']
         medium_to_compare = ''
@@ -231,8 +192,6 @@ class ActionContentForm(FormAction):
            medium_to_compare = self.get_medium_mapped(medium.lower())
 
         
-      #   print("medium_to_compare-->", medium_to_compare)
-
         for category in medium_grade_categories:
               if "medium" in category["code"]:
                  for term in category["terms"]:
@@ -247,10 +206,6 @@ class ActionContentForm(FormAction):
 
      def grade_db(self, grade):
 
-      #   grade_to_compare = self.get_grade_mapped(grade.lower())
-      #   print("grade_to_compare-->", grade_to_compare)
-
-      #   print("grade_list in grade_db-->", grade_list)
         return grade_list
 
      def validate_board(self,
@@ -312,9 +267,7 @@ class ActionContentForm(FormAction):
                          dispatcher: CollectingDispatcher,
                          tracker: Tracker,
                          domain: Dict[Text, Any]) -> Text:
-      #   """Validate medium."""
         redisSessionData ['medium'] = value
-      #   redisSlot =  { "medium":value }
         redisSlot =  json.dumps(redisSessionData)
         self.setRedisKeyValue(tracker.sender_id, redisSlot)
         medium_list = self.medium_grade_db(value)
@@ -323,7 +276,6 @@ class ActionContentForm(FormAction):
            grade_buttons = []
            for grade in grade_list:
               grade_buttons.append({"text": grade, "value": grade})
-         #   print("grade_buttons-->", grade_buttons)
            print("tracker.get_slot('medium') -->",tracker.get_slot('medium'))
            elements = [{
                "blocks": [{
@@ -339,7 +291,6 @@ class ActionContentForm(FormAction):
            medium_buttons = []
            for medium in medium_list:
               medium_buttons.append({"text": medium, "value": medium})
-         #   print("medium_buttons-->", medium_buttons)
 
            elements = [{
                "blocks": [{
@@ -360,7 +311,6 @@ class ActionContentForm(FormAction):
                         domain: Dict[Text, Any]) -> Text:
         
         redisSessionData ['grade'] = value
-      #   redisSlot =  { "grade":value }
         redisSlot =  json.dumps(redisSessionData)
         self.setRedisKeyValue(tracker.sender_id, redisSlot)
         grades = self.grade_db(value)
@@ -390,18 +340,9 @@ class ActionContentForm(FormAction):
         print("inside content_form")
         deviceId = tracker.sender_id
         redisValue = redisClient.get("action_"+ str(deviceId))
-      #   print("redisValue-->", redisValue , " and type --> ", type(redisValue))
         redisValue_str = redisValue.decode('utf-8')
-      #   print("redisValue_str-->", redisValue_str," and type --> ", type(redisValue_str))
 
         redisTracker = json.loads(redisValue_str)
-      #   print("redisTracker -->",redisTracker, " type ",type(redisTracker)," and dir -->", dir(redisTracker))
-      #   print("redisTracker['board'] -->",redisTracker['board'])
-      
-
-      #   board = tracker.get_slot('board')
-      #   grade = tracker.get_slot('grade')
-      #   medium = tracker.get_slot('medium')
 
         board = redisTracker['board']
         grade = redisTracker['grade']
@@ -423,8 +364,6 @@ class ActionContentForm(FormAction):
                     }]
         }]
         dispatcher.utter_message(json_message=elements)
-      #   dispatcher.utter_message(text="<span> Great! I understand that you are looking for content of " + board + " board, class " + grade + ", " + medium + " medium .<br>"
-      #                            "Please visit: <a target='_blank' href='" + url + "'> DIKSHA " + board + " Board</a></span>")
 
         return [SlotSet('board', board), SlotSet('grade', grade), SlotSet('medium', medium)]
 
@@ -482,6 +421,4 @@ class ActionContentForm(FormAction):
         return data[grade]
 
      def setRedisKeyValue (self,key, value):
-      #   expiryInterval = 3600
-	   #   redisClient.set('bot_' + key, value)
         redisClient.set('action_' + key, str(value))
