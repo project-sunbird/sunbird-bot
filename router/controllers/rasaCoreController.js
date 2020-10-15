@@ -9,12 +9,12 @@ const _ = require("lodash")
  * @param arg3: clientId, client id allocated to the connected session
  * @param arg4: cb, callback function
  */
-function processUserData(data,userId, clientId, cb) {
+function processUserData(data, cb) {
         webHookData = {
                 text: data["message"],
                 endpoint: data["endpoint"]
         }
-        API.BOTWebHookAPI(webHookData,userId, clientId, (err, res) => {
+        API.BOTWebHookAPI(webHookData,data.customData.userId, data.customData.deviceId, data.channel , (err, res) => {
                 if (err) {
                         LOG.error(`BOTWebHookAPI failed: ${err}`)
                         return cb(err, null)

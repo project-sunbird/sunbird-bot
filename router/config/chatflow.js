@@ -1,5 +1,5 @@
 var chatflow = {
-    step1: { 
+    step1: {
         messageKey: "START",
         responseVariable: "userIntent"
     },

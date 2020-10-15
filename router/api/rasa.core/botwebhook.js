@@ -3,7 +3,7 @@ var APP_CONFIG = require('../../config/config')
 var LOG = require('../../log/logger')
 
 
-function processResponse(res, userId, clientId, message, cb) {
+function processResponse(res, userId, clientId, message, channel, cb) {
   var botRes = 'unknown_option_freeFlow'
   var knownIntent = ''
   if (res && res.data && res.data.length > 0) {
@@ -40,12 +40,22 @@ function processResponse(res, userId, clientId, message, cb) {
             intent = item.custom.blocks[0].intent
           }
           if (item.custom.blocks[0] && item.custom.blocks[0].text) {
-            text = {
-              "data": {
-                "text": item.custom.blocks[0].text,
-                "buttons": item.custom.blocks[0].buttons
+            if (channel == 'whatsapp') {
+              text = {
+                "data": {
+                  "text": item.custom.blocks[0].text_whatsapp
+                }
               }
+            } else {
+              text = {
+                "data": {
+                  "text": item.custom.blocks[0].text,
+                  "buttons": item.custom.blocks[0].buttons
+                }
+              }
+
             }
+
           }
           if (item.custom.blocks[0] && item.custom.blocks[0].type) {
             type = item.custom.blocks[0].type
@@ -130,7 +140,7 @@ function processResponse(res, userId, clientId, message, cb) {
       }
 
     })
-    consolidatedLog(userId, clientId, message, knownIntent)
+    consolidatedLog(userId, clientId, message, knownIntent, channel)
     return cb(null, {
       res: resp
     })
@@ -144,6 +154,7 @@ function processResponse(res, userId, clientId, message, cb) {
 
 }
 
+<<<<<<< HEAD
 function consolidatedLog(userId, clientId, message, knownIntent) {
   var botResponseIdentifier
   if (knownIntent == "low_confidence") {
@@ -154,6 +165,18 @@ function consolidatedLog(userId, clientId, message, knownIntent) {
     botResponseIdentifier = "Free_flow_intent_detected"
   }
   LOG.info("UserId: " + userId + "," + " DeviceId: " + clientId + "," + " UserQuery: " + message + "," + " Bot_Response_identifier: " + botResponseIdentifier + "," + " BotResponse: " + knownIntent)
+=======
+function consolidatedLog(userId, clientId, message, knownIntent, channel) {
+  if (knownIntent != "low_confidence") {
+    if (channel == 'whatsapp') {
+      botResponseIdentifier = "whatsapp_Free_flow_intent_detected"
+    } else {
+      botResponseIdentifier = "Free_flow_intent_detected"
+    }
+    LOG.info("UserId: " + userId + "," + " DeviceId: " + clientId + "," + " UserQuery: " + message + "," + " Bot_Response_identifier: " + botResponseIdentifier + "," + " BotResponse: " + knownIntent)
+
+  }
+>>>>>>> 54d8585909c8e3eb8ae3b84b5ad9b2bebfad36c4
 }
 
 
@@ -180,11 +203,19 @@ function getRasaEndpoint(type) {
   return APP_CONFIG.RASA_CORE_ENDPOINT;
 }
 
+<<<<<<< HEAD
 exports.BOTWebHookAPI = function (data, userId, clientId, cb) {
   axios.create(getCustomHeaders(APP_CONFIG.RASA_API_TIMEOUT))
     .post(getRasaEndpoint(data.endpoint), getBody(data.text, clientId), getHeaders())
     .then(res => {
       processResponse(res, userId, clientId, data.text, (err, resp) => {
+=======
+exports.BOTWebHookAPI = function (data, userId, clientId, channel, cb) {
+  axios.create(getCustomHeaders(APP_CONFIG.RASA_API_TIMEOUT))
+    .post(getRasaEndpoint(data.endpoint), getBody(data.text, clientId), getHeaders())
+    .then(res => {
+      processResponse(res, userId, clientId, data.text, channel, (err, resp) => {
+>>>>>>> 54d8585909c8e3eb8ae3b84b5ad9b2bebfad36c4
         if (err) {
           LOG.error('error in call to bot')
           cb(err, null)

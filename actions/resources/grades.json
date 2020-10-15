@@ -56,21 +56,5 @@
     "class 4": "Class 4",
     "class 3": "Class 3",
     "class 2": "Class 2",
-    "class 1": "Class 1",
-    "doctors":"Doctors",
-    "nurses":"Nurses",
-    "nolunteers":"Volunteers",
-    "hygiene workers":"Hygiene Workers",
-    "hygieneworker":"Hygiene Workers",
-    "police":"Police",
-    "civil defence officials":"Civil Defence Officials",
-    "defence officials":"Civil Defence Officials",
-    "civil defence":"Civil Defence Officials",
-    "anms":"ANMs",
-    "other state officials":"Other State Officials",
-    "state officials":"Civil Defence Officials",
-    "paramedics":"Paramedics",
-    "other technicians":"Other Technicians",
-    "ayush doctors":"Ayush Doctors",
-    "ayush":"Ayush Doctors"
+    "class 1": "Class 1"
  }
