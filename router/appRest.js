@@ -50,7 +50,6 @@ appBot.post('/bot', function (req, res) {
 		}
 	}
 	handler(req, res, data)
-	res.end()
 })
 
 
