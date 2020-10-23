@@ -26,7 +26,6 @@ var crypto = require('crypto');
 const { data } = require('./log/logger');
 const url = require('url');
 const querystring = require('querystring');
-const { response } = require('express');
 
 // Redis is used as the session tracking store
 const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
