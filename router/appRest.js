@@ -133,11 +133,9 @@ function freeFlowLogic(data, res, chatflowConfig) {
 	RasaCoreController.processUserData(data, (err, resp) => {
 		var response = '';
 		if (err) {
-			console.log("inside err -->")
 			sendChannelResponse(data.customData.deviceId, res, data, 'SORRY')
 		} else {
 			var responses = resp.res;
-			console.log("responses-->",responses)
 			if (responses && responses[0].text && responses[0].text != '') {
 				response = responses[0].text;
 				telemetryData = createInteractionData(responses[0], data, true);
@@ -346,7 +344,6 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 
 	if (channelResponse) {
 		sendResponseWhatsapp(response, channelResponse, data.recipient, "menu driven")
-		response.send(channelResponse)
 	} else {
 		response.send(literals.message[responseKey])
 	}
