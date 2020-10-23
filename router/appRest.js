@@ -26,6 +26,7 @@ var crypto = require('crypto');
 const { data } = require('./log/logger');
 const url = require('url');
 const querystring = require('querystring');
+const { response } = require('express');
 
 // Redis is used as the session tracking store
 const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
@@ -49,6 +50,7 @@ appBot.post('/bot', function (req, res) {
 		}
 	}
 	handler(req, res, data)
+	res.end()
 })
 
 
@@ -156,7 +158,7 @@ function freeFlowLogic(data, res, chatflowConfig) {
 			}
 			telemetry.logInteraction(telemetryData);
 			if (data.channel == config.WHATSAPP) {
-				sendResponseWhatsapp(response, data.recipient, "freeFlow")
+				sendResponseWhatsapp(res, response, data.recipient, "freeFlow")
 			} else {
 				sendResponse(res, response)
 			}
@@ -301,7 +303,7 @@ function sendResponse(response, responseBody, responseCode) {
 }
 
 //send data to user
-function sendResponseWhatsapp(responseBody, recipient, textContent) {
+function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 	var rsponseText = ''
 	if (textContent == "freeFlow") {
 		rsponseText = responseBody.data.text
@@ -334,7 +336,7 @@ function sendResponseWhatsapp(responseBody, recipient, textContent) {
 		if (error) throw new Error(error);
 
 	});
-
+	response.send(responseBody)
 }
 function sendChannelResponse(response, responseKey, data, responseCode) {
 	response.set('Content-Type', 'application/json')
@@ -344,7 +346,7 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 	var channelResponse = literals.message[responseKey + '_' + data.channel];
 
 	if (channelResponse) {
-		sendResponseWhatsapp(channelResponse, data.recipient, "menu driven")
+		sendResponseWhatsapp(response, channelResponse, data.recipient, "menu driven")
 		response.send(channelResponse)
 	} else {
 		response.send(literals.message[responseKey])
