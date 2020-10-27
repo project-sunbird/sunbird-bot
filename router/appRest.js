@@ -70,6 +70,8 @@ appBot.post('/whatsapp', function (req, res) {
 			}
 		}
 		handler(req, res, data)
+	} else {
+		sendErrorResponse(res)
 	}
 
 })
@@ -298,6 +300,10 @@ function sendResponse(response, responseBody, responseCode) {
 	response.send(responseBody)
 }
 
+function sendErrorResponse(response){
+	response.status(401);
+	response.send('invalid request');
+}
 //send data to user
 function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 	var rsponseText = ''
