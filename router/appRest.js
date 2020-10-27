@@ -70,6 +70,8 @@ appBot.post('/whatsapp', function (req, res) {
 			}
 		}
 		handler(req, res, data)
+	} else {
+		sendErrorResponse(res)
 	}
 
 })
@@ -132,11 +134,9 @@ function freeFlowLogic(data, res, chatflowConfig) {
 	RasaCoreController.processUserData(data, (err, resp) => {
 		var response = '';
 		if (err) {
-			console.log("inside err -->")
 			sendChannelResponse(data.customData.deviceId, res, data, 'SORRY')
 		} else {
 			var responses = resp.res;
-			console.log("responses-->",responses)
 			if (responses && responses[0].text && responses[0].text != '') {
 				response = responses[0].text;
 				telemetryData = createInteractionData(responses[0], data, true);
@@ -156,7 +156,7 @@ function freeFlowLogic(data, res, chatflowConfig) {
 			}
 			telemetry.logInteraction(telemetryData);
 			if (data.channel == config.WHATSAPP) {
-				sendResponseWhatsapp(response, data.recipient, "freeFlow")
+				sendResponseWhatsapp(res, response, data.recipient, "freeFlow")
 			} else {
 				sendResponse(res, response)
 			}
@@ -300,8 +300,12 @@ function sendResponse(response, responseBody, responseCode) {
 	response.send(responseBody)
 }
 
+function sendErrorResponse(response){
+	response.status(401);
+	response.send('invalid request');
+}
 //send data to user
-function sendResponseWhatsapp(responseBody, recipient, textContent) {
+function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 	var rsponseText = ''
 	if (textContent == "freeFlow") {
 		rsponseText = responseBody.data.text
@@ -334,7 +338,7 @@ function sendResponseWhatsapp(responseBody, recipient, textContent) {
 		if (error) throw new Error(error);
 
 	});
-
+	response.send(responseBody)
 }
 function sendChannelResponse(response, responseKey, data, responseCode) {
 	response.set('Content-Type', 'application/json')
@@ -344,8 +348,7 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 	var channelResponse = literals.message[responseKey + '_' + data.channel];
 
 	if (channelResponse) {
-		sendResponseWhatsapp(channelResponse, data.recipient, "menu driven")
-		response.send(channelResponse)
+		sendResponseWhatsapp(response, channelResponse, data.recipient, "menu driven")
 	} else {
 		response.send(literals.message[responseKey])
 	}
