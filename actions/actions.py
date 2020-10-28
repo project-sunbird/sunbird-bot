@@ -16,18 +16,13 @@ import requests
 import datetime
 import time
 import redis
-import constant
+from config import config
 from configparser import ConfigParser
 
-config = ConfigParser()
 nlp = spacy.load('en_core_web_sm')
 
-redisClient = redis.Redis(host= "localhost" , port = 6379)
+redisClient = redis.Redis(host= config.REDIS_HOST , port = config.REDIS_PORT)
 redisSessionData = {}
-# data_file = "baspath/bot/router/config.js"
-# configFile = os.path.join(dirname, 'config/config.js')
-#         with open(configFile) as config_values:
-#            config = json.load(config_values)
 
 class ActionSubjectCourses(Action):
      def name(self) -> Text:
@@ -80,7 +75,7 @@ class FrameworkApi:
       obj = {}
       obj['time'] = int(round(time.time() * 1000))
       print("call the api-channel",self.channel_counter+1)
-      channel_res = requests.get(constant.CHANNEL_API) 
+      channel_res = requests.get(config.CHANNEL_API) 
       print("channel_res",channel_res)
       obj['payload'] = channel_res
       print("obj-->",obj, type(obj))
@@ -91,8 +86,8 @@ class FrameworkApi:
       obj = {}
       obj['time'] = int(round(time.time() * 1000))
       print("call the api-framework", self.framework_counter+1)
-      grade_mdium_url = constant.FRAMEWORK_API + \
-            board_identifier + constant.FRAMEWORK_FILTER
+      grade_mdium_url = config.FRAMEWORK_API + \
+            board_identifier + config.FRAMEWORK_FILTER
       framework_res = requests.get(grade_mdium_url)
       print("framework_res-->",framework_res)
       obj['payload'] = framework_res
@@ -382,15 +377,16 @@ class ActionContentForm(FormAction):
 
      def get_board_api_mapped(self, board):
         dirname = os.path.dirname(__file__)
-        filename = os.path.join(dirname, 'resources/boards_api.json')
+        filename = os.path.join(dirname, 'config/boards_api.json')
         with open(filename) as boards_api_values:
            data = json.load(boards_api_values)
+           print("data in get_board_api_mapped-->",data)
         return data[board]
 
      def get_reafactored_board_mapped(self, board_list):
         dirname = os.path.dirname(__file__)
         reafactored_board_list = []
-        filename = os.path.join(dirname, 'resources/refactored_board.json')
+        filename = os.path.join(dirname, 'config/refactored_board.json')
         with open(filename) as reafactored_boards_values:
            data = json.load(reafactored_boards_values)
 
