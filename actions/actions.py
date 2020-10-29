@@ -31,9 +31,7 @@ class ActionSubjectCourses(Action):
      def run(self, dispatcher: CollectingDispatcher,
              tracker: Tracker,
              domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-         print('running action_subject_courses')
          dispatcher.utter_message(template="utter_fetching_data")
-         print(tracker.latest_message.get('entities'))
          elements = [{"type": "subject_courses", "entities": tracker.latest_message.get(
              'entities'), "intent": "subject_courses"}]
          dispatcher.utter_message(json_message=elements)
@@ -97,26 +95,19 @@ class FrameworkApi:
 
    def check_ttl_get_data(self, channel_data, board,framework_data,board_identifier):
       if bool(board):
-         print("inside check_ttl_get_data board")
          last_time = channel_data[board]['time']
       else :
-         print("inside check_ttl_get_data else")
          last_time = framework_data[board_identifier]['time']
 
       time_compare = last_time+self.ttl
-      print("time_compare-->",time_compare)
-      print("self.ttl-->",self.ttl)
       current_time = int(round(time.time() * 1000))
-      print("current_time-->",current_time)
       if time_compare < current_time:
-         print("inside time_compare if")
          if bool(board):
             self.fetch_channel_data(board)
          else:
             self.fetch_framework_data(board_identifier)
 
       if bool(board):
-         print("inside time if")
          return self.channel_data[board]['payload']
       else : 
          return self.framework_data[board_identifier]['payload']
@@ -134,32 +125,19 @@ class ActionContentForm(FormAction):
       
      def board_db(self, value):
         global channel_response
-
         a = FrameworkApi()
-        
-        print("a.channel_data-->",a.channel_data)
-
         if not bool(a.channel_data):
-           print("calling a.fetch_channel_data(value)")
            channel_response = a.fetch_channel_data(value)
-           print("method1-->",channel_response)
         else:
            cached_boards = a.channel_data.keys()
-           print("cached_boards-->",cached_boards)
-           print("comparing value in cached_boards",value)
            if value in cached_boards :
               channel_response = a.check_ttl_get_data(a.channel_data,value,"","")
-              print("method2-->",channel_response)
               
            else:
               channel_response = a.fetch_channel_data(value)
-              print("method1-->",channel_response)
           
-        print("inside board_db ", value)
         board_list = []
-        
         res_json = channel_response.json()
-
         channels = res_json['result']['channel']['frameworks']
         for channel in channels:
          board_list.append(channel['identifier'])
@@ -179,11 +157,10 @@ class ActionContentForm(FormAction):
         else:
            cached_mediums = a.framework_data.keys()
            if board_identifier in cached_mediums :
-            #   
               grade_medium_api_response = a.check_ttl_get_data("","",a.framework_data,board_identifier)
-              
            else:
               grade_medium_api_response = a.fetch_framework_data(board_identifier)
+
         res_framwork = grade_medium_api_response.json()
         medium_grade_categories = res_framwork['result']['framework']['categories']
         medium_to_compare = ''
@@ -218,9 +195,7 @@ class ActionContentForm(FormAction):
         redisSlot =  json.dumps(redisSessionData)
         self.setRedisKeyValue(tracker.sender_id, redisSlot)
   
-        print("calling board_db from validate_board")
         board_list = self.board_db(value)
-        print("board_list-->",board_list)
         api_matching_board = self.get_board_api_mapped(value.lower())
         if(api_matching_board in board_list):
            board_identifier = api_matching_board
@@ -228,7 +203,6 @@ class ActionContentForm(FormAction):
            medium_buttons = []
            for medium in medium_list:
               medium_buttons.append({"text": medium, "value": medium})
-              print("medium_buttons-->", medium_buttons)
 
            elements = [{
                "blocks": [{
@@ -248,7 +222,6 @@ class ActionContentForm(FormAction):
            board_buttons = []
            for board in reafactored_board_list:
               board_buttons.append({"text": board, "value": board})
-           print("board_buttons-->", board_buttons)
            elements = [{
                "blocks": [{
                    "intent": "greet",
@@ -275,7 +248,6 @@ class ActionContentForm(FormAction):
            grade_buttons = []
            for grade in grade_list:
               grade_buttons.append({"text": grade, "value": grade})
-           print("tracker.get_slot('medium') -->",tracker.get_slot('medium'))
            elements = [{
                "blocks": [{
                    "intent": "greet",
@@ -336,7 +308,6 @@ class ActionContentForm(FormAction):
                 tracker: Tracker,
                 domain: Dict[Text, Any]) -> List[Dict]:
 
-        print("inside content_form")
         deviceId = tracker.sender_id
         redisValue = redisClient.get("action_"+ str(deviceId))
         redisValue_str = redisValue.decode('utf-8')
@@ -346,10 +317,6 @@ class ActionContentForm(FormAction):
         board = redisTracker['board']
         grade = redisTracker['grade']
         medium = redisTracker['medium']
-
-        print('Grade -->', grade)
-        print('Medium -->', medium)
-        print('Board -->', board)
 
         url = self.gererate_diksha_url(board, medium, grade)
 
@@ -367,7 +334,6 @@ class ActionContentForm(FormAction):
         return [SlotSet('board', board), SlotSet('grade', grade), SlotSet('medium', medium)]
 
      def gererate_diksha_url(self, board, medium, grade):
-        print("inside gererate_diksha_url")
         base_url = "https://diksha.gov.in/explore"
         board_url = "?board=" + self.get_board_mapped(board.lower())
         medium_url = "&medium=" + self.get_medium_mapped(medium.lower())
@@ -396,7 +362,6 @@ class ActionContentForm(FormAction):
 
             else:
               reafactored_board_list.append(board)
-        print("reafactored_board_list-->", reafactored_board_list)
         return reafactored_board_list
 
      def get_board_mapped(self, board):
