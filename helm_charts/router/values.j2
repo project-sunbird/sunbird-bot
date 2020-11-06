@@ -27,6 +27,6 @@ routerenv:
   sunbird_api_auth_token: "{{ sunbird_api_auth_token_bot }}"
   telemetry_service_url: "https://{{ domain_name }}/api/data/"
   WHATSAPP_TELEMETRY_CHANNEL: '"{{sunbird_whatsapp_telemetry_channel | default("")}}"'
-  WHATSAPP_SECRET_KEY: "{{sunbird_whatsapp_secret_key | default("")}}"
-  WHATSAPP_AUTH_TOKEN: "{{sunbird_whatsapp_auth_token | default("")}}"
-  WHATSAPP_SOURCE: "{{sunbird_whatsapp_source | default("")}}"
+  WHATSAPP_SECRET_KEY: "{{sunbird_whatsapp_secret_key | default("''")}}"
+  WHATSAPP_AUTH_TOKEN: "{{sunbird_whatsapp_auth_token | default("''")}}"
+  WHATSAPP_SOURCE: "{{sunbird_whatsapp_source | default("''")}}"
