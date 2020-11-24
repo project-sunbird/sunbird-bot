@@ -183,6 +183,148 @@ var chatflow = {
         messageKey: "CERTIFICATE_ISSUE",
         responseVariable: ""
     },
+    step1_2_3: {
+        messageKey: "NISHTHA_TRAINING",
+        responseVariable: ""
+    },
+    step1_2_3_1: {
+        messageKey: "NISHTHA_BOARD",
+        name: "TAMILNADU",
+        boardName: "state (tamil nadu)",
+        responseVariable: ""
+    },
+    step1_2_3_2: {
+        messageKey: "NISHTHA_BOARD",
+        name: "KARNATAKA",
+        boardName: "state (karnataka)",
+        responseVariable: ""
+    },
+    step1_2_3_3: {
+        messageKey: "NISHTHA_BOARD",
+        name: "GUJARAT",
+        boardName: "state (gujarat)",
+        responseVariable: ""
+    },
+    step1_2_3_4: {
+        messageKey: "NISHTHA_BOARD",
+        name: "UTTAR PRADESH",
+        boardName: "state (uttar pradesh)",
+        responseVariable: ""
+    },
+    step1_2_3_5: {
+        messageKey: "NISHTHA_BOARD",
+        name: "PUNJAB",
+        boardName: "state (punjab)",
+        responseVariable: ""
+    },
+    step1_2_3_6: {
+        messageKey: "NISHTHA_BOARD",
+        name: "RAJASTAN",
+        boardName: "state (rajasthan)",
+        responseVariable: ""
+    },
+    step1_2_3_7: {
+        messageKey: "NISHTHA_BOARD",
+        Nname: "MANIPUR",
+        boardName: "state (manipur)",
+        responseVariable: ""
+    },
+    step1_2_3_8: {
+        messageKey: "NISHTHA_BOARD",
+        name: "CHHATTISGARH",
+        boardName: "state (chhattisgarh)",
+        responseVariable: ""
+    },
+    step1_2_3_9: {
+        messageKey: "NISHTHA_BOARD",
+        name: "MAHARASTHTRA",
+        boardName: "state (maharashtra)",
+        responseVariable: ""
+    },
+    step1_2_3_10: {
+        messageKey: "NISHTHA_BOARD",
+        name: "BIHAR",
+        boardName: "state (bihar)",
+        responseVariable: ""
+    },
+    step1_2_3_11: {
+        messageKey: "NISHTHA_BOARD",
+        name: "ODISHA",
+        boardName: "state (odisha)",
+        responseVariable: ""
+    },
+    step1_2_3_12: {
+        messageKey: "NISHTHA_BOARD",
+        name: "ASSAM",
+        boardName: "state (assam)",
+        responseVariable: ""
+    },
+    step1_2_3_13: {
+        messageKey: "NISHTHA_BOARD",
+        name: "MADHYA PRADESH",
+        boardName: "state (madhya pradesh)",
+        responseVariable: ""
+    },
+    step1_2_3_14: {
+        messageKey: "NISHTHA_BOARD",
+        name: "HARYANA",
+        boardName: "state (haryana)",
+        responseVariable: ""
+    },
+    step1_1_1_2_15: {
+        messageKey: "NISHTHA_BOARD",
+        name: "NAGALAND",
+        boardName: "state (nagaland)",
+        responseVariable: ""
+    },
+    step1_2_3_16: {
+        messageKey: "NISHTHA_BOARD",
+        name: "GOA",
+        boardName: "state (goa)",
+        responseVariable: ""
+    },
+    step1_2_3_17: {
+        messageKey: "NISHTHA_BOARD",
+        name: "TELENGANA",
+        boardName: "state (telangana)",
+        responseVariable: ""
+    },
+    step1_2_3_18: {
+        messageKey: "NISHTHA_BOARD",
+        name: "ANDHRA PRADESH",
+        boardName: "state (andhra pradesh)",
+        responseVariable: ""
+    },
+    step1_2_3_19: {
+        messageKey: "NISHTHA_BOARD",
+        name: "MEGHALAYA",
+        boardName: "state (meghalaya)",
+        responseVariable: ""
+    },
+    step1_2_3_20: {
+        messageKey: "NISHTHA_BOARD",
+        name: "CBSE",
+        boardName: "CBSE",
+        responseVariable: ""
+    },
+    step1_1_1_2_21: {
+        messageKey: "NISHTHA_BOARD",
+        name: "JHARKHAND",
+        boardName: "state (jharkhand)",
+        responseVariable: ""
+    },
+    step1_2_3_22: {
+        messageKey: "NISHTHA_BOARD",
+        name: "SIKKIM",
+        boardName: "state (sikkim)",
+        responseVariable: ""
+    },
+    step1_2_3_23: {
+        messageKey: "NISHTHA_BOARD",
+        name: "CHANDIGARH",
+        boardName: "state (chandigarh)",
+        responseVariable: ""
+    },
     step1_2_2_error: {
         messageKey: "WRONG_INPUT_AT_FIRST_LEVEL",
         responseVariable: ""

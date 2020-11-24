@@ -4,6 +4,7 @@ const cors = require('cors')
 var https = require('https');
 var http = require('http');
 var fs = require('fs');
+var _ = require('lodash');
 var redis = require('redis');
 var LOG = require('./log/logger')
 var literals = require('./config/literals')
@@ -32,7 +33,6 @@ const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
-
 	var userId = req.body.userId ? req.body.userId : req.body.From;
 	var data = {
 		message: req.body.Body,
@@ -350,7 +350,19 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 	if (channelResponse) {
 		sendResponseWhatsapp(response, channelResponse, data.recipient, "menu driven")
 	} else {
-		response.send(literals.message[responseKey])
+		var currentFlowText = literals.message[responseKey].data.text;
+		if(currentFlowText.includes("[NISHTHA_COURSE_LINK]")){
+			var currentFlowStep = redisSessionData.currentFlowStep;
+			var selectedBoard = chatflow.chatflow[currentFlowStep].boardName;
+			var selectedBoardName = chatflow.chatflow[currentFlowStep].name;
+			currentFlowText = _.replace(currentFlowText, '[NISHTHA_COURSE_LINK]',config.DIKSHA_COURSE_LINK)
+			currentFlowText = _.replace(currentFlowText, '[KEY]','Nishtha%202020');
+			currentFlowText = _.replace(currentFlowText, '[BOARD]',selectedBoard);
+			currentFlowText = _.replace(currentFlowText, '[%BOARD%]',selectedBoardName);
+		}
+		var responseData = literals.message[responseKey];
+		responseData.data.text = currentFlowText;
+		response.send(responseData);
 	}
 }
 function createInteractionData(responseData, data, isNonNumeric) {
