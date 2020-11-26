@@ -350,19 +350,17 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 	if (channelResponse) {
 		sendResponseWhatsapp(response, channelResponse, data.recipient, "menu driven")
 	} else {
-		var currentFlowText = literals.message[responseKey].data.text;
-		if(currentFlowText.includes("[NISHTHA_COURSE_LINK]")){
+		const currentFlowText = _.cloneDeep(literals.message[responseKey]);
+		if(currentFlowText.data.text.includes("[NISHTHA_COURSE_LINK]")){
 			var currentFlowStep = redisSessionData.currentFlowStep;
 			var selectedBoard = chatflow.chatflow[currentFlowStep].boardName;
 			var selectedBoardName = chatflow.chatflow[currentFlowStep].name;
-			currentFlowText = _.replace(currentFlowText, '[NISHTHA_COURSE_LINK]',config.DIKSHA_COURSE_LINK)
-			currentFlowText = _.replace(currentFlowText, '[KEY]','Nishtha%202020');
-			currentFlowText = _.replace(currentFlowText, '[BOARD]',selectedBoard);
-			currentFlowText = _.replace(currentFlowText, '[%BOARD%]',selectedBoardName);
+			currentFlowText.data.text = _.replace(currentFlowText.data.text, '[NISHTHA_COURSE_LINK]',config.DIKSHA_COURSE_LINK)
+			currentFlowText.data.text = _.replace(currentFlowText.data.text, '[KEY]','Nishtha%202020');
+			currentFlowText.data.text = _.replace(currentFlowText.data.text, '[BOARD]',selectedBoard);
+			currentFlowText.data.text = _.replace(currentFlowText.data.text, '[%BOARD%]',selectedBoardName);
 		}
-		var responseData = literals.message[responseKey];
-		responseData.data.text = currentFlowText;
-		response.send(responseData);
+		response.send(currentFlowText);
 	}
 }
 function createInteractionData(responseData, data, isNonNumeric) {
