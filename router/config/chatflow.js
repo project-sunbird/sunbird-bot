@@ -271,7 +271,7 @@ var chatflow = {
         boardName: "state (haryana)",
         responseVariable: ""
     },
-    step1_1_1_2_15: {
+    step1_2_3_15: {
         messageKey: "NISHTHA_BOARD",
         name: "NAGALAND",
         boardName: "state (nagaland)",
@@ -307,7 +307,7 @@ var chatflow = {
         boardName: "CBSE",
         responseVariable: ""
     },
-    step1_1_1_2_21: {
+    step1_2_3_21: {
         messageKey: "NISHTHA_BOARD",
         name: "JHARKHAND",
         boardName: "state (jharkhand)",
