@@ -189,140 +189,117 @@ var chatflow = {
     },
     step1_2_3_1: {
         messageKey: "NISHTHA_BOARD",
-        name: "TAMILNADU",
-        boardName: "state (tamil nadu)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (tamil nadu)",name: "TAMILNADU"}},
         responseVariable: ""
     },
     step1_2_3_2: {
         messageKey: "NISHTHA_BOARD",
-        name: "KARNATAKA",
-        boardName: "state (karnataka)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (karnataka)",name: "KARNATAKA"}},
         responseVariable: ""
     },
     step1_2_3_3: {
         messageKey: "NISHTHA_BOARD",
-        name: "GUJARAT",
-        boardName: "state (gujarat)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (gujarat)",name: "GUJARAT"}},
         responseVariable: ""
     },
     step1_2_3_4: {
         messageKey: "NISHTHA_BOARD",
-        name: "UTTAR PRADESH",
-        boardName: "state (uttar pradesh)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (uttar pradesh)",name: "UTTAR PRADESH"}},
         responseVariable: ""
     },
     step1_2_3_5: {
         messageKey: "NISHTHA_BOARD",
-        name: "PUNJAB",
-        boardName: "state (punjab)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (punjab)",name: "PUNJAB"}},
         responseVariable: ""
     },
     step1_2_3_6: {
         messageKey: "NISHTHA_BOARD",
-        name: "RAJASTAN",
-        boardName: "state (rajasthan)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (rajasthan)",name: "RAJASTAN"}},
         responseVariable: ""
     },
     step1_2_3_7: {
         messageKey: "NISHTHA_BOARD",
-        Nname: "MANIPUR",
-        boardName: "state (manipur)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (manipur)",name: "MANIPUR"}},
         responseVariable: ""
     },
     step1_2_3_8: {
         messageKey: "NISHTHA_BOARD",
-        name: "CHHATTISGARH",
-        boardName: "state (chhattisgarh)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (chhattisgarh)",name: "CHHATTISGARH"}},
         responseVariable: ""
     },
     step1_2_3_9: {
         messageKey: "NISHTHA_BOARD",
-        name: "MAHARASTHTRA",
-        boardName: "state (maharashtra)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (maharashtra)",name: "MAHARASTHTRA"}},
         responseVariable: ""
     },
     step1_2_3_10: {
         messageKey: "NISHTHA_BOARD",
-        name: "BIHAR",
-        boardName: "state (bihar)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (bihar)",name: "BIHAR"}},
         responseVariable: ""
     },
     step1_2_3_11: {
         messageKey: "NISHTHA_BOARD",
-        name: "ODISHA",
-        boardName: "state (odisha)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (odisha)",name: "ODISHA"}},
         responseVariable: ""
     },
     step1_2_3_12: {
         messageKey: "NISHTHA_BOARD",
-        name: "ASSAM",
-        boardName: "state (assam)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (assam)",name: "ASSAM"}},
         responseVariable: ""
     },
     step1_2_3_13: {
         messageKey: "NISHTHA_BOARD",
-        name: "MADHYA PRADESH",
-        boardName: "state (madhya pradesh)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (madhya pradesh)",name: "MADHYA PRADESH"}},
         responseVariable: ""
     },
     step1_2_3_14: {
         messageKey: "NISHTHA_BOARD",
-        name: "HARYANA",
-        boardName: "state (haryana)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (haryana)",name: "HARYANA"}},
         responseVariable: ""
     },
     step1_2_3_15: {
         messageKey: "NISHTHA_BOARD",
-        name: "NAGALAND",
-        boardName: "state (nagaland)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (nagaland)",name: "NAGALAND"}},
         responseVariable: ""
     },
     step1_2_3_16: {
         messageKey: "NISHTHA_BOARD",
-        name: "GOA",
-        boardName: "state (goa)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (goa)",name: "GOA"}},
         responseVariable: ""
     },
     step1_2_3_17: {
         messageKey: "NISHTHA_BOARD",
-        name: "TELENGANA",
-        boardName: "state (telangana)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (telangana)",name: "TELENGANA"}},
         responseVariable: ""
     },
     step1_2_3_18: {
         messageKey: "NISHTHA_BOARD",
-        name: "ANDHRA PRADESH",
-        boardName: "state (andhra pradesh)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (andhra pradesh)",name: "ANDHRA PRADESH"}},
         responseVariable: ""
     },
     step1_2_3_19: {
         messageKey: "NISHTHA_BOARD",
-        name: "MEGHALAYA",
-        boardName: "state (meghalaya)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (meghalaya)",name: "MEGHALAYA"}},
         responseVariable: ""
     },
     step1_2_3_20: {
         messageKey: "NISHTHA_BOARD",
-        name: "CBSE",
-        boardName: "CBSE",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (cbse)",name: "CBSE"}},
         responseVariable: ""
     },
     step1_2_3_21: {
         messageKey: "NISHTHA_BOARD",
-        name: "JHARKHAND",
-        boardName: "state (jharkhand)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (jharkhand)",name: "JHARKHAND"}},
         responseVariable: ""
     },
     step1_2_3_22: {
         messageKey: "NISHTHA_BOARD",
-        name: "SIKKIM",
-        boardName: "state (sikkim)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (sikkim)",name: "SIKKIM"}},
         responseVariable: ""
     },
     step1_2_3_23: {
         messageKey: "NISHTHA_BOARD",
-        name: "CHANDIGARH",
-        boardName: "state (chandigarh)",
+        data: {replaceLabels: {link: "https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%", key: "Nishtha 2020", board: "state (chandigarh)",name: "CHANDIGARH"}},
         responseVariable: ""
     },
     step1_2_2_error: {

@@ -200,26 +200,11 @@ message.CHOOSE_STATE_BOARD =
     }
 }
 
-message.BOARD =
-{
-    "type": "button",
-    "data": {
-        "text": " Please visit <a target='_blank' href='{$course_link}'>DIKSHA TAMILNADU</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
-        "buttons": [{
-            "text": "Go Back",
-            "value": "99",
-        },
-        {
-            "text": "Main Menu",
-            "value": "0",
-        }]
-    }
-}
 message.NISHTHA_BOARD =
 {
     "type": "button",
     "data": {
-        "text": " Please visit <a target='_blank' href='[NISHTHA_COURSE_LINK]'>DIKSHA [%BOARD%]</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "text": " Please visit <a target='_blank' href='%link%'>DIKSHA %name%</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
         "buttons": [{
             "text": "Go Back",
             "value": "99",

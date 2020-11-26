@@ -351,15 +351,17 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 		sendResponseWhatsapp(response, channelResponse, data.recipient, "menu driven")
 	} else {
 		const currentFlowText = _.cloneDeep(literals.message[responseKey]);
-		if(currentFlowText.data.text.includes("[NISHTHA_COURSE_LINK]")){
-			var currentFlowStep = redisSessionData.currentFlowStep;
-			var selectedBoard = chatflow.chatflow[currentFlowStep].boardName;
-			var selectedBoardName = chatflow.chatflow[currentFlowStep].name;
-			currentFlowText.data.text = _.replace(currentFlowText.data.text, '[NISHTHA_COURSE_LINK]',config.DIKSHA_COURSE_LINK)
-			currentFlowText.data.text = _.replace(currentFlowText.data.text, '[KEY]','Nishtha%202020');
-			currentFlowText.data.text = _.replace(currentFlowText.data.text, '[BOARD]',selectedBoard);
-			currentFlowText.data.text = _.replace(currentFlowText.data.text, '[%BOARD%]',selectedBoardName);
-		}
+		var currentFlowStep = redisSessionData.currentFlowStep;
+		// Replace link and board
+		currentFlowText.data.text = currentFlowText.data.text.replace(/[%]?\w+[%]/g, function(item){
+			var matchedItem = item.replace(/[^a-zA-Z ]/g, "");
+			return chatflow.chatflow[currentFlowStep].data.replaceLabels[matchedItem];
+		});
+		//Replace search queries
+		currentFlowText.data.text = currentFlowText.data.text.replace(/[%]?\w+[%]/g, function(item){
+			var matchedItem = item.replace(/[^a-zA-Z ]/g, "");
+			return chatflow.chatflow[currentFlowStep].data.replaceLabels[matchedItem];
+		});
 		response.send(currentFlowText);
 	}
 }
