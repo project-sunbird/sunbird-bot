@@ -99,117 +99,94 @@ message.CHOOSE_STATE_BOARD =
         "text": " Which state board do you belong to? ",
         "buttons": [{
             "text": "Tamilnadu",
-            "data": {"name": "state (tamil nadu)"},
             "value": 1,
         },
         {
             "text": "Karnataka",
-            "data": {"name": "State (Karnataka)"},
             "value": 2,
         },
         {
             "text": "Gujarat",
-            "data": {"name": "State (Gujarat)"},
             "value": 3,
         },
         {
             "text": "UttarPradesh",
-            "data": {"channel": ""},
             "value": 4,
         },
         {
             "text": "Punjab",
-            "data": {"channel": ""},
             "value": 5,
         },
         {
             "text": "Rajasthan",
-            "data": {"channel": ""},
             "value": 6,
         },
         {
             "text": "Manipur",
-            "data": {"channel": ""},
             "value": 7,
         },
         {
             "text": "Chhattisgarh",
-            "data": {"channel": ""},
             "value": 8,
         },
         {
             "text": "Maharashtra",
-            "data": {"channel": ""},
             "value": 9,
         },
         {
             "text": "Bihar",
-            "data": {"channel": ""},
             "value": 10,
         },
         {
             "text": "Odisha",
-            "data": {"channel": ""},
             "value": 11,
         },
         {
             "text": "Assam",
-            "data": {"channel": ""},
             "value": 12,
         },
         {
             "text": "Madhya Pradesh",
-            "data": {"channel": ""},
             "value": 13,
         },
         {
             "text": "Haryana",
-            "data": {"channel": ""},
             "value": 14,
         },
         {
             "text": "Nagaland",
-            "data": {"channel": ""},
             "value": 15,
         },
         {
             "text": "Goa",
-            "data": {"channel": ""},
             "value": 16,
         },
         {
             "text": "Telangana",
-            "data": {"channel": ""},
             "value": 17,
         },
         {
             "text": "Andhra Pradesh",
-            "data": {"name": "state (andhra pradesh)"},
             "value": 18,
         },
         {
             "text": "Meghalaya",
-            "data": {"channel": ""},
             "value": 19,
         },
         {
             "text": "NCERT",
-            "data": {"channel": ""},
             "value": 20,
         },
         {
             "text": "Jharkhand",
-            "data": {"channel": ""},
             "value": 21,
         },
         {
             "text": "Sikkim",
-            "data": {"channel": ""},
             "value": 22,
         },
         {
             "text": "Chandigarh",
-            "data": {"channel": ""},
             "value": 23,
         },
         {
