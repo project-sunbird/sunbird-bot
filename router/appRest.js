@@ -4,6 +4,7 @@ const cors = require('cors')
 var https = require('https');
 var http = require('http');
 var fs = require('fs');
+var _ = require('lodash');
 var redis = require('redis');
 var LOG = require('./log/logger')
 var literals = require('./config/literals')
@@ -32,7 +33,6 @@ const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
-
 	var userId = req.body.userId ? req.body.userId : req.body.From;
 	var data = {
 		message: req.body.Body,
@@ -350,7 +350,16 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 	if (channelResponse) {
 		sendResponseWhatsapp(response, channelResponse, data.recipient, "menu driven")
 	} else {
-		response.send(literals.message[responseKey])
+		const currentFlowText = _.cloneDeep(literals.message[responseKey]);
+		var currentFlowStep = redisSessionData.currentFlowStep;
+		//Replace search queries
+		if(_.has(currentFlowText, 'data.text')){
+			currentFlowText.data.text = currentFlowText.data.text.replace(/[%]?\w+[%]/g, function(item){
+				var matchedItem = item.replace(/[^a-zA-Z ]/g, "");
+				return chatflow.chatflow[currentFlowStep].data.replaceLabels[matchedItem];
+			});
+		}
+		response.send(currentFlowText);
 	}
 }
 function createInteractionData(responseData, data, isNonNumeric) {

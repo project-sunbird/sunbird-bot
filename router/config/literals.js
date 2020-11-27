@@ -200,6 +200,22 @@ message.CHOOSE_STATE_BOARD =
     }
 }
 
+message.NISHTHA_BOARD =
+{
+    "type": "button",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%?&utm_source=Tara'>DIKSHA %board%</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
 message.TN_BOARD =
 {
     "type": "button",
@@ -217,7 +233,6 @@ message.TN_BOARD =
 }
 
 message.KA_BOARD =
-
 {
     "type": "button",
     "data": {
@@ -587,6 +602,7 @@ message.CH_BOARD =
     }
 }
 
+
 message.WEEKLY_CRITICAL_THINKING =
 {
     "type": "button",
@@ -616,6 +632,10 @@ message.TRAINING =
         {
             "text": "IGOT Courses",
             "value": 2,
+        },
+        {
+            "text": "NISHTHA Courses",
+            "value": 3,
         },
         {
             "text": "Go Back",
@@ -758,6 +778,8 @@ message.TRAINING_OTHERS_BOARD =
             }]
     }
 }
+
+message.NISHTHA_TRAINING = message.CHOOSE_STATE_BOARD
 
 message.CHOOSE_IGOT_TRAINING_OPTION =
 {
