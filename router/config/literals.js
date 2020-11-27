@@ -216,6 +216,392 @@ message.NISHTHA_BOARD =
     }
 }
 
+message.TN_BOARD =
+{
+    "type": "button",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/tn/explore/?utm_source=Tara'>DIKSHA TAMILNADU</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.KA_BOARD =
+{
+    "type": "button",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/ka/explore/?utm_source=Tara'>DIKSHA KARNATAKA</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.GJ_BOARD =
+{
+    "type": "button",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/gj/explore/?utm_source=Tara'>DIKSHA GUJARAT</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.UP_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": "  Please visit <a target='_blank' href='https://diksha.gov.in/up/explore/?utm_source=Tara'>DIKSHA UTTARPRADESH</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.PB_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": "  Please visit <a target='_blank' href='https://diksha.gov.in/up/explore/?utm_source=Tara'>DIKSHA UTTARPRADESH</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.RJ_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": "   Please visit <a target='_blank' href='https://diksha.gov.in/rj/explore/?utm_source=Tara'>DIKSHA RAJASTHAN</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.MN_BOARD =
+{
+    "text": "  Please visit <a target='_blank' href='https://diksha.gov.in/mn/explore/?utm_source=Tara'>DIKSHA MANIPUR</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+    "intent": "greet",
+    "type": "buttons",
+    "buttons": [{
+        "text": "Go Back",
+        "value": "99",
+    },
+    {
+        "text": "Main Menu",
+        "value": "0",
+    }]
+}
+
+message.CG_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/cg/explore/?utm_source=Tara'>DIKSHA CHHATTISGARH</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.MITRA_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/mitra/explore/?utm_source=Tara'>DIKSHA MAHARASHTRA</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.BR_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/br/explore/?utm_source=Tara'>DIKSHA BIHAR</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.OD_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/od/explore/?utm_source=Tara'>DIKSHA ODISHA</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.AS_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/as/explore/?utm_source=Tara'>DIKSHA ASSAM</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.MP_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/mp/explore/?utm_source=Tara'>DIKSHA MADHYAPRADESH</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.HR_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/hr/explore/?utm_source=Tara'>DIKSHA HARYANA</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br><br><hr><strong>** </strong>Press 99 to go back to choose another board or press 0 to go to Main Menu.",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.NL_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/nl/explore/?utm_source=Tara'>DIKSHA NAGALAND</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.GA_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/ga/explore/?utm_source=Tara'>DIKSHA GOA</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.TS_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/ts/explore/?utm_source=Tara'>DIKSHA TELANGANA</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.APEKX_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/apekx/explore/?utm_source=Tara'>DIKSHA ANDHRAPRADESH</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.ML_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/ml/explore/?utm_source=Tara'>DIKSHA MEGHALAYA</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.NCERT_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": "Please visit <a target='_blank' href='https://diksha.gov.in/ncert/explore/?utm_source=Tara'>DIKSHA NCERT</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.JH_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": "Please visit <a target='_blank' href='https://diksha.gov.in/jh/explore/?utm_source=Tara'>DIKSHA JHARKHAND</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.SK_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": "Please visit <a target='_blank' href='https://diksha.gov.in/sk/explore/?utm_source=Tara'>DIKSHA SIKKIM</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
+message.CH_BOARD =
+{
+    "type": "buttons",
+    "data": {
+        "text": "Please visit <a target='_blank' href='https://diksha.gov.in/ch/explore/?utm_source=Tara'>DIKSHA CHANDIGARH</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "intent": "greet",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+
 
 message.WEEKLY_CRITICAL_THINKING =
 {

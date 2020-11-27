@@ -353,10 +353,12 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 		const currentFlowText = _.cloneDeep(literals.message[responseKey]);
 		var currentFlowStep = redisSessionData.currentFlowStep;
 		//Replace search queries
-		currentFlowText.data.text = currentFlowText.data.text.replace(/[%]?\w+[%]/g, function(item){
-			var matchedItem = item.replace(/[^a-zA-Z ]/g, "");
-			return chatflow.chatflow[currentFlowStep].data.replaceLabels[matchedItem];
-		});
+		if(_.has(currentFlowText, 'data.text')){
+			currentFlowText.data.text = currentFlowText.data.text.replace(/[%]?\w+[%]/g, function(item){
+				var matchedItem = item.replace(/[^a-zA-Z ]/g, "");
+				return chatflow.chatflow[currentFlowStep].data.replaceLabels[matchedItem];
+			});
+		}
 		response.send(currentFlowText);
 	}
 }
