@@ -86,6 +86,7 @@ function handler(req, res, data) {
 		sendResponse(data.customData.deviceId, res, "From attribute missing", 400);
 	} else {
 		redisClient.get(REDIS_KEY_PREFIX + data.customData.deviceId, (err, redisValue) => {
+			console.log("redisValue-->",redisValue)
 
 			if (redisValue != null) {
 

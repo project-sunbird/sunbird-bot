@@ -11,6 +11,7 @@ function processResponse(res, userId, clientId, message, channel, cb) {
     let intent = ''
     let resp = res.data.map((item) => {
       if (item.text) {
+        LOG.info('inside item.text')
         if (item.text.split('-----').length > 1) {
           intent = item.text.split('-----')[1]
           item.text = item.text.split('-----')[0]
@@ -28,7 +29,9 @@ function processResponse(res, userId, clientId, message, channel, cb) {
           "intent": intent
         }
       } else if (item.custom) {
+        console.log("inside item.custom")
         if (item.custom.blocks) {
+          console.log("inside item.custom.blocks")
           quick_replies = item.custom
           text = item.text
           type = ''
@@ -46,7 +49,8 @@ function processResponse(res, userId, clientId, message, channel, cb) {
             } else {
               text = {
                 "data": {
-                  "text": item.custom.blocks[0].text
+                  "text": item.custom.blocks[0].text,
+                  "buttons": item.custom.blocks[0].buttons
                 }
               }
 
@@ -69,13 +73,39 @@ function processResponse(res, userId, clientId, message, channel, cb) {
           }
         }
         else {
+          console.log("inside else item.custom")
           quick_replies = item.custom
+
+          console.log("item.custom[0]-->", item.custom[0])
+          console.log("item.custom[0].blocks[0].text-->", item.custom[0].blocks[0].text)
+
           text = item.text
           type = ''
           entities = []
           if (item.custom[0].intent) {
             intent = item.custom[0].intent
           }
+          if (item.custom[0].blocks[0] && item.custom[0].blocks[0].text) {
+            console.log("inside item.custom[0].blocks[0]")
+            buttons = item.custom[0].blocks[0].buttons? item.custom[0].blocks[0].buttons : ''
+            console.log("fetching buttons from domain-->")
+            text = {
+              "data": {
+                "text": item.custom[0].blocks[0].text,
+                "buttons": item.custom[0].blocks[0].buttons
+              }
+            }
+            if (item.custom[0].blocks[0].buttons) {
+              console.log("item.custom.blocks[0].buttons-->", item.custom[0].blocks[0].buttons)
+              // text = {
+              //   "data": {
+              //     "text": item.custom[0].blocks[0].text,
+              //     "buttons": item.custom[0].blocks[0].buttons
+              //   }
+              // }
+            }
+          }
+
           if (item.custom[0].text) {
             text = item.custom[0].text
           }
@@ -91,11 +121,13 @@ function processResponse(res, userId, clientId, message, channel, cb) {
             "quick_replies": quick_replies,
             "intent": intent,
             "type": type,
-            "entities": entities
+            "entities": entities,
+            // "buttons": buttons
           }
 
         }
       } else {
+        console.log("inside else ")
         if (item.button) {
           quick_replies.push(item.button)
         }

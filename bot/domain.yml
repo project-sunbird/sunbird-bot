@@ -19,6 +19,20 @@ entities:
   - medium
   - subject
 
+slots:
+        board:
+                type: unfeaturized
+                auto_fill: false
+        grade:
+                type: unfeaturized
+                auto_fill: false
+        subject:
+                type: unfeaturized
+                auto_fill: false
+        medium:
+                type: unfeaturized
+                auto_fill: false
+
 actions:
 - utter_greet
 - utter_goodbye
@@ -35,8 +49,15 @@ actions:
 - utter_worksheet
 - utter_content_suggestions
 - utter_get_started
+- utter_ask_valid_medium
+- utter_ask_medium
+- utter_ask_grade
+- utter_ask_board
+- action_courses
+- utter_submit
+- utter_response
 
-responses:
+templates:
   utter_greet:
   - custom:
      blocks:
@@ -108,16 +129,12 @@ responses:
        text: "We support English, Hindi, Kannada, Bengali, Marathi, Tamil, Telugu, Urdu languages."
        intent: "language_support"
 
-
   utter_content_customization:
   - custom:
      blocks:
      - type: "response"
        text: "Yes, you can customize the content for your domain. Any field/screen on DISKHA can be customized to suit organization needs."
        intent: "utter_content_customization"
-
-  utter_content_suggestions:
-  - text: "Sure, here are a few content for {board} {medium} {grade} {subject}"
 
   utter_flag_reviewer:
   - custom:
@@ -133,6 +150,153 @@ responses:
        text: "An author can be credited by following these steps. Log in to the diksha portal  -> Select Workspace -> Select Create -> click the Course tile. -> Click Edit Details to enter/ modify the course details -> Enter Creators -> Enter Contributors details -> Enter Original Author details -> Click Save to save the details"
        intent: "author_credit"
 
+  utter_content_suggestions:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Sure, here are a few content for {board} {medium} {grade} {subject}"
+       intent: "content_suggestions"
+
+  utter_ask_valid_medium:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Please enter the valid medium"
+       intent: "content_suggestions"
+
+  utter_ask_board:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Please select the valid board"
+       buttons: [{
+            "text": "CBSE",
+            "value": "CBSE",
+        },
+        {
+            "text": "ICSE",
+            "value": "ICSE",
+        },
+        {
+            "text": "Maharashtra",
+            "value": "maharashtra",
+        },
+        {
+            "text": "Karnataka",
+            "value": "karnataka",
+        },
+        {
+            "text": "Tamil Nadu",
+            "value": "Tamil Nadu",
+        },
+        {
+            "text": "Punjab",
+            "value": "punjab",
+        },
+        {
+            "text": "Rajasthan",
+            "value": "rajasthan",
+        },
+        {
+            "text": "manipur",
+            "value": "manipur",
+        },
+        {
+            "text": "chhattisgarh",
+            "value": "chhattisgarh",
+        },
+        {
+            "text": "assam",
+            "value": "assam",
+        },
+        {
+            "text": "madhyapradesh",
+            "value": "madhyapradesh",
+        },
+        {
+            "text": "haryana",
+            "value": "haryana",
+        },
+        {
+            "text": "telangana",
+            "value": "telangana",
+        },
+        {
+            "text": "sikkim",
+            "value": "sikkim",
+        },
+        {
+            "text": "chandigarh",
+            "value": "chandigarh",
+        },
+        {
+            "text": "bihar",
+            "value": "bihar",
+        },
+        {
+            "text": "odisha",
+            "value": "odisha",
+        },
+        {
+            "text": "nagaland",
+            "value": "nagaland",
+        },
+        {
+            "text": "goa",
+            "value": "goa",
+        },
+        {
+            "text": "jharkhand",
+            "value": "jharkhand",
+        },
+        {
+            "text": "igot",
+            "value": "igot",
+        }
+        ]
+       intent: "which_board"
+
+  utter_ask_grade:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Which standard content would you like to browse?"
+       buttons: [
+        ]
+       intent: "which_grade"
+
+  utter_ask_subject:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Can you name the subject you are interested in?"
+       intent: "which_subject"
+
+  utter_submit:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "subject: {subject}, board: {board}, grade: {grade}"
+       intent: "submit"
+
+  utter_response:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "subject: {subject}, board: {board}, grade: {grade}"
+       intent: "greet "
+
+  utter_ask_medium:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "Please enter the valid medium"
+       buttons: [
+        ]
+       intent: "content_suggestions"
+
+forms:
+        -  content_form
 
 session_config:
   session_expiration_time: 60

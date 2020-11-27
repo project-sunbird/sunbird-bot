@@ -4,3 +4,9 @@ Urdu
 Hindi
 Kannada
 Telugu
+Gujarati
+Bengali
+Sindhi
+Tamil
+Assamese
+Sanskrit

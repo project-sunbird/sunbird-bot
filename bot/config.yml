@@ -4,6 +4,7 @@ language: en
 pipeline:
 - name: "WhitespaceTokenizer"
 - name: "RegexFeaturizer"
+# - name: "RegexEntityExtractor"
 - name: "CRFEntityExtractor"
 - name: "EntitySynonymMapper"
 - name: "CountVectorsFeaturizer"
@@ -17,6 +18,7 @@ pipeline:
 # https://rasa.com/docs/rasa/core/policies/
 policies:
   - name: MemoizationPolicy
+  - name: FormPolicy
   - name: KerasPolicy
   - name: MappingPolicy
   - name: FallbackPolicy
