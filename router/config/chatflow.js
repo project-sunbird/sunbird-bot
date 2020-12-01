@@ -284,7 +284,7 @@ var chatflow = {
     },
     step1_2_3_20: {
         messageKey: "NISHTHA_BOARD",
-        data: {replaceLabels: {key: "Nishtha 2020", board: "state (cbse)",name: "CBSE"}},
+        data: {replaceLabels: {key: "Nishtha 2020", board: "NCERT",name: "NCERT"}},
         responseVariable: ""
     },
     step1_2_3_21: {
