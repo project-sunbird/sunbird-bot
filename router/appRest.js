@@ -348,17 +348,11 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 	var channelResponse = literals.message[responseKey + '_' + data.channel];
 
 	if (channelResponse) {
+		channelResponse = replaceUserSpecficData(channelResponse);
 		sendResponseWhatsapp(response, channelResponse, data.recipient, "menu driven")
 	} else {
 		const currentFlowText = _.cloneDeep(literals.message[responseKey]);
-		var currentFlowStep = redisSessionData.currentFlowStep;
-		//Replace search queries
-		if(_.has(currentFlowText, 'data.text')){
-			currentFlowText.data.text = currentFlowText.data.text.replace(/[%]?\w+[%]/g, function(item){
-				var matchedItem = item.replace(/[^a-zA-Z ]/g, "");
-				return chatflow.chatflow[currentFlowStep].data.replaceLabels[matchedItem];
-			});
-		}
+		currentFlowText.data.text = replaceUserSpecficData(currentFlowText.data.text);
 		response.send(currentFlowText);
 	}
 }
@@ -410,6 +404,20 @@ function getUserSpec(req) {
 	}
 }
 
+/**
+* This function helps to replace %string% with required data
+*/
+function replaceUserSpecficData(str) {
+	var currentFlowStep = redisSessionData.currentFlowStep;
+	var regEx = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/
+	if(regEx.test(str)){
+		str = str.replace(/[%]?\w+[%]/g, function(item){
+			var matchedItem = item.replace(/[^a-zA-Z ]/g, "");
+			return chatflow.chatflow[currentFlowStep].data.replaceLabels[matchedItem];
+		});
+	}
+	return str;
+}
 
 
 

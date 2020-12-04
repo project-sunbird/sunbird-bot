@@ -204,7 +204,7 @@ message.NISHTHA_BOARD =
 {
     "type": "button",
     "data": {
-        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/explore/1?key=%key%&selectedTab=all&board=%board%?&primaryCategory=course&utm_source=Tara'>DIKSHA %board%</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
+        "text": " Please visit <a target='_blank' href='https://diksha.gov.in/explore-course/1?key=%key%&selectedTab=course&organisation=%name%?&primaryCategory=course&utm_source=Tara'>DIKSHA %name%</a><br>Select the Medium and Class to view relevant subject textbook on the board website.<br>",
         "buttons": [{
             "text": "Go Back",
             "value": "99",
