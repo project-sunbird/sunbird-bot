@@ -1,6 +1,8 @@
 const _ = require('lodash')
 var LOG = require('../../log/logger')
 const Telemetry = require('sb_telemetry_util')
+const TelemetryLogger = require('sb_logger_util')
+var UUID = require('uuid')
 const telemetry = new Telemetry()
 module.exports = {
   ver  : '',
@@ -89,5 +91,33 @@ module.exports = {
     } catch(e) {
       LOG.error('Error while initilising telemetry')
     }
+  },
+
+  /**
+ * for log event
+ * data object have these properties {'edata', context', 'object', 'tags'}
+ */
+telemetryLog : function (data, edata) {
+  try {
+    var channelId = data.channelId
+    var appId = data.appId
+    var env = data.env
+    var rollup = telemetry.getRollUpData([])
+    var did = data.deviceId
+    var mid = 'LOG:' + UUID();
+    let logData = {
+      eid: "LOG",
+      ets: new Date().getTime(),
+      ver: "3.0",
+      mid: mid,
+      actor: telemetry.getActorData(data.userId, 'user'),
+      context: telemetry.getContextData({ channel: channelId, env: env, pdata: {id: 'org.sunbird.chatbot.router'},cdata: [], rollup: rollup, did: did }),
+      object: {},
+      edata: edata
+    };
+    TelemetryLogger.info(logData);
+  } catch (e) {
+    LOG.error('Error while logger info event')
   }
+}
 } 
