@@ -92,7 +92,7 @@ appBot.post('/refresh', function(req, response) {
 			literals = reload('./config/literals');
 			updateConfigFromBlob(url, dest, chatflowStr, function(){
 				try {
-					literals = reload('./config/chatflow');
+					chatflow = reload('./config/chatflow');
 					response.send({'msg': 'Configuration is updated successfully for chatflow and literals!!!'})
 				} catch (e) {
 					//if this threw an error, the api variable is still set to the old, working version
