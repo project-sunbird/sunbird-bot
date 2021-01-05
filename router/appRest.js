@@ -10,6 +10,9 @@ var LOG = require('./log/logger')
 var literals = require('./config/literals')
 var config = require('./config/config')
 var chatflow = require('./config/chatflow')
+var reload = require('require-reload')(require),
+chatflow = reload('./config/chatflow');
+literals = reload('./config/literals');
 var RasaCoreController = require('./controllers/rasaCoreController')
 const telemetry = require('./api/telemetry/telemetry.js')
 var UUIDV4 = require('uuid')
@@ -75,6 +78,43 @@ appBot.post('/whatsapp', function (req, res) {
 	}
 
 })
+
+// Update latest config from blob
+appBot.post('/refresh', function(req, response) {
+	var url = 'https://sunbirddev.blob.core.windows.net/chatbot/router/config/literals.js'
+	var dest = 'router/config/literals.js'
+	// Update config for literals
+	updateConfigFromBlob(url, dest, function(){
+		try {
+			literals = reload('./config/literals');
+		} catch (e) {
+			//if this threw an error, the api variable is still set to the old, working version
+			console.error("Failed to reload literals.js! Error: ", e);
+		}
+	})
+
+	updateConfigFromBlob('https://sunbirddev.blob.core.windows.net/chatbot/router/config/chatflow.js', './config/chatflow.js', function(){
+		try {
+			chatflow = reload('./config/chatflow');
+		} catch (e) {
+			//if this threw an error, the api variable is still set to the old, working version
+			console.error("Failed to reload chatflow.js! Error: ", e);
+		}
+	})
+})
+
+var updateConfigFromBlob = function(url, dest, cb) {
+	var file = fs.createWriteStream(dest);
+	var request = https.get(url, function(response) {
+	  response.pipe(file);
+	  file.on('finish', function() {
+		file.close(cb);  // close() is async, call cb after close completes.
+	  });
+	}).on('error', function(err) { // Handle errors
+	  fs.unlink(dest); // Delete the file async. (But we don't check the result)
+	  if (cb) cb(err.message);
+	});
+  };
 
 function handler(req, res, data) {
 
