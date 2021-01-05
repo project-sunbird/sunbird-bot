@@ -81,29 +81,34 @@ appBot.post('/whatsapp', function (req, res) {
 
 // Update latest config from blob
 appBot.post('/refresh', function(req, response) {
-	var url = 'https://sunbirddev.blob.core.windows.net/chatbot/router/config/literals.js'
-	var dest = 'router/config/literals.js'
-	// Update config for literals
-	updateConfigFromBlob(url, dest, function(){
+	var domian = config.ENV_URL[req.headers.host]
+	var url = domian + 'chatbot/router/config/'
+	var dest = './config/'
+
+	var literalsStr = 'literals.js';
+	var chatflowStr = 'chatflow.js';
+	updateConfigFromBlob(url, dest, literalsStr, function(){
 		try {
 			literals = reload('./config/literals');
+			updateConfigFromBlob(url, dest, chatflowStr, function(){
+				try {
+					literals = reload('./config/chatflow');
+					response.send({'msg': 'Configuration is updated successfully for chatflow and literals!!!'})
+				} catch (e) {
+					//if this threw an error, the api variable is still set to the old, working version
+					console.error("Failed to reload literals.js! Error: ", e);
+				}
+			})
 		} catch (e) {
 			//if this threw an error, the api variable is still set to the old, working version
 			console.error("Failed to reload literals.js! Error: ", e);
 		}
 	})
-
-	updateConfigFromBlob('https://sunbirddev.blob.core.windows.net/chatbot/router/config/chatflow.js', './config/chatflow.js', function(){
-		try {
-			chatflow = reload('./config/chatflow');
-		} catch (e) {
-			//if this threw an error, the api variable is still set to the old, working version
-			console.error("Failed to reload chatflow.js! Error: ", e);
-		}
-	})
 })
 
-var updateConfigFromBlob = function(url, dest, cb) {
+var updateConfigFromBlob = function(url, dest, configName, cb) {
+	url = url + configName;
+	dest = dest + configName;
 	var file = fs.createWriteStream(dest);
 	var request = https.get(url, function(response) {
 	  response.pipe(file);

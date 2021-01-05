@@ -56,4 +56,13 @@ config.UNKNOWN_OPTION_FREEFLOW               = 'unknown_option_freeFlow'
 config.UNKNOWN_OPTION                        = 'unknown_option'
 
 config.TELEGRAM_BOT_ENDPOINT         = 'https://api.telegram.org/bot<bot_secret_key>/sendMessage'
+
+config.ENV_URL = {
+    'diksha.gov.in': 'https://ntpproductionall.blob.core.windows.net/',
+    'staging.sunbirded.org':'https://ntpstagingall.blob.core.windows.net/',
+    'preprod.ntp.net.in':'https://preprodall.blob.core.windows.net/',
+    'dev.sunbirded.org':'https://sunbirddev.blob.core.windows.net/',
+    'vdn.diksha.gov.in/': ''
+}
+
 module.exports = config;
