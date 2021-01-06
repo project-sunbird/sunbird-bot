@@ -45,7 +45,8 @@ appBot.post('/bot', function (req, res) {
 			env: req.body.appId + '.bot',
 			sessionId: '',
 			channelId: req.body.channel,
-			uaspec: getUserSpec(req)
+			uaspec: getUserSpec(req),
+			requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
 		}
 	}
 	handler(req, res, data)
@@ -66,7 +67,8 @@ appBot.post('/whatsapp', function (req, res) {
 				env: config.TELEMETRY_DATA_ENV_WHATSAPP,
 				channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
 				sessionId: '',
-				uaspec: getUserSpec(req)
+				uaspec: getUserSpec(req),
+				requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
 			}
 		}
 		handler(req, res, data)
@@ -78,7 +80,8 @@ appBot.post('/whatsapp', function (req, res) {
 			env: config.TELEMETRY_DATA_ENV_WHATSAPP,
 			channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
 			sessionId: '',
-			uaspec: getUserSpec(req)
+			uaspec: getUserSpec(req),
+			requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
 		}
 		sendErrorResponse(res, customData)
 	}
@@ -95,7 +98,7 @@ function handler(req, res, data) {
 		var edata = {
 			type: "system",
 			level: "INFO",
-			requestid: "",
+			requestid: data.customData.requestid,
 			message: "Attribute missing from request body"
 		  }
 		telemetry.telemetryLog(data.customData, edata);
@@ -152,7 +155,7 @@ function freeFlowLogic(data, res, chatflowConfig) {
 		var edata = {
 			type: "system",
 			level: "INFO",
-			requestid: "",
+			requestid: data.customData.requestid,
 			message: ""
 		  }
 		if (err) {
@@ -229,7 +232,7 @@ function menuDrivenLogic(data, res, chatflowConfig) {
 		var edata = {
 			type: "system",
 			level: "INFO",
-			requestid: "",
+			requestid: data.customData.requestid,
 			message: ""
 		  }
 		edata.message = "UNKNOWN OPTION";
@@ -278,7 +281,7 @@ function consolidatedLog(data, responseKey, menuIntentKnown, isMenuDriven) {
 	var edata = {
 		type: "system",
 		level: "INFO",
-		requestid: "",
+		requestid: data.customData.requestid,
 		message: message
 	  }
 	telemetry.telemetryLog(data.customData, edata)
@@ -348,7 +351,7 @@ function sendErrorResponse(response, data){
 	var edata = {
 		type: "system",
 		level: "INFO",
-		requestid: "",
+		requestid: data.customData.requestid,
 		message: "401 invalid request"
 	  }
 	telemetry.telemetryLog(data, edata)
@@ -398,7 +401,7 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 		var edata = {
 			type: "system",
 			level: "INFO",
-			requestid: "",
+			requestid: data.customData.requestid,
 			message: "404 not found"
 		  }
 		telemetry.telemetryLog(data.customData, edata)
