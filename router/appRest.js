@@ -81,29 +81,35 @@ appBot.post('/whatsapp', function (req, res) {
 
 // Update latest config from blob
 appBot.post('/refresh', function(req, response) {
-	var domian = config.ENV_URL[req.headers.host]
-	var url = domian + 'chatbot/router/config/'
-	var dest = './config/'
+	if(config.CONFIG_BLOB_PATH) {
+		var domian = "https://" + config.CONFIG_BLOB_PATH + ".blob.core.windows.net"
+		var url = domian + '/chatbot/router/config/'
+		var dest = 'router/config/'
 
-	var literalsStr = 'literals.js';
-	var chatflowStr = 'chatflow.js';
-	updateConfigFromBlob(url, dest, literalsStr, function(){
-		try {
-			literals = reload('./config/literals');
-			updateConfigFromBlob(url, dest, chatflowStr, function(){
-				try {
-					chatflow = reload('./config/chatflow');
-					response.send({'msg': 'Configuration is updated successfully for chatflow and literals!!!'})
-				} catch (e) {
-					//if this threw an error, the api variable is still set to the old, working version
-					console.error("Failed to reload literals.js! Error: ", e);
-				}
-			})
-		} catch (e) {
-			//if this threw an error, the api variable is still set to the old, working version
-			console.error("Failed to reload literals.js! Error: ", e);
-		}
-	})
+		var literalsStr = 'literals.js';
+		var chatflowStr = 'chatflow.js';
+		updateConfigFromBlob(url, dest, literalsStr, function(){
+			try {
+				literals = reload('./config/literals');
+				updateConfigFromBlob(url, dest, chatflowStr, function(){
+					try {
+						chatflow = reload('./config/chatflow');
+						response.send({'msg': 'Configuration is updated successfully for chatflow and literals!!!'})
+					} catch (e) {
+						//if this threw an error, the api variable is still set to the old, working version
+						console.error("Failed to reload chatflow.js! Error: ", e);
+						response.send({'msg': e.message})
+					}
+				})
+			} catch (e) {
+				//if this threw an error, the api variable is still set to the old, working version
+				console.error("Failed to reload literals.js! Error: ", e);
+				response.send({'msg': e.message})
+			}
+		})
+	} else {
+		response.send({'msg': 'ENV configuration blob path is not defined'})
+	}
 })
 
 var updateConfigFromBlob = function(url, dest, configName, cb) {
