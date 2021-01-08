@@ -56,4 +56,7 @@ config.UNKNOWN_OPTION_FREEFLOW               = 'unknown_option_freeFlow'
 config.UNKNOWN_OPTION                        = 'unknown_option'
 
 config.TELEGRAM_BOT_ENDPOINT         = 'https://api.telegram.org/bot<bot_secret_key>/sendMessage'
+
+config.CONFIG_BLOB_PATH = env.CONFIG_BLOB_PATH
+
 module.exports = config;

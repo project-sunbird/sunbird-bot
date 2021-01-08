@@ -10,6 +10,9 @@ var LOG = require('./log/logger')
 var literals = require('./config/literals')
 var config = require('./config/config')
 var chatflow = require('./config/chatflow')
+var reload = require('require-reload')(require),
+chatflow = reload('./config/chatflow');
+literals = reload('./config/literals');
 var RasaCoreController = require('./controllers/rasaCoreController')
 const telemetry = require('./api/telemetry/telemetry.js')
 var UUIDV4 = require('uuid')
@@ -87,6 +90,54 @@ appBot.post('/whatsapp', function (req, res) {
 	}
 
 })
+
+// Update latest config from blob
+appBot.post('/refresh', function(req, response) {
+	if(config.CONFIG_BLOB_PATH) {
+		var domian = "https://" + config.CONFIG_BLOB_PATH + ".blob.core.windows.net"
+		var url = domian + '/chatbot/router/config/'
+		var dest = 'router/config/'
+
+		var literalsStr = 'literals.js';
+		var chatflowStr = 'chatflow.js';
+		updateConfigFromBlob(url, dest, literalsStr, function(){
+			try {
+				literals = reload('./config/literals');
+				updateConfigFromBlob(url, dest, chatflowStr, function(){
+					try {
+						chatflow = reload('./config/chatflow');
+						response.send({'msg': 'Configuration is updated successfully for chatflow and literals!!!'})
+					} catch (e) {
+						//if this threw an error, the api variable is still set to the old, working version
+						console.error("Failed to reload chatflow.js! Error: ", e);
+						response.send({'msg': e.message})
+					}
+				})
+			} catch (e) {
+				//if this threw an error, the api variable is still set to the old, working version
+				console.error("Failed to reload literals.js! Error: ", e);
+				response.send({'msg': e.message})
+			}
+		})
+	} else {
+		response.send({'msg': 'ENV configuration blob path is not defined'})
+	}
+})
+
+var updateConfigFromBlob = function(url, dest, configName, cb) {
+	url = url + configName;
+	dest = dest + configName;
+	var file = fs.createWriteStream(dest);
+	var request = https.get(url, function(response) {
+	  response.pipe(file);
+	  file.on('finish', function() {
+		file.close(cb);  // close() is async, call cb after close completes.
+	  });
+	}).on('error', function(err) { // Handle errors
+	  fs.unlink(dest); // Delete the file async. (But we don't check the result)
+	  if (cb) cb(err.message);
+	});
+  };
 
 function handler(req, res, data) {
 
