@@ -96,7 +96,7 @@ appBot.post('/refresh', function(req, response) {
 	if(config.CONFIG_BLOB_PATH) {
 		var domian = "https://" + config.CONFIG_BLOB_PATH + ".blob.core.windows.net"
 		var url = domian + '/chatbot/router/config/'
-		var dest = 'router/config/'
+		var dest = './config/'
 
 		var literalsStr = 'literals.js';
 		var chatflowStr = 'chatflow.js';
