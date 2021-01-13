@@ -10,6 +10,9 @@ var LOG = require('./log/logger')
 var literals = require('./config/literals')
 var config = require('./config/config')
 var chatflow = require('./config/chatflow')
+var reload = require('require-reload')(require),
+chatflow = reload('./config/chatflow');
+literals = reload('./config/literals');
 var RasaCoreController = require('./controllers/rasaCoreController')
 const telemetry = require('./api/telemetry/telemetry.js')
 var UUIDV4 = require('uuid')
@@ -45,7 +48,8 @@ appBot.post('/bot', function (req, res) {
 			env: req.body.appId + '.bot',
 			sessionId: '',
 			channelId: req.body.channel,
-			uaspec: getUserSpec(req)
+			uaspec: getUserSpec(req),
+			requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
 		}
 	}
 	handler(req, res, data)
@@ -66,15 +70,74 @@ appBot.post('/whatsapp', function (req, res) {
 				env: config.TELEMETRY_DATA_ENV_WHATSAPP,
 				channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
 				sessionId: '',
-				uaspec: getUserSpec(req)
+				uaspec: getUserSpec(req),
+				requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
 			}
 		}
 		handler(req, res, data)
 	} else {
-		sendErrorResponse(res)
+		var customData= {
+			userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+			deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+			appId: config.TELEMETRY_DATA_PID_WHATSAPP,
+			env: config.TELEMETRY_DATA_ENV_WHATSAPP,
+			channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
+			sessionId: '',
+			uaspec: getUserSpec(req),
+			requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
+		}
+		sendErrorResponse(res, customData)
 	}
 
 })
+
+// Update latest config from blob
+appBot.post('/refresh', function(req, response) {
+	if(config.CONFIG_BLOB_PATH) {
+		var domian = "https://" + config.CONFIG_BLOB_PATH + ".blob.core.windows.net"
+		var url = domian + '/chatbot/router/config/'
+		var dest = './config/'
+
+		var literalsStr = 'literals.js';
+		var chatflowStr = 'chatflow.js';
+		updateConfigFromBlob(url, dest, literalsStr, function(){
+			try {
+				literals = reload('./config/literals');
+				updateConfigFromBlob(url, dest, chatflowStr, function(){
+					try {
+						chatflow = reload('./config/chatflow');
+						response.send({'msg': 'Configuration is updated successfully for chatflow and literals!!!'})
+					} catch (e) {
+						//if this threw an error, the api variable is still set to the old, working version
+						console.error("Failed to reload chatflow.js! Error: ", e);
+						response.send({'msg': e.message})
+					}
+				})
+			} catch (e) {
+				//if this threw an error, the api variable is still set to the old, working version
+				console.error("Failed to reload literals.js! Error: ", e);
+				response.send({'msg': e.message})
+			}
+		})
+	} else {
+		response.send({'msg': 'ENV configuration blob path is not defined'})
+	}
+})
+
+var updateConfigFromBlob = function(url, dest, configName, cb) {
+	url = url + configName;
+	dest = dest + configName;
+	var file = fs.createWriteStream(dest);
+	var request = https.get(url, function(response) {
+	  response.pipe(file);
+	  file.on('finish', function() {
+		file.close(cb);  // close() is async, call cb after close completes.
+	  });
+	}).on('error', function(err) { // Handle errors
+	  fs.unlink(dest); // Delete the file async. (But we don't check the result)
+	  if (cb) cb(err.message);
+	});
+  };
 
 function handler(req, res, data) {
 
@@ -83,6 +146,13 @@ function handler(req, res, data) {
 	redisSessionData = {};
 
 	if (!data.customData.deviceId) {
+		var edata = {
+			type: "system",
+			level: "INFO",
+			requestid: data.customData.requestid,
+			message: "Attribute missing from request body"
+		  }
+		telemetry.telemetryLog(data.customData, edata);
 		sendResponse(data.customData.deviceId, res, "From attribute missing", 400);
 	} else {
 		redisClient.get(REDIS_KEY_PREFIX + data.customData.deviceId, (err, redisValue) => {
@@ -133,7 +203,15 @@ function handler(req, res, data) {
 function freeFlowLogic(data, res, chatflowConfig) {
 	RasaCoreController.processUserData(data, (err, resp) => {
 		var response = '';
+		var edata = {
+			type: "system",
+			level: "INFO",
+			requestid: data.customData.requestid,
+			message: ""
+		  }
 		if (err) {
+			edata.message = "Sorry: Core RASA controller failed to load";
+			telemetry.telemetryLog(data.customData, edata);
 			sendChannelResponse(data.customData.deviceId, res, data, 'SORRY')
 		} else {
 			var responses = resp.res;
@@ -156,8 +234,12 @@ function freeFlowLogic(data, res, chatflowConfig) {
 			}
 			telemetry.logInteraction(telemetryData);
 			if (data.channel == config.WHATSAPP) {
+				edata.message = "Free flow whats app response";
+				telemetry.telemetryLog(data.customData, edata);
 				sendResponseWhatsapp(res, response, data.recipient, "freeFlow")
 			} else {
+				edata.message = "Free flow web poartal response";
+				telemetry.telemetryLog(data.customData, edata);
 				sendResponse(res, response)
 			}
 
@@ -198,6 +280,14 @@ function menuDrivenLogic(data, res, chatflowConfig) {
 	} else {
 		responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, true)
 		menuIntentKnown = false
+		var edata = {
+			type: "system",
+			level: "INFO",
+			requestid: data.customData.requestid,
+			message: ""
+		  }
+		edata.message = "UNKNOWN OPTION";
+		telemetry.telemetryLog(data.customData, edata);
 		// TODO : Don't call function inside each if/else if it should be called once.
 		telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data, false)
 	}
@@ -237,8 +327,16 @@ function consolidatedLog(data, responseKey, menuIntentKnown, isMenuDriven) {
 			intent = config.FREEFLOW_INTENT_NOT_DETECTED
 		}
 	}
+	var message = "UserId: " + data.customData.userId + "," + " DeviceId: " + data.customData.deviceId + "," + " UserQuery: " + data.message + "," + " Bot_Response_identifier: " + intent + "," + " BotResponse: " + responseKey;
 
-	LOG.info("UserId: " + data.customData.userId + "," + " DeviceId: " + data.customData.deviceId + "," + " UserQuery: " + data.message + "," + " Bot_Response_identifier: " + intent + "," + " BotResponse: " + responseKey)
+	var edata = {
+		type: "system",
+		level: "INFO",
+		requestid: data.customData.requestid,
+		message: message
+	  }
+	telemetry.telemetryLog(data.customData, edata)
+	LOG.info(message)
 }
 
 function setRedisKeyValue(key, value) {
@@ -300,7 +398,14 @@ function sendResponse(response, responseBody, responseCode) {
 	response.send(responseBody)
 }
 
-function sendErrorResponse(response){
+function sendErrorResponse(response, data){
+	var edata = {
+		type: "system",
+		level: "INFO",
+		requestid: data.customData.requestid,
+		message: "401 invalid request"
+	  }
+	telemetry.telemetryLog(data, edata)
 	response.status(401);
 	response.send('invalid request');
 }
@@ -342,7 +447,16 @@ function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 }
 function sendChannelResponse(response, responseKey, data, responseCode) {
 	response.set('Content-Type', 'application/json')
-	if (responseCode) response.status(responseCode)
+	if (responseCode){
+		response.status(responseCode)
+		var edata = {
+			type: "system",
+			level: "INFO",
+			requestid: data.customData.requestid,
+			message: "404 not found"
+		  }
+		telemetry.telemetryLog(data.customData, edata)
+	}
 
 	//version check
 	var channelResponse = literals.message[responseKey + '_' + data.channel];
