@@ -532,9 +532,4 @@ function replaceUserSpecficData(str) {
 	}
 	return str;
 }
-
-
-
-
-
-
+module.exports = appBot;
