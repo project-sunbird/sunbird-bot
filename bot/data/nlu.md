@@ -126,13 +126,60 @@
 
 ## intent:content_suggestions
 - I want to learn [CBSE](board) content
+- I want to learn in [English](medium) medium
 - I'm a student from [Maharashtra](board) and want to learn from home
 - Do you have any content from [Karnataka](board) state board
-- Show me class [one](grade) content from [Tamil Nadu](board)
+- Show me class [one](grade) content from [TamilNadu](board)
 - Please show [second](grade) standard content
 - I want to do [maths](subject) revision
 - I want to learn [fourth](grade) standard [physics](subject)
-
+- I am a student of [karnataka](board) board and want to read [history](subject) books for [fifth](grade) standard
+- can you suggest [mathematics](subject) books for [ninth](grade) class [cbse](board) board
+- I want to learn [CBSE](board) board [second](grade) standard [physics](subject).
+- I want to learn [CBSE](board) board [third](grade)standard in [English](medium).
+- I am from [fourth](grade) standard
+- I am from [tenth](grade) grade
+- I want to learn [history](subject)
+- I am from [Marathi](medium) medium
+- I am in [third](grade) standard and I want to learn [maths](subject)
+- I want to learn [science](subject) of [bihar](board) board 
+- [kannada](medium)
+- [tenth](grade)
+- I am from [hindi](medium) medium
+- I am from [class 10](grade)
+- i want to learn [class 5](grade) syllabus
+- [Class 5](grade)
+- [Class 4](grade)
+- [Class 3](grade)
+- [Class 2](grade)
+- [Class 1](grade)
+- [Class 7](grade)
+- [seventh](grade)
+- [fourth](grade)
+- [eighth](grade)
+- [first](grade)
+- [karnataka](board)
+- [english](medium)
+- [Hindi](medium)
+- [Sindhi](medium)
+- [Gujarati](medium)
+- [Urdu](medium)
+- [Telugu](medium)
+- [Marathi](medium)
+- [Tamil](medium)
+- [AndhraPradesh](board)
+- [Tamilnadu](board)
+- [Nagaland](board)
+- [UttarPradesh](board)
+- [Jharkhand](board)
+- [Rajasthan](board)
+- I want to learn [class 7](grade) [maths](subject)
+- I want [class 8](grade) [geography](subject) videos
+- I want to study [english](subject)
+- I want practice questions for [maths](subject) [class 10](grade)
+- Show me videos for [science](subject) [class 6](grade)
+- Want to study cbse [class 12](grade) [physics](subject)
+  
 ## lookup:board
 data/boards.txt
 
@@ -144,4 +191,3 @@ data/subjects.txt
 
 ## lookup:medium
 data/mediums.txt
-  

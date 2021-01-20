@@ -30,9 +30,9 @@
 * content_customization
   - utter_content_customization
 
-# content_suggestions
+<!-- # content_suggestions
 * content_suggestions
-  - utter_content_suggestions
+  - utter_content_suggestions -->
 
 # language_support
 * language_support
@@ -45,3 +45,11 @@
 # worksheet
 * worksheet
   - utter_worksheet
+  
+# content_suggestions
+* content_suggestions
+  - content_form
+  - form{"name": "board"}
+  - form{"name": "grade"}
+  - form{"name": "subject"}
+  - form{"name": "null"}

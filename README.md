@@ -70,7 +70,7 @@ Run the below curl to check if the bot is up and running. A successful setup wou
     - modify endpoints.yml if needed to change action server endpoint
 
 - Starting the services:
-    - start RASA core server by running `make bot` or `rasa run -p 5005 --enable-api --cors "*" -vv`
+    - start RASA core server by running `make bot` or `rasa run -p 5055 --enable-api --cors "*" -vv`
     - start RASA action endpoint server by running `make action` or `rasa run actions -vv -p 5056`
 
 # Integration Instructions
