@@ -27,6 +27,15 @@ module.exports = {
             ]
         }
     },
+    whatsappResponse:{
+        "text": "Hi, I’m TARA, your DIKSHA assistant. How may I help you today? \n Select from one of the following options. Send the number corresponding to your choice \n 1- To find and play content \n 2- To download/update the DIKSHA mobile app \n 3- Other Queries",
+        "intent": "greet",
+        "type": "buttons",
+        "buttons": []
+    },
+    refreshAPIResponse: {
+        "msg": "ENV configuration blob path is not defined"
+    },
     postRes: {
         "code": "ok",
         "payload": {}
