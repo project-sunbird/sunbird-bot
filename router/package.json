@@ -4,12 +4,16 @@
   "description": "thor bot router",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "router-test": "nyc mocha 'test/**/*.spec.js'",
+    "coverage": "nyc --reporter=lcov --reporter=text-lcov npm run router-test"
   },
   "author": "waibhav",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.2",
+    "body-parser": "^1.19.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "cors": "^2.8.5",
     "dateformat": "^3.0.3",
     "elasticsearch": "^16.6.0",
@@ -18,15 +22,18 @@
     "helmet": "^3.21.2",
     "lodash": "^4.17.20",
     "method-override": "^3.0.0",
-    "ua-parser-js": "^0.7.13",
-    "sb_telemetry_util": "file:libs/sb_telemetry_util",
-    "sb_config_util": "file:libs/sb-config-util",
-    "sb_logger_util": "file:libs/sb_logger_util",
+    "mocha": "^8.2.1",
+    "nock": "^13.0.5",
+    "nyc": "^15.1.0",
     "redis": "^3.0.2",
     "request": "^2.88.0",
     "require-reload": "^0.2.2",
+    "sb_config_util": "file:libs/sb-config-util",
+    "sb_logger_util": "file:libs/sb_logger_util",
+    "sb_telemetry_util": "file:libs/sb_telemetry_util",
     "socket.io": "^2.3.0",
     "tz-lookup": "^6.1.25",
+    "ua-parser-js": "^0.7.13",
     "uuid": "^3.4.0",
     "winston": "^3.2.1"
   }
