@@ -31,7 +31,7 @@ node('build-slave') {
                 echo "public_repo_commit_hash: " + public_repo_commit_hash
                 bot_repo_url = params.private_bot_repo 
                 
-                if (params.private_bot_repo && params.private_bot_tag) {
+                if (params.private_bot_repo || params.private_bot_tag) {
                     dir('bot_repo') {
                       if (params.private_bot_tag == "") {
                          def scmVars = checkout scm
@@ -52,9 +52,10 @@ node('build-slave') {
             stage('Build') {
                 env.NODE_ENV = "build"
                 print "Environment will be : ${env.NODE_ENV}"
-                build_tag = public_repo_commit_hash + "_" + private_repo_commit_hash + "_" + env.BUILD_NUMBER + "_bot"
+                build_tag = public_repo_commit_hash + "_" + env.BUILD_NUMBER + "_bot"
                 if (params.private_bot_repo && params.private_bot_tag) {
                     sh('cp -r bot_repo/* .')
+                    build_tag = public_repo_commit_hash + "_" + private_repo_commit_hash + "_" + env.BUILD_NUMBER + "_bot"
                 }
                 dir('bot') {
                 sh('chmod 777 build.sh')
