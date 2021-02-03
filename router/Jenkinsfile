@@ -30,26 +30,34 @@ node('build-slave') {
                 }
 
                 echo "public_repo_commit_hash: " + public_repo_commit_hash
-                bot_repo_url = params.diksha_bot_repo
-                dir('bot_repo') {
-                    if (params.diksha_bot_tag == "") {
+                bot_repo_url = params.private_bot_repo
+
+                if (params.private_bot_repo || params.private_bot_tag) {
+                    dir('bot_repo') {
+                    if (params.private_bot_tag == "") {
                        def scmVars = checkout scm
                        checkout scm: ([$class: 'GitSCM', branches: [[name: "refs/heads/master"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'private_repo_credentials', url: "$bot_repo_url"]]])
                        private_repo_commit_hash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     } 
                     else {
                        def scmVars = checkout scm
-                       checkout scm: ([$class: 'GitSCM', branches: [[name: "refs/tags/params.diksha_bot_tag"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'private_repo_credentials', url: "$bot_repo_url"]]])
-                       private_repo_commit_hash = params.diksha_bot_tag
+                       checkout scm: ([$class: 'GitSCM', branches: [[name: "refs/tags/params.private_bot_tag"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'private_repo_credentials', url: "$bot_repo_url"]]])
+                       private_repo_commit_hash = params.private_bot_tag
                     }
                 } 
+
+                }    
             }
 
             stage('Build') {
                 env.NODE_ENV = "build"
                 print "Environment will be : ${env.NODE_ENV}"
-                build_tag = public_repo_commit_hash + "_" + private_repo_commit_hash + "_" + env.BUILD_NUMBER + "_router"
-                sh('cp -r bot_repo/* .')
+
+                build_tag = public_repo_commit_hash + "_" + env.BUILD_NUMBER + "_bot"
+                if (params.private_bot_repo && params.private_bot_tag) {
+                    sh('cp -r bot_repo/* .')
+                    build_tag = public_repo_commit_hash + "_" + private_repo_commit_hash + "_" + env.BUILD_NUMBER + "_bot"
+                }
                 dir('router') {
                 sh('chmod 777 build.sh')
                 sh("./build.sh ${build_tag} ${env.NODE_NAME} ${hub_org}")
