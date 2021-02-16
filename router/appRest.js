@@ -268,14 +268,14 @@ function menuDrivenLogic(data, res, chatflowConfig) {
 		responseKey = chatflowConfig[currentFlowStep].messageKey
 		menuIntentKnown = true
 		// TODO : Don't call function inside each if/else if it should be called once.
-		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
+		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: 'MAIN_MENU' }, data, false)
 	} else if (data.message === '99') {
 		if (currentFlowStep.lastIndexOf("_") > 0) {
 			currentFlowStep = currentFlowStep.substring(0, currentFlowStep.lastIndexOf("_"))
 			responseKey = chatflowConfig[currentFlowStep].messageKey
 			menuIntentKnown = true
 			// TODO : Don't call function inside each if/else if it should be called once. 
-			telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
+			telemetryData = createInteractionData({ currentStep: 'step_99', responseKey: 'GO_BACK' }, data, false)
 		}
 	} else {
 		responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, true)
