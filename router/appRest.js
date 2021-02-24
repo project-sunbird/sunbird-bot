@@ -531,7 +531,7 @@ function replaceUserSpecficData(str) {
 	var currentFlowStep = redisSessionData.currentFlowStep;
 	var regEx = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/
 	if(regEx.test(str)){
-		str = str.replace(/[%]?\w+[%]/g, function(item){
+		str = str.replace(/[%]\w+[%]/g, function(item){
 			var matchedItem = item.replace(/[^a-zA-Z ]/g, "");
 			return chatflow.chatflow[currentFlowStep].data.replaceLabels[matchedItem];
 		});
