@@ -282,9 +282,12 @@ function menuDrivenLogic(data, res, chatflowConfig) {
 			// Telemetry event for Go-back button
 			var goBackEventData = createInteractionData({ currentStep: 'step_99', responseKey: 'GO_BACK' }, data, false)
 			telemetry.logInteraction(goBackEventData);
+		} else {
+			responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, true)
+			telemetryData = createInteractionData({ currentStep: currentFlowStep + '_UNKNOWN_OPTION' }, data, false)
 		}
 	} else {
-		responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, true)
+		responseKey = getErrorMessageForInvalidInput(possibleFlow, chatflowConfig, true)
 		menuIntentKnown = false
 		var edata = {
 			type: "system",
@@ -355,7 +358,7 @@ function delRedisKey(key) {
 }
 
 function getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, isNumeric) {
-	if (isNumeric) {
+	if (isNumeric && !_.isUndefined(currentFlowStep) && _.has(chatflowConfig, currentFlowStep)) {
 		return chatflowConfig[currentFlowStep + '_error'].messageKey;
 	} else {
 		return chatflowConfig['step1_wrong_input'].messageKey
