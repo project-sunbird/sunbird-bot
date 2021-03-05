@@ -31,7 +31,7 @@
     "sb_config_util": "file:libs/sb-config-util",
     "sb_logger_util": "file:libs/sb_logger_util",
     "sb_telemetry_util": "file:libs/sb_telemetry_util",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "tz-lookup": "^6.1.25",
     "ua-parser-js": "^0.7.13",
     "uuid": "^3.4.0",
