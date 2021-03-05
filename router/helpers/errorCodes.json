@@ -1,0 +1,70 @@
+{
+    "/bot": {
+        "post": {
+            "endPoint": "/bot",
+            "key": "ChatbotPortal",
+            "errorObject": {
+                "err_404": {
+                    "errMsg": "Bot is not anabled and not found API",
+                    "err": "CB_BOT01"
+                },
+                "err_400": {
+                    "errMsg": "Attributes are missing from request body",
+                    "err": "CB_BOT02"
+                },
+                "err_403": {
+                    "errMsg": "Sorry: Core RASA controller failed to load",
+                    "err": "CB_BOT03"
+                },
+                "err_402": {
+                    "errMsg": "Redis client is not started",
+                    "err": "CB_BOT04"
+                },
+                "err_401": {
+                    "errMsg": "Invalid request",
+                    "err": "CB_BOT04"
+                },
+                "err_500": {
+                    "errMsg": "Bot API is failed",
+                    "err": "CB_BOT05"
+                }
+            }
+        }
+    },
+    "/whatsapp": {
+        "post": {
+            "endPoint": "/whatsapp",
+            "key": "ChatbotWhatsapp",
+            "errorObject": {
+                "err_401": {
+                    "errMsg": "Whatsapp chatbot invalid request",
+                    "err": "CB_WA01"
+                },
+                "err_500": {
+                    "errMsg": "Whatsapp API is failed",
+                    "err": "CB_WA02"
+                }
+            }
+        }
+    },
+    "/refresh": {
+        "post": {
+            "endPoint": "/refresh",
+            "key": "ChatbotRefresh",
+            "errorObject": {
+                "err_400": {
+                    "errMsg": "Environment configuration blob path is not defined",
+                    "err": "CB_RF01"
+                },
+                "err_401": {
+                    "errMsg": "Failed to reload/update chatbot configuration",
+                    "err": "CB_RF02"
+                },
+                "err_500": {
+                    "errMsg": "Refersh API is failed",
+                    "err": "CB_RF03"
+                }
+            }
+        }
+    }
+}
