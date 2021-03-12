@@ -124,6 +124,11 @@ appBot.post('/refresh', function(req, response) {
 	}
 })
 
+// dummy api for load testing
+appBot.post('/dummy', function (req, res) {
+	res.json({message: 'success'})
+})
+
 var updateConfigFromBlob = function(url, dest, configName, cb) {
 	url = url + configName;
 	dest = dest + configName;

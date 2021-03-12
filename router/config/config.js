@@ -30,7 +30,7 @@ config.ELASTIC_HOST                  = 'http://<user>:<password><IP>:<Port>'
 config.ELASTIC_INDEX_NAME            = 'indx_name'
 config.ELASTIC_INDEX_TYPE            = 'indx_type'
 
-config.WHATSAPP_URL                = 'https://waapi.pepipost.com/api/v2/message/'
+config.WHATSAPP_URL                = env.WHATSAPP_URL || 'https://waapi.pepipost.com/api/v2/message/'
 config.WHATSAPP_AUTHORIZATION      = env.WHATSAPP_AUTH_TOKEN || 'authtoken'
 config.WHATSAPP_MESSAGE_TYPE       = 'text'
 config.WHATSAPP_SOURCE             = env.WHATSAPP_SOURCE || 'source'
