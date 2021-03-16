@@ -20,6 +20,13 @@ strategy:
   maxsurge: {{ router_maxsurge|default('50%') }}
   maxunavailable: {{ router_maxunavailable|default('50%') }} 
 
+autoscaling:
+  enabled: {{ router_autoscaling_enabled | default('false') }}
+  minReplicas: {{ router_autoscaling_minReplicas|default(1) }}
+  maxReplicas: {{ router_autoscaling_maxReplicas|default(3) }}
+  targetCPUUtilizationPercentage: {{ router_autoscaling_targetCPUUtilizationPercentage|default(80) }}
+  targetMemoryUtilizationPercentage: {{ router_autoscaling_targetMemoryUtilizationPercentage|default('') }}
+
 routerenv:
   RASA_CORE_ENDPOINT: http://bot-service:5005/webhooks/rest/webhook
   REDIS_HOST: "{{ dedup_redis_host }}"
