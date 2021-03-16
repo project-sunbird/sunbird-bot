@@ -5,27 +5,23 @@
             "key": "ChatbotPortal",
             "errorObject": {
                 "err_404": {
-                    "errMsg": "Bot is not anabled and not found API",
+                    "errMsg": "The Chatbot/bot feature is not enabled for your instance",
                     "err": "CB_BOT01"
                 },
                 "err_400": {
-                    "errMsg": "Attributes are missing from request body",
+                    "errMsg": "Mandatory fields are missing in the request. Enter the required values and resend the request.",
                     "err": "CB_BOT02"
                 },
                 "err_403": {
-                    "errMsg": "Sorry: Core RASA controller failed to load",
+                    "errMsg": "The RASA controller failed to load. Try again later.",
                     "err": "CB_BOT03"
                 },
                 "err_402": {
-                    "errMsg": "Redis client is not started",
-                    "err": "CB_BOT04"
-                },
-                "err_401": {
-                    "errMsg": "Invalid request",
+                    "errMsg": "The Redis server is not available. It may not be enabled or needs to start. Try again later.",
                     "err": "CB_BOT04"
                 },
                 "err_500": {
-                    "errMsg": "Bot API is failed",
+                    "errMsg": "The bot API call failed. There may be a network error or there are too many concurrent calls to the server. Try again later.",
                     "err": "CB_BOT05"
                 }
             }
@@ -37,11 +33,11 @@
             "key": "ChatbotWhatsapp",
             "errorObject": {
                 "err_401": {
-                    "errMsg": "Whatsapp chatbot invalid request",
+                    "errMsg": "Missing WhatsApp API key. Contact your system administrator.",
                     "err": "CB_WA01"
                 },
                 "err_500": {
-                    "errMsg": "Whatsapp API is failed",
+                    "errMsg": "The whatsapp API call failed. There may be a network error or there are too many concurrent calls to the server. Try again later.",
                     "err": "CB_WA02"
                 }
             }
@@ -53,15 +49,11 @@
             "key": "ChatbotRefresh",
             "errorObject": {
                 "err_400": {
-                    "errMsg": "Environment configuration blob path is not defined",
+                    "errMsg": "The configuration blob path is not defined. Mention the environment URL.",
                     "err": "CB_RF01"
                 },
-                "err_401": {
-                    "errMsg": "Failed to reload/update chatbot configuration",
-                    "err": "CB_RF02"
-                },
                 "err_500": {
-                    "errMsg": "Refersh API is failed",
+                    "errMsg": "The refresh API call failed. There may be a network error or there are too many concurrent calls to the server. Try again later.",
                     "err": "CB_RF03"
                 }
             }
