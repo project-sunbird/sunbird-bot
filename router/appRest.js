@@ -57,35 +57,28 @@ appBot.post('/bot', function (req, res) {
 
 
 appBot.post('/whatsapp', function (req, res) {
+	const incoming_message = req.body.incoming_message[0];
+	const incoming_msg_from = incoming_message.from;
+	var customData = {
+		userId: crypto.createHash('sha256').update(incoming_msg_from).digest("hex"),
+		deviceId: crypto.createHash('sha256').update(incoming_msg_from).digest("hex"),
+		appId: config.TELEMETRY_DATA_PID_WHATSAPP,
+		env: config.TELEMETRY_DATA_ENV_WHATSAPP,
+		channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
+		sessionId: '',
+		uaspec: getUserSpec(req),
+		requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] : "",
+	}
 	if (req.query.client_key == config.SECRET_KEY) {
-		var userId = req.body.incoming_message[0].from;
+		var userId = incoming_msg_from;
 		var data = {
-			message: req.body.incoming_message[0].text_type.text,
+			message: incoming_message.text_type.text,
 			recipient: userId,
 			channel: config.WHATSAPP,
-			customData: {
-				userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-				deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-				appId: config.TELEMETRY_DATA_PID_WHATSAPP,
-				env: config.TELEMETRY_DATA_ENV_WHATSAPP,
-				channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
-				sessionId: '',
-				uaspec: getUserSpec(req),
-				requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
-			}
+			customData: customData
 		}
 		handler(req, res, data)
 	} else {
-		var customData= {
-			userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-			deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-			appId: config.TELEMETRY_DATA_PID_WHATSAPP,
-			env: config.TELEMETRY_DATA_ENV_WHATSAPP,
-			channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
-			sessionId: '',
-			uaspec: getUserSpec(req),
-			requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
-		}
 		sendErrorResponse(res, customData)
 	}
 
@@ -124,6 +117,11 @@ appBot.post('/refresh', function(req, response) {
 	}
 })
 
+// dummy api for load testing
+appBot.post('/dummy', function (req, res) {
+	res.json({message: 'success'})
+})
+
 var updateConfigFromBlob = function(url, dest, configName, cb) {
 	url = url + configName;
 	dest = dest + configName;
@@ -141,11 +139,12 @@ var updateConfigFromBlob = function(url, dest, configName, cb) {
 
 function handler(req, res, data) {
 
-
-	var chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context] : chatflow.chatflow : chatflow.chatflow;
+	const reqBodycontext = req.body.context;
+	var chatflowConfig = reqBodycontext ? chatflow[reqBodycontext] ? chatflow[reqBodycontext] : chatflow.chatflow : chatflow.chatflow;
 	redisSessionData = {};
+	const deviceId = data.customData.deviceId;
 
-	if (!data.customData.deviceId) {
+	if (!deviceId) {
 		var edata = {
 			type: "system",
 			level: "INFO",
@@ -153,9 +152,9 @@ function handler(req, res, data) {
 			message: "Attribute missing from request body"
 		  }
 		telemetry.telemetryLog(data.customData, edata);
-		sendResponse(data.customData.deviceId, res, "From attribute missing", 400);
+		sendResponse(deviceId, res, "From attribute missing", 400);
 	} else {
-		redisClient.get(REDIS_KEY_PREFIX + data.customData.deviceId, (err, redisValue) => {
+		redisClient.get(REDIS_KEY_PREFIX + deviceId, (err, redisValue) => {
 
 			if (redisValue != null) {
 
@@ -177,7 +176,7 @@ function handler(req, res, data) {
 
 				var uuID = UUIDV4();
 				userData = { sessionID: uuID, currentFlowStep: 'step1' };
-				setRedisKeyValue(data.customData.deviceId, userData);
+				setRedisKeyValue(deviceId, userData);
 				data.customData.sessionId = uuID;
 				telemetry.logSessionStart(data.customData);
 				if (data.channel == "botclient") {
@@ -481,16 +480,17 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 }
 function createInteractionData(responseData, data, isNonNumeric) {
 	subtypeVar = ''
+	const intentData =  responseData.intent;
 	if (isNonNumeric) {
 		if (data.channel == config.WHATSAPP) {
-			subtypeVar = responseData.intent ? config.WHATSAPP_FREEFLOW_INTENT_DETECTED : config.WHATSAPP_FREEFLOW_INTENT_NOT_DETECTED
+			subtypeVar = intentData ? config.WHATSAPP_FREEFLOW_INTENT_DETECTED : config.WHATSAPP_FREEFLOW_INTENT_NOT_DETECTED
 		} else {
-			subtypeVar = responseData.intent ? config.FREEFLOW_INTENT_DETECTED : config.FREEFLOW_INTENT_NOT_DETECTED
+			subtypeVar = intentData ? config.FREEFLOW_INTENT_DETECTED : config.FREEFLOW_INTENT_NOT_DETECTED
 		}
 		return {
 			interactionData: {
-				id: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
-				type: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
+				id: intentData ? intentData : 'UNKNOWN_OPTION',
+				type: intentData ? intentData : 'UNKNOWN_OPTION',
 				subtype: subtypeVar
 
 			},
@@ -498,9 +498,9 @@ function createInteractionData(responseData, data, isNonNumeric) {
 		}
 	} else {
 		if (data.channel == config.WHATSAPP) {
-			subtypeVar = responseData.intent ? config.WHATSAPP_INTENT_DETECTED : config.WHATSAPP_INTENT_NOT_DETECTED
+			subtypeVar = intentData ? config.WHATSAPP_INTENT_DETECTED : config.WHATSAPP_INTENT_NOT_DETECTED
 		} else {
-			subtypeVar = responseData.intent ? config.INTENT_DETECTED : config.INTENT_NOT_DETECTED
+			subtypeVar = intentData ? config.INTENT_DETECTED : config.INTENT_NOT_DETECTED
 		}
 		return {
 			interactionData: {
