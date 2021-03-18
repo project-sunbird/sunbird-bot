@@ -129,19 +129,19 @@ appBot.post('/refresh', function(req, response) {
 					} catch (e) {
 						//if this threw an error, the api variable is still set to the old, working version
 						console.error("Failed to reload chatflow.js! Error: ", e);
-						var errorBody = errorResponse(req, 401);
+						var errorBody = errorResponse(req, 401, e);
 						response.send(errorBody);
 					}
 				})
 			} catch (e) {
 				//if this threw an error, the api variable is still set to the old, working version
 				console.error("Failed to reload literals.js! Error: ", e);
-				var errorBody = errorResponse(req, 401);
+				var errorBody = errorResponse(req, 401, e);
 				response.send(errorBody);
 			}
 		})
 	} else {
-		var errorBody = errorResponse(req, 400);
+		var errorBody = errorResponse(req, 400, errorCodes["/refresh"].post.errorObject.err_400.errMsg);
 		response.send(errorBody);
 	}
 })
@@ -183,12 +183,12 @@ function handler(req, res, data) {
 		telemetry.telemetryLog(data.customData, edata);
 		sendResponse(data.customData.deviceId, res, "From attribute missing", 400);
 		// Error code
-		var errorBody = errorResponse(req, 400);
+		var errorBody = errorResponse(req, 400, edata.message);
 		res.send(errorBody);
 	} else {
 		redisClient.get(REDIS_KEY_PREFIX + data.customData.deviceId, (err, redisValue) => {
 			if(err){
-				var errorBody = errorResponse(req, 402);
+				var errorBody = errorResponse(req, 402, err);
 				response.send(errorBody);
 			}
 			if (redisValue != null) {
@@ -248,7 +248,7 @@ function freeFlowLogic(data, res, chatflowConfig, req) {
 			telemetry.telemetryLog(data.customData, edata);
 			sendChannelResponse(data.customData.deviceId, res, data, 'SORRY')
 			// Error code
-			var errorBody = errorResponse(req, 403);
+			var errorBody = errorResponse(req, 403, err);
 			res.send(errorBody);
 		} else {
 			var responses = resp.res;
@@ -459,7 +459,7 @@ function sendErrorResponse(response, data, req){
 	telemetry.telemetryLog(data, edata)
 	response.status(401);
 	// Error code
-	var errorBody = errorResponse(req, 401);
+	var errorBody = errorResponse(req, 401, errorCodes["/bot"].post.errorObject.err_404.errMsg);
 	response.send(errorBody);
 }
 //send data to user
@@ -510,7 +510,7 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 		  }
 		telemetry.telemetryLog(data.customData, edata)
 		// Error code
-		var errorBody = errorResponse(req, 404);
+		var errorBody = errorResponse(req, 404, errorCodes["/bot"].post.errorObject.err_404.errMsg);
 		res.send(errorBody);
 	}
 
@@ -590,7 +590,7 @@ function replaceUserSpecficData(str) {
 	return str;
 }
 
-function errorResponse(req, statusCode) {
+function errorResponse(req, statusCode, stackTrace) {
 	const errorCode = `err_${statusCode}`;
 	const method = req.method.toLowerCase();
 	const path = `${req.route.path}.${method}.errorObject`;
@@ -602,6 +602,7 @@ function errorResponse(req, statusCode) {
 	error_obj['params']['msgid'] = req.headers['x-request-id']; // TODO: replace with x-request-id;
 	error_obj['params']['errmsg'] = errorObj.errMsg
 	error_obj['params']['err'] = errorObj.err;
+	error_obj['params']['stacktrace'] = stackTrace;
 	return error_obj;
   }
 module.exports = appBot;
