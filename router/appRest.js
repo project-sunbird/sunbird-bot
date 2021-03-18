@@ -73,22 +73,25 @@ appBot.post('/bot', function (req, res) {
 
 
 appBot.post('/whatsapp', function (req, res) {
+	const incoming_message = req.body.incoming_message[0];
+	const incoming_msg_from = incoming_message.from;
+	var customData = {
+		userId: crypto.createHash('sha256').update(incoming_msg_from).digest("hex"),
+		deviceId: crypto.createHash('sha256').update(incoming_msg_from).digest("hex"),
+		appId: config.TELEMETRY_DATA_PID_WHATSAPP,
+		env: config.TELEMETRY_DATA_ENV_WHATSAPP,
+		channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
+		sessionId: '',
+		uaspec: getUserSpec(req),
+		requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] : "",
+	}
 	if (req.query.client_key == config.SECRET_KEY) {
-		var userId = req.body.incoming_message[0].from;
+		var userId = incoming_msg_from;
 		var data = {
-			message: req.body.incoming_message[0].text_type.text,
+			message: incoming_message.text_type.text,
 			recipient: userId,
 			channel: config.WHATSAPP,
-			customData: {
-				userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-				deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-				appId: config.TELEMETRY_DATA_PID_WHATSAPP,
-				env: config.TELEMETRY_DATA_ENV_WHATSAPP,
-				channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
-				sessionId: '',
-				uaspec: getUserSpec(req),
-				requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
-			}
+			customData: customData
 		}
 		handler(req, res, data)
 	} else {
@@ -143,6 +146,11 @@ appBot.post('/refresh', function(req, response) {
 	}
 })
 
+// dummy api for load testing
+appBot.post('/dummy', function (req, res) {
+	res.json({message: 'success'})
+})
+
 var updateConfigFromBlob = function(url, dest, configName, cb) {
 	url = url + configName;
 	dest = dest + configName;
@@ -160,11 +168,12 @@ var updateConfigFromBlob = function(url, dest, configName, cb) {
 
 function handler(req, res, data) {
 
-
-	var chatflowConfig = req.body.context ? chatflow[req.body.context] ? chatflow[req.body.context] : chatflow.chatflow : chatflow.chatflow;
+	const reqBodycontext = req.body.context;
+	var chatflowConfig = reqBodycontext ? chatflow[reqBodycontext] ? chatflow[reqBodycontext] : chatflow.chatflow : chatflow.chatflow;
 	redisSessionData = {};
+	const deviceId = data.customData.deviceId;
 
-	if (!data.customData.deviceId) {
+	if (!deviceId) {
 		var edata = {
 			type: "system",
 			level: "INFO",
@@ -202,7 +211,7 @@ function handler(req, res, data) {
 
 				var uuID = UUIDV4();
 				userData = { sessionID: uuID, currentFlowStep: 'step1' };
-				setRedisKeyValue(data.customData.deviceId, userData);
+				setRedisKeyValue(deviceId, userData);
 				data.customData.sessionId = uuID;
 				telemetry.logSessionStart(data.customData);
 				if (data.channel == "botclient") {
@@ -245,7 +254,7 @@ function freeFlowLogic(data, res, chatflowConfig, req) {
 			var responses = resp.res;
 			if (responses && responses[0].text && responses[0].text != '') {
 				response = responses[0].text;
-				telemetryData = createInteractionData(responses[0], data, true);
+				telemetryData = createInteractionData(response.data, data, true);
 			} else {
 				responseKey = getErrorMessageForInvalidInput(responses[0], chatflowConfig, false);
 				if (data.channel == config.WHATSAPP) {
@@ -258,7 +267,7 @@ function freeFlowLogic(data, res, chatflowConfig, req) {
 					response = literals.message[responseKey];
 				}
 				consolidatedLog(data, responseKey, '', false);
-				telemetryData = createInteractionData(responses[0], data, true)
+				telemetryData = createInteractionData(response.data, data, true)
 			}
 			telemetry.logInteraction(telemetryData);
 			if (data.channel == config.WHATSAPP) {
@@ -290,25 +299,30 @@ function menuDrivenLogic(data, res, chatflowConfig) {
 		responseKey = chatflowConfig[currentFlowStep].messageKey
 		// TODO : Don't call function inside each if/else if it should be called once.
 		menuIntentKnown = true
-		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
+		var interactionData = { currentStep: currentFlowStep, responseKey: responseKey, intent: menuIntentKnown }
+		telemetryData = createInteractionData(interactionData, data, false)
 	} else if (data.message === '0') {
 		currentFlowStep = 'step1'
 		responseKey = chatflowConfig[currentFlowStep].messageKey
 		menuIntentKnown = true
 		// TODO : Don't call function inside each if/else if it should be called once.
-		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
+		var interactionData = { currentStep: currentFlowStep, responseKey: responseKey, intent: menuIntentKnown }
+		telemetryData = createInteractionData(interactionData, data, false)
 		// Telemetry event for Main menu button
-		var mainMenuEventData = createInteractionData({ currentStep: 'step_0', responseKey: 'MAIN_MENU' }, data, false)
+		var interactionDataMainMenu = { currentStep: 'step_0', responseKey: 'MAIN_MENU', intent: menuIntentKnown }
+		var mainMenuEventData = createInteractionData(interactionDataMainMenu, data, false)
 		telemetry.logInteraction(mainMenuEventData);
 	} else if (data.message === '99') {
 		if (currentFlowStep.lastIndexOf("_") > 0) {
 			currentFlowStep = currentFlowStep.substring(0, currentFlowStep.lastIndexOf("_"))
 			responseKey = chatflowConfig[currentFlowStep].messageKey
 			menuIntentKnown = true
+			var interactionData = { currentStep: currentFlowStep, responseKey: responseKey, intent: menuIntentKnown }
 			// TODO : Don't call function inside each if/else if it should be called once. 
-			telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
+			telemetryData = createInteractionData(interactionData, data, false)
 			// Telemetry event for Go-back button
-			var goBackEventData = createInteractionData({ currentStep: 'step_99', responseKey: 'GO_BACK' }, data, false)
+			var interactionDataGoBack= { currentStep: 'step_99', responseKey: 'GO_BACK', intent: menuIntentKnown }
+			var goBackEventData = createInteractionData(interactionDataGoBack, data, false)
 			telemetry.logInteraction(goBackEventData);
 		} else {
 			responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, true)
@@ -514,16 +528,17 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 }
 function createInteractionData(responseData, data, isNonNumeric) {
 	subtypeVar = ''
+	const intentData =  responseData.intent;
 	if (isNonNumeric) {
 		if (data.channel == config.WHATSAPP) {
-			subtypeVar = responseData.intent ? config.WHATSAPP_FREEFLOW_INTENT_DETECTED : config.WHATSAPP_FREEFLOW_INTENT_NOT_DETECTED
+			subtypeVar = intentData ? config.WHATSAPP_FREEFLOW_INTENT_DETECTED : config.WHATSAPP_FREEFLOW_INTENT_NOT_DETECTED
 		} else {
-			subtypeVar = responseData.intent ? config.FREEFLOW_INTENT_DETECTED : config.FREEFLOW_INTENT_NOT_DETECTED
+			subtypeVar = intentData ? config.FREEFLOW_INTENT_DETECTED : config.FREEFLOW_INTENT_NOT_DETECTED
 		}
 		return {
 			interactionData: {
-				id: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
-				type: responseData.intent ? responseData.intent : 'UNKNOWN_OPTION',
+				id: intentData ? intentData : 'UNKNOWN_OPTION',
+				type: intentData ? intentData : 'UNKNOWN_OPTION',
 				subtype: subtypeVar
 
 			},
@@ -531,9 +546,9 @@ function createInteractionData(responseData, data, isNonNumeric) {
 		}
 	} else {
 		if (data.channel == config.WHATSAPP) {
-			subtypeVar = responseData.intent ? config.WHATSAPP_INTENT_DETECTED : config.WHATSAPP_INTENT_NOT_DETECTED
+			subtypeVar = intentData ? config.WHATSAPP_INTENT_DETECTED : config.WHATSAPP_INTENT_NOT_DETECTED
 		} else {
-			subtypeVar = responseData.intent ? config.INTENT_DETECTED : config.INTENT_NOT_DETECTED
+			subtypeVar = intentData ? config.INTENT_DETECTED : config.INTENT_NOT_DETECTED
 		}
 		return {
 			interactionData: {

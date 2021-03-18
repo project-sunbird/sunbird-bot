@@ -20,4 +20,9 @@ strategy:
   maxsurge: {{ bot_maxsurge|default('50%') }}
   maxunavailable: {{ bot_maxunavailable|default('50%') }} 
 
-
+autoscaling:
+  enabled: {{ bot_autoscaling_enabled | default('false') }}
+  minReplicas: {{ bot_autoscaling_minReplicas|default(1) }}
+  maxReplicas: {{ bot_autoscaling_maxReplicas|default(3) }}
+  targetCPUUtilizationPercentage: {{ bot_autoscaling_targetCPUUtilizationPercentage|default(80) }}
+  targetMemoryUtilizationPercentage: {{ bot_autoscaling_targetMemoryUtilizationPercentage|default('') }}
