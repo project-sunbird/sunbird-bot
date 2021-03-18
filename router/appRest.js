@@ -13,6 +13,7 @@ var chatflow = require('./config/chatflow')
 var reload = require('require-reload')(require),
 chatflow = reload('./config/chatflow');
 literals = reload('./config/literals');
+const dateFormat = require('dateformat')
 var RasaCoreController = require('./controllers/rasaCoreController')
 const telemetry = require('./api/telemetry/telemetry.js')
 var UUIDV4 = require('uuid')
@@ -33,6 +34,21 @@ const querystring = require('querystring');
 
 // Redis is used as the session tracking store
 const redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST);
+
+const errorCodes = require('./helpers/errorCodes.json');
+const defaultErrorCode = 'err_500';
+let error_obj = {
+  "id": "",
+  "ver": "1.0",
+  "ts": "",
+  "params": {
+      "resmsgid": "5f36c090-2eee-11eb-80ed-6bb70096c082",
+      "msgid": "",
+      "status": "failed",
+      "err": "",
+      "errmsg": ""
+  }
+}
 
 // Route that receives a POST request to /bot
 appBot.post('/bot', function (req, res) {
@@ -79,7 +95,17 @@ appBot.post('/whatsapp', function (req, res) {
 		}
 		handler(req, res, data)
 	} else {
-		sendErrorResponse(res, customData)
+		var customData= {
+			userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+			deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
+			appId: config.TELEMETRY_DATA_PID_WHATSAPP,
+			env: config.TELEMETRY_DATA_ENV_WHATSAPP,
+			channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
+			sessionId: '',
+			uaspec: getUserSpec(req),
+			requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
+		}
+		sendErrorResponse(res, customData, req)
 	}
 
 })
@@ -103,17 +129,20 @@ appBot.post('/refresh', function(req, response) {
 					} catch (e) {
 						//if this threw an error, the api variable is still set to the old, working version
 						console.error("Failed to reload chatflow.js! Error: ", e);
-						response.send({'msg': e.message})
+						var errorBody = errorResponse(req, 401, e);
+						response.send(errorBody);
 					}
 				})
 			} catch (e) {
 				//if this threw an error, the api variable is still set to the old, working version
 				console.error("Failed to reload literals.js! Error: ", e);
-				response.send({'msg': e.message})
+				var errorBody = errorResponse(req, 401, e);
+				response.send(errorBody);
 			}
 		})
 	} else {
-		response.send({'msg': 'ENV configuration blob path is not defined'})
+		var errorBody = errorResponse(req, 400, errorCodes["/refresh"].post.errorObject.err_400.errMsg);
+		response.send(errorBody);
 	}
 })
 
@@ -152,10 +181,16 @@ function handler(req, res, data) {
 			message: "Attribute missing from request body"
 		  }
 		telemetry.telemetryLog(data.customData, edata);
-		sendResponse(deviceId, res, "From attribute missing", 400);
+		sendResponse(data.customData.deviceId, res, "From attribute missing", 400);
+		// Error code
+		var errorBody = errorResponse(req, 400, edata.message);
+		res.send(errorBody);
 	} else {
-		redisClient.get(REDIS_KEY_PREFIX + deviceId, (err, redisValue) => {
-
+		redisClient.get(REDIS_KEY_PREFIX + data.customData.deviceId, (err, redisValue) => {
+			if(err){
+				var errorBody = errorResponse(req, 402, err);
+				response.send(errorBody);
+			}
 			if (redisValue != null) {
 
 				// Key is already exist and hence assiging data which is already there at the posted key
@@ -165,7 +200,7 @@ function handler(req, res, data) {
 				// all non numeric user messages go to bot
 				if (isNaN(data.message)) {
 					///Bot interaction flow
-					freeFlowLogic(data, res,chatflowConfig)
+					freeFlowLogic(data, res,chatflowConfig, req)
 
 				} else {
 					menuDrivenLogic(data, res, chatflowConfig)
@@ -187,7 +222,7 @@ function handler(req, res, data) {
 				} else {
 					if (isNaN(data.message)) {
 						///Bot interaction flow
-						freeFlowLogic(data, res, chatflowConfig)
+						freeFlowLogic(data, res, chatflowConfig, req)
 
 					} else {
 						menuDrivenLogic(data, res, chatflowConfig)
@@ -199,7 +234,7 @@ function handler(req, res, data) {
 	}
 }
 
-function freeFlowLogic(data, res, chatflowConfig) {
+function freeFlowLogic(data, res, chatflowConfig, req) {
 	RasaCoreController.processUserData(data, (err, resp) => {
 		var response = '';
 		var edata = {
@@ -212,6 +247,9 @@ function freeFlowLogic(data, res, chatflowConfig) {
 			edata.message = "Sorry: Core RASA controller failed to load";
 			telemetry.telemetryLog(data.customData, edata);
 			sendChannelResponse(data.customData.deviceId, res, data, 'SORRY')
+			// Error code
+			var errorBody = errorResponse(req, 403, err);
+			res.send(errorBody);
 		} else {
 			var responses = resp.res;
 			if (responses && responses[0].text && responses[0].text != '') {
@@ -411,16 +449,18 @@ function sendResponse(response, responseBody, responseCode) {
 	response.send(responseBody)
 }
 
-function sendErrorResponse(response, data){
+function sendErrorResponse(response, data, req){
 	var edata = {
 		type: "system",
 		level: "INFO",
-		requestid: data.customData.requestid,
+		requestid: data.requestid,
 		message: "401 invalid request"
 	  }
 	telemetry.telemetryLog(data, edata)
 	response.status(401);
-	response.send('invalid request');
+	// Error code
+	var errorBody = errorResponse(req, 401, errorCodes["/bot"].post.errorObject.err_404.errMsg);
+	response.send(errorBody);
 }
 //send data to user
 function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
@@ -469,6 +509,9 @@ function sendChannelResponse(response, responseKey, data, responseCode) {
 			message: "404 not found"
 		  }
 		telemetry.telemetryLog(data.customData, edata)
+		// Error code
+		var errorBody = errorResponse(req, 404, errorCodes["/bot"].post.errorObject.err_404.errMsg);
+		res.send(errorBody);
 	}
 
 	//version check
@@ -546,4 +589,20 @@ function replaceUserSpecficData(str) {
 	}
 	return str;
 }
+
+function errorResponse(req, statusCode, stackTrace) {
+	const errorCode = `err_${statusCode}`;
+	const method = req.method.toLowerCase();
+	const path = `${req.route.path}.${method}.errorObject`;
+	const errorObj = _.get(errorCodes, `${path}.${errorCode}`) || _.get(errorCodes, `${path}.${defaultErrorCode}`);
+	const id =  req.originalUrl.split('/');
+
+	error_obj['id'] = id.join('.');
+	error_obj['ts'] = dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss:lo');
+	error_obj['params']['msgid'] = req.headers['x-request-id']; // TODO: replace with x-request-id;
+	error_obj['params']['errmsg'] = errorObj.errMsg
+	error_obj['params']['err'] = errorObj.err;
+	error_obj['params']['stacktrace'] = stackTrace;
+	return error_obj;
+  }
 module.exports = appBot;
