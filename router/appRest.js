@@ -216,7 +216,7 @@ function freeFlowLogic(data, res, chatflowConfig) {
 			var responses = resp.res;
 			if (responses && responses[0].text && responses[0].text != '') {
 				response = responses[0].text;
-				telemetryData = createInteractionData(responses[0], data, true);
+				telemetryData = createInteractionData(response.data, data, true);
 			} else {
 				responseKey = getErrorMessageForInvalidInput(responses[0], chatflowConfig, false);
 				if (data.channel == config.WHATSAPP) {
@@ -229,7 +229,7 @@ function freeFlowLogic(data, res, chatflowConfig) {
 					response = literals.message[responseKey];
 				}
 				consolidatedLog(data, responseKey, '', false);
-				telemetryData = createInteractionData(responses[0], data, true)
+				telemetryData = createInteractionData(response.data, data, true)
 			}
 			telemetry.logInteraction(telemetryData);
 			if (data.channel == config.WHATSAPP) {
@@ -261,25 +261,30 @@ function menuDrivenLogic(data, res, chatflowConfig) {
 		responseKey = chatflowConfig[currentFlowStep].messageKey
 		// TODO : Don't call function inside each if/else if it should be called once.
 		menuIntentKnown = true
-		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
+		var interactionData = { currentStep: currentFlowStep, responseKey: responseKey, intent: menuIntentKnown }
+		telemetryData = createInteractionData(interactionData, data, false)
 	} else if (data.message === '0') {
 		currentFlowStep = 'step1'
 		responseKey = chatflowConfig[currentFlowStep].messageKey
 		menuIntentKnown = true
 		// TODO : Don't call function inside each if/else if it should be called once.
-		telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
+		var interactionData = { currentStep: currentFlowStep, responseKey: responseKey, intent: menuIntentKnown }
+		telemetryData = createInteractionData(interactionData, data, false)
 		// Telemetry event for Main menu button
-		var mainMenuEventData = createInteractionData({ currentStep: 'step_0', responseKey: 'MAIN_MENU' }, data, false)
+		var interactionDataMainMenu = { currentStep: 'step_0', responseKey: 'MAIN_MENU', intent: menuIntentKnown }
+		var mainMenuEventData = createInteractionData(interactionDataMainMenu, data, false)
 		telemetry.logInteraction(mainMenuEventData);
 	} else if (data.message === '99') {
 		if (currentFlowStep.lastIndexOf("_") > 0) {
 			currentFlowStep = currentFlowStep.substring(0, currentFlowStep.lastIndexOf("_"))
 			responseKey = chatflowConfig[currentFlowStep].messageKey
 			menuIntentKnown = true
+			var interactionData = { currentStep: currentFlowStep, responseKey: responseKey, intent: menuIntentKnown }
 			// TODO : Don't call function inside each if/else if it should be called once. 
-			telemetryData = createInteractionData({ currentStep: currentFlowStep, responseKey: responseKey }, data, false)
+			telemetryData = createInteractionData(interactionData, data, false)
 			// Telemetry event for Go-back button
-			var goBackEventData = createInteractionData({ currentStep: 'step_99', responseKey: 'GO_BACK' }, data, false)
+			var interactionDataGoBack= { currentStep: 'step_99', responseKey: 'GO_BACK', intent: menuIntentKnown }
+			var goBackEventData = createInteractionData(interactionDataGoBack, data, false)
 			telemetry.logInteraction(goBackEventData);
 		} else {
 			responseKey = getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, true)
