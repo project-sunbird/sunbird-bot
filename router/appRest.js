@@ -410,7 +410,7 @@ function sendErrorResponse(response, data){
 	var edata = {
 		type: "system",
 		level: "INFO",
-		requestid: data.customData.requestid,
+		requestid: data.requestid,
 		message: "401 invalid request"
 	  }
 	telemetry.telemetryLog(data, edata)
