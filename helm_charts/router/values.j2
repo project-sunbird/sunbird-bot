@@ -24,7 +24,7 @@ autoscaling:
   enabled: {{ router_autoscaling_enabled | default('false') }}
   minReplicas: {{ router_autoscaling_minReplicas|default(1) }}
   maxReplicas: {{ router_autoscaling_maxReplicas|default(3) }}
-  targetCPUUtilizationPercentage: {{ router_autoscaling_targetCPUUtilizationPercentage|default(80) }}
+  targetCPUUtilizationPercentage: {{ router_autoscaling_targetCPUUtilizationPercentage|default(60) }}
   targetMemoryUtilizationPercentage: {{ router_autoscaling_targetMemoryUtilizationPercentage|default('') }}
 
 routerenv:
