@@ -41,8 +41,10 @@ telemetrySyncManager.prototype.dispatch = function (telemetryEvent) {
   this.teleData.push(event)
   if ((event.eid.toUpperCase() == 'END') || (this.teleData.length >= this.config.batchsize)) {
     var events = this.teleData.splice(0, this.config.batchsize) 
+    console.log("Telemetry events sent", events.length);
     this.sync(events, function(error, res, failedEvents){
       if(error) {
+        console.log("Telemetry events failed", error);
         telemetryBatchUtil.add(failedEvents)
       }
     })
