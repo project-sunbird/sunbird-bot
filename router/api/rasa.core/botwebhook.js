@@ -32,26 +32,29 @@ function processResponse(res, userId, clientId, message, channel, cb) {
           quick_replies = item.custom
           text = item.text
           type = ''
+          menu_key = ''
           entities = []
           if (item.custom.blocks[0] && item.custom.blocks[0].intent) {
             intent = item.custom.blocks[0].intent
           }
-          if (item.custom.blocks[0] && item.custom.blocks[0].text) {
+          if ((item.custom.blocks[0] && item.custom.blocks[0].text) || 
+              (item.custom.blocks[0] && item.custom.blocks[0].menu_key)) {
             if (channel == 'whatsapp') {
               text = {
                 "data": {
-                  "text": item.custom.blocks[0].text_whatsapp
+                  "text": item.custom.blocks[0].text_whatsapp,
+                  "menu_key": item.custom.blocks[0].menu_key || ''
                 }
               }
             } else {
               text = {
                 "data": {
-                  "text": item.custom.blocks[0].text
+                  "text": item.custom.blocks[0].text,
+                  "menu_key": item.custom.blocks[0].menu_key || ''
                 }
               }
 
             }
-
           }
           if (item.custom.blocks[0] && item.custom.blocks[0].type) {
             type = item.custom.blocks[0].type
