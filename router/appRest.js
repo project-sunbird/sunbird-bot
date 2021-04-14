@@ -417,6 +417,8 @@ function getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, isNumer
 function getMessage(params) {
 	let [ freeflowRes, channel ] = params;
 	if(freeflowRes.data.text === '' && freeflowRes.data.menu_key !== '') {
+		// TODO: Need to change this logic to use single literals key for both client portal and whatsapp
+		// Modify literals to have single response for both client and change the logic all the places
 		if(channel === "botclient") {
 			freeflowRes = _.cloneDeep(literals.message[freeflowRes.data.menu_key]);
 			freeflowRes.data.text = replaceUserSpecficData(freeflowRes.data.text);
