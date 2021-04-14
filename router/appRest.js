@@ -251,12 +251,14 @@ function freeFlowLogic(data, res, chatflowConfig, req) {
 			var errorBody = errorResponse(req, 403, err);
 			res.send(errorBody);
 		} else {
-			var responses = resp.res;
-			if (responses && responses[0].text && responses[0].text != '') {
-				response = responses[0].text;
+			var responses = resp.res[0];
+			if ((responses && responses.text && responses.text != '') || 
+				(responses && responses.menu_key && responses.menu_key != '') ) {
+				response = responses.text;
+				response = getMessage([response, data.channel]);
 				telemetryData = createInteractionData(response.data, data, true);
 			} else {
-				responseKey = getErrorMessageForInvalidInput(responses[0], chatflowConfig, false);
+				responseKey = getErrorMessageForInvalidInput(responses, chatflowConfig, false);
 				if (data.channel == config.WHATSAPP) {
 					errorResponse = literals.message[responseKey + config._WHATSAPP];
 					response = {
@@ -405,6 +407,26 @@ function getErrorMessageForInvalidInput(currentFlowStep, chatflowConfig, isNumer
 	} else {
 		return chatflowConfig['step1_wrong_input'].messageKey
 	}
+}
+
+/**
+ * @description This method is use to decide message for web & whatsapp bot based on menu_key
+ * @param  {array} params has  freeflowMsg, channel parameters 
+ * @return if freeFlowLogic is returning empty text & menu_key then it will return message from literals
+ */
+function getMessage(params) {
+	let [ freeflowRes, channel ] = params;
+	if(freeflowRes.data.text === '' && freeflowRes.data.menu_key !== '') {
+		// TODO: Need to change this logic to use single literals key for both client portal and whatsapp
+		// Modify literals to have single response for both client and change the logic all the places
+		if(channel === "botclient") {
+			freeflowRes = _.cloneDeep(literals.message[freeflowRes.data.menu_key]);
+			freeflowRes.data.text = replaceUserSpecficData(freeflowRes.data.text);
+		} else {
+			freeflowRes.data.text = literals.message[freeflowRes.data.menu_key + '_' + channel];	
+		}
+	}
+	return freeflowRes
 }
 
 //http endpoint
