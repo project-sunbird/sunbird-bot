@@ -452,6 +452,7 @@ function sendErrorResponse(response, data, req, errorCode = 500, stackTrace = ''
  * @param  { object } req api request object 
  * @param  { string } client bot client name 
  * @return { object } custom data 
+ * @todo implement interface for object
  */
  function getCustomLogData(req, client) {
 	let cryptoHash;
