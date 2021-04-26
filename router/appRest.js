@@ -457,12 +457,7 @@ function sendErrorResponse(response, data, req, errorCode = 500, stackTrace = ''
 	let data = {
 		sessionId: '',
 		uaspec: getUserSpec(req),
-		requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] : "",
-		userId: req.body.userId ? req.body.userId : req.body.From,
-		deviceId: req.body.From,
-		appId: req.body.appId + '.bot',
-		env: req.body.appId + '.bot',
-		channelId: req.body.channel
+		requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] : ""
 	}
 	if(client === 'botclient') {
 		_.merge(data, {
