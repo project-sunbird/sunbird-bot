@@ -57,57 +57,35 @@ appBot.post('/bot', function (req, res) {
 		message: req.body.Body,
 		recipient: userId,
 		channel: 'botclient',
-		customData: {
-			userId: userId,
-			deviceId: req.body.From,
-			appId: req.body.appId + '.bot',
-			env: req.body.appId + '.bot',
-			sessionId: '',
-			channelId: req.body.channel,
-			uaspec: getUserSpec(req),
-			requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
-		}
+		customData: getCustomLogData(req, 'botclient')
 	}
 	handler(req, res, data)
 })
 
-
 appBot.post('/whatsapp', function (req, res) {
-	const incoming_message = req.body.incoming_message[0];
-	const incoming_msg_from = incoming_message.from;
-	var customData = {
-		userId: crypto.createHash('sha256').update(incoming_msg_from).digest("hex"),
-		deviceId: crypto.createHash('sha256').update(incoming_msg_from).digest("hex"),
-		appId: config.TELEMETRY_DATA_PID_WHATSAPP,
-		env: config.TELEMETRY_DATA_ENV_WHATSAPP,
-		channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
-		sessionId: '',
-		uaspec: getUserSpec(req),
-		requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] : "",
+	const customData = getCustomLogData(req, 'whatsapp');
+	if(!req.body.incoming_message || !req.body.incoming_message[0]) {
+		sendErrorResponse(res, customData, req, 400);
+		return false;	
 	}
-	if (req.query.client_key == config.SECRET_KEY) {
-		var userId = incoming_msg_from;
-		var data = {
-			message: incoming_message.text_type.text,
-			recipient: userId,
-			channel: config.WHATSAPP,
-			customData: customData
+	try {
+		const incoming_message = req.body.incoming_message[0];
+		const incoming_msg_from = incoming_message.from;
+		if (req.query.client_key == config.SECRET_KEY) {
+			var userId = incoming_msg_from;
+			var data = {
+				message: incoming_message.text_type.text,
+				recipient: userId,
+				channel: config.WHATSAPP,
+				customData: customData
+			}
+			handler(req, res, data)
+		} else {
+			sendErrorResponse(res, customData, req, 401)
 		}
-		handler(req, res, data)
-	} else {
-		var customData= {
-			userId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-			deviceId: crypto.createHash('sha256').update(req.body.incoming_message[0].from).digest("hex"),
-			appId: config.TELEMETRY_DATA_PID_WHATSAPP,
-			env: config.TELEMETRY_DATA_ENV_WHATSAPP,
-			channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP,
-			sessionId: '',
-			uaspec: getUserSpec(req),
-			requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] :"",
-		}
-		sendErrorResponse(res, customData, req)
+	} catch (error) {
+		sendErrorResponse(res, customData, req, 500, error.stack);
 	}
-
 })
 
 // Update latest config from blob
@@ -449,19 +427,65 @@ function sendResponse(response, responseBody, responseCode) {
 	response.send(responseBody)
 }
 
-function sendErrorResponse(response, data, req){
+/**
+ * @description This method is use to prepare error response body and log telemetry log and send response to client
+ * @param  { object } response api response object
+ * @param  { object } data custom log data 
+ * @param  { object } req api request object
+ * @param  { string } errorCode custom error status code || default value is 500
+ * @param  { string } stackTrace error stackTrace details || default value is empty
+ */
+function sendErrorResponse(response, data, req, errorCode = 500, stackTrace = ''){
+	const errorBody = errorResponse(req, errorCode, stackTrace);
 	var edata = {
 		type: "system",
 		level: "INFO",
 		requestid: data.requestid,
-		message: "401 invalid request"
-	  }
-	telemetry.telemetryLog(data, edata)
-	response.status(401);
-	// Error code
-	var errorBody = errorResponse(req, 401, errorCodes["/bot"].post.errorObject.err_404.errMsg);
-	response.send(errorBody);
+		message: errorBody.params.errmsg
+	}
+	telemetry.telemetryLog(data, edata);
+	response.status(errorCode).send(errorBody);
 }
+
+/**
+ * @description This method is use to generate custom log data based on bot client 
+ * @param  { object } req api request object 
+ * @param  { string } client bot client name 
+ * @return { object } custom data 
+ */
+ function getCustomLogData(req, client) {
+	let data = {
+		sessionId: '',
+		uaspec: getUserSpec(req),
+		requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] : "",
+		userId: req.body.userId ? req.body.userId : req.body.From,
+		deviceId: req.body.From,
+		appId: req.body.appId + '.bot',
+		env: req.body.appId + '.bot',
+		channelId: req.body.channel
+	}
+	if(client === 'botclient') {
+		_.merge(data, {
+			userId: req.body.userId ? req.body.userId : req.body.From,
+			deviceId: req.body.From,
+			appId: req.body.appId + '.bot',
+			env: req.body.appId + '.bot',
+			channelId: req.body.channel
+		})
+	} else {
+		const incoming_msg_from = _.get(req, 'body.incoming_message[0].from') || '';
+		const cryptoHash = incoming_msg_from ? crypto.createHash('sha256').update(incoming_msg_from).digest("hex") : undefined;
+		_.merge(data, {
+			userId: cryptoHash,
+			deviceId: cryptoHash,
+			appId: config.TELEMETRY_DATA_PID_WHATSAPP,
+			env: config.TELEMETRY_DATA_ENV_WHATSAPP,
+			channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP
+		})
+	}
+	return data;
+}
+
 //send data to user
 function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 	var rsponseText = ''
