@@ -454,29 +454,31 @@ function sendErrorResponse(response, data, req, errorCode = 500, stackTrace = ''
  * @return { object } custom data 
  */
  function getCustomLogData(req, client) {
-	let data = {
-		sessionId: '',
-		uaspec: getUserSpec(req),
-		requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] : ""
-	}
+	let data = { }
 	if(client === 'botclient') {
-		_.merge(data, {
+		data = {
+			sessionId: '',
+			uaspec: getUserSpec(req),
+			requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] : "",
 			userId: req.body.userId ? req.body.userId : req.body.From,
 			deviceId: req.body.From,
 			appId: req.body.appId + '.bot',
 			env: req.body.appId + '.bot',
 			channelId: req.body.channel
-		})
+		}
 	} else {
 		const incoming_msg_from = _.get(req, 'body.incoming_message[0].from') || '';
 		const cryptoHash = incoming_msg_from ? crypto.createHash('sha256').update(incoming_msg_from).digest("hex") : undefined;
-		_.merge(data, {
+		data = {
+			sessionId: '',
+			uaspec: getUserSpec(req),
+			requestid: req.headers["x-request-id"] ? req.headers["x-request-id"] : "",
 			userId: cryptoHash,
 			deviceId: cryptoHash,
 			appId: config.TELEMETRY_DATA_PID_WHATSAPP,
 			env: config.TELEMETRY_DATA_ENV_WHATSAPP,
 			channelId: config.TELEMETRY_DATA_CHANNELID_WHATSAPP
-		})
+		}
 	}
 	return data;
 }
