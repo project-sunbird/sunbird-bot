@@ -504,10 +504,6 @@ function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 		json: true
 	};
 	request(options, function (error, response, body) {
-		// adding logs for debugging purposes only
-		LOG.info("Sending response to whatsapp is failing :", error);
-		LOG.info("Sending response to whatsapp is failing :", response);
-		LOG.info("Sending response to whatsapp is failing :", body);
 		if (error) throw new Error(error);
 	});
 	response.send(responseBody)
