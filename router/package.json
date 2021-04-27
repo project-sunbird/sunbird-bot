@@ -25,7 +25,7 @@
     "mocha": "^8.2.1",
     "nock": "^13.0.5",
     "nyc": "^15.1.0",
-    "redis": "^3.0.2",
+    "redis": "^3.1.1",
     "request": "^2.88.0",
     "require-reload": "^0.2.2",
     "sb_config_util": "file:libs/sb-config-util",
