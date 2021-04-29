@@ -481,6 +481,7 @@ function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 	} else {
 		rsponseText = responseBody
 	}
+	const customData = getCustomLogData(response.req, 'whatsApp');
 	var options = {
 		method: 'POST',
 		url: config.WHATSAPP_URL,
@@ -503,8 +504,20 @@ function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 		},
 		json: true
 	};
-	request(options, function (error, response, body) {
-		if (error) throw new Error(error);
+	request(options, function (error, resp, body) {
+		const edata = {
+			type: "system",
+			level: "INFO",
+			requestid: response.req.headers["x-request-id"] ? response.req.headers["x-request-id"] : "",
+			message: body,
+			request: {
+				url: options.url
+			}
+		}
+		telemetry.telemetryLog(customData, edata)
+		if (error) {
+			throw new Error(error)
+		};
 	});
 	response.send(responseBody)
 }
