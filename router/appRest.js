@@ -509,12 +509,13 @@ function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 			type: "system",
 			level: "INFO",
 			requestid: response.req.headers["x-request-id"] ? response.req.headers["x-request-id"] : "",
-			message: body,
+			message: body.message || '',
 			request: {
 				url: options.url
 			}
 		}
-		telemetry.telemetryLog(customData, edata)
+		telemetry.telemetryLog(customData, edata);
+		LOG.info("WhatsApp api Response body :: ", body);
 		if (error) {
 			throw new Error(error)
 		};
