@@ -481,6 +481,7 @@ function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 	} else {
 		rsponseText = responseBody
 	}
+	const customData = getCustomLogData(response.req, 'whatsApp');
 	var options = {
 		method: 'POST',
 		url: config.WHATSAPP_URL,
@@ -503,12 +504,21 @@ function sendResponseWhatsapp(response,responseBody, recipient, textContent) {
 		},
 		json: true
 	};
-	request(options, function (error, response, body) {
-		// adding logs for debugging purposes only
-		LOG.info("Sending response to whatsapp is failing :", error);
-		LOG.info("Sending response to whatsapp is failing :", response);
-		LOG.info("Sending response to whatsapp is failing :", body);
-		if (error) throw new Error(error);
+	request(options, function (error, resp, body) {
+		const edata = {
+			type: "system",
+			level: "INFO",
+			requestid: response.req.headers["x-request-id"] ? response.req.headers["x-request-id"] : "",
+			message: body.message || '',
+			request: {
+				url: options.url
+			}
+		}
+		telemetry.telemetryLog(customData, edata);
+		LOG.info("WhatsApp api Response body :: ", body);
+		if (error) {
+			throw new Error(error)
+		};
 	});
 	response.send(responseBody)
 }
