@@ -39,6 +39,10 @@
                 "err_500": {
                     "errMsg": "The whatsapp API call failed. There may be a network error or there are too many concurrent calls to the server. Try again later.",
                     "err": "CB_WA02"
+                },
+                "err_400": {
+                    "errMsg": "Mandatory fields are missing in the request. Contact your system administrator.",
+                    "err": "CB_WA03"
                 }
             }
         }
