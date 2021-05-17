@@ -88,6 +88,29 @@ appBot.post('/whatsapp', function (req, res) {
 	}
 })
 
+appBot.post('/whatsapp/deliveryStatus', function (req, res) {
+	const customData = getCustomLogData(req, 'whatsapp');
+	if(!req.body.delivery_status || !req.body.delivery_status[0]) {
+		sendErrorResponse(res, customData, req, 400);
+		return false;	
+	}
+	try {
+		const deliveryInfo = req.body.delivery_status[0]
+		LOG.info(`Delivery status: ${deliveryInfo.status} & remark :: ${deliveryInfo.status_remark}`)
+		const edata = {
+			type: "system",
+			level: "INFO",
+			requestid: customData.requestid,
+			message: deliveryInfo.status_remark,
+			whatsapp_delivery_status: deliveryInfo.status
+		}
+		telemetry.telemetryLog(customData, edata);
+		res.status(200).send({success: true});
+	} catch (error) {
+		sendErrorResponse(res, customData, req, 500, error.stack);
+	}
+})
+
 // Update latest config from blob
 appBot.post('/refresh', function(req, response) {
 	if(config.CONFIG_BLOB_PATH) {
@@ -478,8 +501,8 @@ function sendErrorResponse(response, data, req, errorCode = 500, stackTrace = ''
  */
  function getCustomLogData(req, client) {
 	let cryptoHash;
-	if(_.get(req, 'body.incoming_message[0].from')) {
-		const incoming_msg_from = _.get(req, 'body.incoming_message[0].from') || '';
+	if(_.get(req, 'body.incoming_message[0].from') || _.get(req, 'body.delivery_status[0].recipient')) {
+		const incoming_msg_from = _.get(req, 'body.incoming_message[0].from') || _.get(req, 'body.delivery_status[0].recipient') || '';
 		cryptoHash = incoming_msg_from ? crypto.createHash('sha256').update(incoming_msg_from).digest("hex") : undefined;
 	}
 	const data = {
@@ -639,7 +662,8 @@ function replaceUserSpecficData(str) {
 function errorResponse(req, statusCode, stackTrace) {
 	const errorCode = `err_${statusCode}`;
 	const method = req.method.toLowerCase();
-	const path = `${req.route.path}.${method}.errorObject`;
+	const routePath = req.route.path.split('/')[1];
+	const path = `/${routePath}.${method}.errorObject`;
 	const errorObj = _.get(errorCodes, `${path}.${errorCode}`) || _.get(errorCodes, `${path}.${defaultErrorCode}`);
 	const id =  req.originalUrl.split('/');
 
