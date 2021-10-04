@@ -1,0 +1,12 @@
+version: "2.0"
+nlu:
+  - lookup: board
+    examples: |
+      - CBSE
+      - ICSE
+      - Maharashtra
+      - Karnataka
+      - Tamil Nadu
+      - Punjab
+      - Gujarat
+      - Rajasthan
