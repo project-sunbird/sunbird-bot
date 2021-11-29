@@ -1,0 +1,11 @@
+version: "2.0"
+nlu:
+  - lookup: medium
+    examples: |
+      - English
+      - Marathi
+      - Urdu
+      - Hindi
+      - Kannada
+      - Telugu
+

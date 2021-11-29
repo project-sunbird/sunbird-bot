@@ -1,0 +1,127 @@
+version: "2.0"
+
+stories:
+- story: greet user
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- story: get started
+  steps:
+  - intent: get_started
+  - action: utter_get_started
+
+- story: bot challenge
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- story: course_mentor
+  steps:
+  - intent: course_mentor
+  - action: utter_course_mentor
+
+- story: flag_reviewer
+  steps:
+  - intent: flag_reviewer
+  - action: utter_flag_reviewer
+
+- story: content_customization
+  steps:
+  - intent: content_customization
+  - action: utter_content_customization
+
+- story: language_support
+  steps:
+  - intent: language_support
+  - action: utter_language_support
+
+- story: author_credit
+  steps:
+  - intent: author_credit
+  - action: utter_author_credit
+
+- story: worksheet
+  steps:
+  - intent: worksheet
+  - action: utter_worksheet
+
+- story: well_being
+  steps:
+  - intent: well_being
+  - action: utter_well_being
+
+- story: say bye
+  steps:
+  - intent: bye
+  - action: utter_bye
+
+- story: online or live classes
+  steps:
+  - intent: online_class
+  - action: utter_online_class
+
+- story: curfew or lockdown
+  steps:
+  - intent: lockdown_study
+  - action: utter_lockdown_study
+
+- story: covid or corona or covid 19 satisfied path
+  steps:
+  - intent: COVID19_queries
+  - action: utter_COVID19_queries
+
+- story: creative and critical thinking
+  steps:
+  - intent: critical_practice
+  - action: utter_critical_practice
+
+- story: download diksha app
+  steps:
+  - intent: app_link
+  - action: utter_app_link
+
+- story: how to scan qr code
+  steps:
+  - intent: scan_qr_code
+  - action: utter_scan_qr_code
+
+- story: unable to login
+  steps:
+  - intent: login_issue
+  - action: utter_login_issue
+
+- story: unable to register
+  steps:
+  - intent: register_issue
+  - action: utter_register_issue
+
+- story: merge account
+  steps:
+  - intent: merge_account
+  - action: utter_merge_account
+
+- story: query about reset password
+  steps:
+  - intent: reset_password
+  - action: utter_reset_password
+
+- story: contribute content
+  steps:
+  - intent: vidyadaan_link
+  - action: utter_vidyadaan_link
+
+- story: igot training
+  steps:
+  - intent: igot
+  - action: utter_IGOT
+
+- story: state training
+  steps:
+  - intent: state_training
+  - action: utter_state_training
+
+- story: training certificate
+  steps:
+  - intent: training_certificate
+  - action: utter_training_certificate

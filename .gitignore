@@ -4,3 +4,4 @@ router/log/*.log
 router/node_modules/
 node_modules
 bot/models/*
+bot/venv

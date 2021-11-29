@@ -1,17 +1,32 @@
+version: "2.0"
+
 intents:
   - greet
-  - goodbye
+  - bye
   - bot_challenge
   - get_started
-  - how_you
+  - well_being
   - worksheet
   - course_mentor
   - flag_reviewer
   - language_support
   - content_customization
   - author_credit
-  - find_content
-  - content_suggestions
+  - online_class
+  - lockdown_study
+  - COVID19_queries
+  - critical_practice
+  - app_link
+  - scan_qr_code
+  - login_issue
+  - register_issue
+  - merge_account
+  - reset_password
+  - vidyadaan_link
+  - igot
+  - state_training
+  - training_certificate
+  - low_confidence
 
 entities:
   - board
@@ -21,11 +36,11 @@ entities:
 
 actions:
 - utter_greet
-- utter_goodbye
-- utter_iamabot
+- utter_bye
 - fallback_action
+- utter_iamabot
 - utter_out_of_scope
-- utter_how_you
+- utter_well_being
 - utter_low_confidence
 - utter_course_mentor
 - utter_flag_reviewer
@@ -33,7 +48,20 @@ actions:
 - utter_language_support
 - utter_author_credit
 - utter_worksheet
-- utter_content_suggestions
+- utter_online_class
+- utter_lockdown_study
+- utter_COVID19_queries
+- utter_critical_practice
+- utter_app_link
+- utter_scan_qr_code
+- utter_login_issue
+- utter_register_issue
+- utter_merge_account
+- utter_reset_password
+- utter_vidyadaan_link
+- utter_IGOT
+- utter_state_training
+- utter_training_certificate
 - utter_get_started
 
 responses:
@@ -41,49 +69,57 @@ responses:
   - custom:
      blocks:
      - type: "response"
-       text: "Hi there! Please press 0 for menu."
+       text: "<span>Hi, there!<br><br>Tell me your query so that I can help you or press 0 to go to Main menu </span>"
+       text_whatsapp: ""
        intent: "greet"
+       menu_key: "START"
 
-  utter_how_you:
+  utter_well_being:
   - custom:
      blocks:
      - type: "response"
-       text: "I am good, thanks for asking. Please press 0 for menu."
-       intent: "how_you"
+       text: "<span>I am good! Hope you doing well too.<br><br>Tell me your query so that I can help you or press 0 to go to Main menu </span>"
+       text_whatsapp: "I am good! Hope you doing well too.\n \n Tell me your query so that I can help you or press 0 to go to Main menu ."
+       intent: "well_being"
 
   utter_get_started:
   - custom:
      blocks:
      - type: "response"
        text: "Hello!"
+       text_whatsapp: "Hello!"
        intent: "get_started"
 
   utter_iamabot:
   - custom:
      blocks:
      - type: "response"
-       text: "I am bot, here to help you. Please press 0 for menu."
+       text: "<span>I am Tara, your DIKSHA bot guide.<br><br>Tell me you query so that I can help you or press 0 to go to Main menu </span>"
+       text_whatsapp: "I am Tara, your DIKSHA bot guide.\n \n Tell me you query so that I can help you or press 0 to go to Main menu "
        intent: "who_am_i"
 
-  utter_goodbye:
+  utter_bye:
   - custom:
      blocks:
      - type: "response"
-       text: "See ya!"
-       intent: "goodbye"
+       text: "<span>Bye. Happy learning! <br><br><hr><strong>**</strong>Press 0 to go to Main menu or type your query directly</span>"
+       text_whatsapp: "Bye. Happy learning! \n ** Press 0 to go to Main menu or type your query directly"
+       intent: "bye"
 
   utter_low_confidence:
   - custom:
      blocks:
      - type: "response"
-       text: "Can you rephrase that please? Press 0 for menu."
+       text: "<span>I could not understand correctly, can you rephrase that for me? or Press 0 to go to Main menu</span>"
+       text_whatsapp: "I could not understand correctly, can you rephrase that for me? or Press 0 to go to Main menu"
        intent: "low_confidence"
 
   utter_out_of_scope:
   - custom:
      blocks:
      - type: "response"
-       text: "Sorry, I could not understand you. Please press 0 for menu."
+       text: "<span> Sorry, I do not understand what you’re asking. Press 0 to go to Main menu or type your query directly, so I can help you better </span>"
+       text_whatsapp: " Sorry, I do not understand what you’re asking. Press 0 to go to Main menu or type your query directly, so I can help you better."
        intent: "out_of_scope"
 
   utter_worksheet:
@@ -91,21 +127,23 @@ responses:
      blocks:
      - type: "response"
        text: "A set or questions or tasks put together to assess the understanding of any particular topic/unit/chapter. Worksheets can be created on DIKSHA using the inbuilt content editor."
+       text_whatsapp: "A set or questions or tasks put together to assess the understanding of any particular topic/unit/chapter. Worksheets can be created on DIKSHA using the inbuilt content editor."
        intent: "worksheet"
-
 
   utter_course_mentor:
   - custom:
      blocks:
      - type: "response"
        text: "A Course Mentor guides and instructs learners on how to undertake a course On DIKSHA, a course mentor creates batches of users to to enrol for and take a course. Mentors also ensure completion of a course within a stipulated time."
+       text_whatsapp: "A Course Mentor guides and instructs learners on how to undertake a course On DIKSHA, a course mentor creates batches of users to to enrol for and take a course. Mentors also ensure completion of a course within a stipulated time."
        intent: "course_mentor"
 
   utter_language_support:
   - custom:
      blocks:
      - type: "response"
-       text: "We support English, Hindi, Kannada, Bengali, Marathi, Tamil, Telugu, Urdu languages."
+       text: "<span>DIKSHA has digital contents in English, Hindi, Kannada, Bengali, Marathi, Tamil, Telugu, Urdu languages.<br><br><hr><strong>**</strong> Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "DIKSHA has digital contents in English, Hindi, Kannada, Bengali, Marathi, Tamil, Telugu, Urdu languages.\n \n **  Press 0 to go to Main menu  or type your query directly"
        intent: "language_support"
 
 
@@ -114,16 +152,15 @@ responses:
      blocks:
      - type: "response"
        text: "Yes, you can customize the content for your domain. Any field/screen on DISKHA can be customized to suit organization needs."
+       text_whatsapp: "Yes, you can customize the content for your domain. Any field/screen on DISKHA can be customized to suit organization needs."
        intent: "utter_content_customization"
-
-  utter_content_suggestions:
-  - text: "Sure, here are a few content for {board} {medium} {grade} {subject}"
 
   utter_flag_reviewer:
   - custom:
      blocks:
      - type: "response"
        text: "A person who assesses flagged content. On DIKSHA the flag reviewer reviews the content and rejects if the content is inappropriate according to DIKSHA review guidelines. The flag is removed if the content fits the guidelines"
+       text_whatsapp: "A person who assesses flagged content. On DIKSHA the flag reviewer reviews the content and rejects if the content is inappropriate according to DIKSHA review guidelines. The flag is removed if the content fits the guidelines"
        intent: "flag_reviewer"
 
   utter_author_credit:
@@ -131,9 +168,121 @@ responses:
      blocks:
      - type: "response"
        text: "An author can be credited by following these steps. Log in to the diksha portal  -> Select Workspace -> Select Create -> click the Course tile. -> Click Edit Details to enter/ modify the course details -> Enter Creators -> Enter Contributors details -> Enter Original Author details -> Click Save to save the details"
+       text_whatsapp: "An author can be credited by following these steps. Log in to the diksha portal  -> Select Workspace -> Select Create -> click the Course tile. -> Click Edit Details to enter/ modify the course details -> Enter Creators -> Enter Contributors details -> Enter Original Author details -> Click Save to save the details"
        intent: "author_credit"
 
+  utter_online_class:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>Currently, there are no online or live classes on DIKSHA. But, I can guide you to a lot of interesting content specific to your board, medium, class and subject.<br>To discover content, press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "Currently, there are no online or live classes on DIKSHA. But, I can guide you to a lot of interesting content specific to your board, medium, class and subject. \n To discover content, press 0 to go to Main menu  or type your query directly."
+       intent: "online_class"
 
+  utter_lockdown_study:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand you are worried about studying during these trying times.I can guide you to a lot of interesting content for you on DIKSHA.<br>To discover content, press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand you are worried about studying during these trying times.I can guide you to a lot of interesting content for you on DIKSHA.\n To discover content, press 0 to go to Main menu  or type your query directly."
+       intent: "lockdown_study"
+
+  utter_COVID19_queries:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand that you are worried about the situation. Unfortunately, I cannot help you with this information. But, I can guide you to a lot of interesting content on DIKSHA. <br>To discover content, press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand that you are worried about the situation. Unfortunately, I cannot help you with this information. But, I can guide you to a lot of interesting content on DIKSHA. \n To discover content, press 0 to go to Main menu  or type your query directly."
+       intent: "COVID19_queries"
+
+  utter_critical_practice:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand you want to practice Weekly Creative and Critical Thinking questions. <br>Please visit : <a href='https://diksha.gov.in/play/collection/do_31290608850520473612338?contentType=TextBook&utm_source=Tara'>Critical thinking questions<a/><br>Select the Subject to view relevant content on the webpage.<br><hr><strong>**</strong> Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand you want to practice Weekly Creative and Critical Thinking questions. \n Please visit : https://diksha.gov.in/play/collection/do_31290608850520473612338?contentType=TextBook&utm_source=WA_Tara Critical thinking questions.Select the Subject to view relevant content on the webpage.\n ** \n Press 0 to go to Main menu  or type your query directly"
+       intent: "critical_practice"
+
+  utter_app_link:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand you want to download DIKSHA app.<br> Please visit (<a target='_blank' href='https://play.google.com/store/apps/details?id=in.gov.diksha.app&referrer=utm_source%3Dtara'>DIKSHA mobile app</a>)<br><strong>Step 1.</strong> Download the DIKSHA mobile app from the link given above.<br><strong>Step 2.</strong> Install the DIKSHA app<br><strong>Step 3.</strong> Follow the instructions provided in the app<br><br>You are good to go!<br><hr><strong>**</strong> Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand you want to download DIKSHA app. Please visit:  https://play.google.com/store/apps/details?id=in.gov.diksha.app&referrer=utm_source%3DWA_tara \n Step 1. Download the DIKSHA mobile app from the link given above.\n Step 2. Install the DIKSHA app \n Step 3.</strong> Follow the instructions provided in the app \n\n You are good to go!\n **Press 0 to go to Main menu  or type your query directly"
+       intent: "app_link"
+
+  utter_scan_qr_code:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand you want to see how to scan the QR code.<br>Please visit: <a target='_blank' href='https://diksha.gov.in/help/getting-started/diksha-mobile-app/understanding-qr-code.html?utm_source=Tara'>Scan QR code</a><br><hr><strong>**</strong> Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand you want to see how to scan the QR code.Please visit: https://diksha.gov.in/help/getting-started/diksha-mobile-app/understanding-qr-code.html?utm_source=WA_Tara \n **  Press 0 to go to Main menu  or type your query directly"
+       intent: "scan_qr_code"
+
+  utter_login_issue:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand you want to know how to login/Register.<br>Please visit: <a target='_blank' href='https://diksha.gov.in/help/getting-started/login/index.html?utm_source=Tara'>Login issues</a><br><hr><strong>**</strong>Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand you want to know how to login/Register.\n Please visit: https://diksha.gov.in/help/getting-started/login/index.html?utm_source=WA_Tara \n ** Press 0 to go to Main menu  or type your query directly"
+       intent: "login_issue"
+
+  utter_register_issue:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand you want to know how to Register. <br>Please visit: <a target='_blank' href='https://diksha.gov.in/help/getting-started/login/sign-up.html?utm_source=Tara'>Register on Diksha</a><br><hr><strong>**</strong>Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand you want to know how to Register. \n Please visit: https://diksha.gov.in/help/getting-started/login/sign-up.html?utm_source=WA_Tara \n ** Press 0 to go to Main menu  or type your query directly"
+       intent: "register_issue"
+
+  utter_merge_account:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>Please log in using 'Login with state system' and follow the steps below-<br><br><strong>Step 1.</strong> Select your state<br><strong>Step 2.</strong> Enter credentials given by state<br><strong>Step 3.</strong> Enter your email id or mobile number to receive otp<br><strong>Step 4.</strong> Click 'merge' on the next page<br><strong>Step 5.</strong> Enter password of your old account<br><strong>Step 6.</strong> Click 'OK' on next screen<br><hr><strong>**</strong>Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "Please log in using 'Login with state system' and follow the steps below-\n \n Step 1. Select your state \n Step 2. Enter credentials given by state \n Step 3. Enter your email id or mobile number to receive otp \n Step 4. Click 'merge' on the next page \n Step 5.Enter password of your old account \n Step 6. Click 'OK' on next screen \n ** Press 0 to go to Main menu  or type your query directly"
+       intent: "merge_account"
+
+  utter_reset_password:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand you want to know how to reset password.<br>Please visit: <a target='_blank' href='https://diksha.gov.in/help/getting-started/recover-password/index.html?utm_source=Tara'>Reset password</a><br><hr><strong>**</strong> Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand you want to know how to reset password.\n Please visit: https://diksha.gov.in/help/getting-started/recover-password/index.html?utm_source=WA_Tara \n ** Press 0 to go to Main menu  or type your query directly"
+       intent: "reset_password"
+
+  utter_vidyadaan_link:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand you want to contribute content to DIKSHA <br>Please visit: <a target='_blank' href='https://vdn.diksha.gov.in/'>VIDYADAAN</a><br><hr><strong>**</strong>Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand you want to contribute content to DIKSHA \n Please visit: https://vdn.diksha.gov.in/ \n ** Press 0 to go to Main menu  or type your query directly."
+       intent: "vidyadaan_link"
+
+  utter_IGOT:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand you want to take IGOT Training-Please visit and select your Role to view relevant training: <a target='_blank' href='https://igot.gov.in/igot/explore-course'> DIKSHA IGOT</a><br><hr><strong>**</strong> Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand you want to take IGOT Training-Please visit and select your Role to view relevant training: https://igot.gov.in/igot/explore-course \n ** Press 0 to go to Main menu  or type your query directly"
+       intent: "igot"  
+  
+  utter_state_training:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>I understand you want to take a state training. Please visit and select the Topic, Medium, Class and Subject to view relevant training: <a target='_blank' href='https://diksha.gov.in/explore-course'> DIKSHA State training </a><br><hr><strong>**</strong> Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "I understand you want to take a state training. Please visit and select the Topic, Medium, Class and Subject to view relevant training: https://diksha.gov.in/explore-course \n ** Press 0 to go to Main menu  or type your query directly."
+       intent: "state_training" 
+  
+  utter_training_certificate:
+  - custom:
+     blocks:
+     - type: "response"
+       text: "<span>You will be notified as soon as your certificate is issued to you. After the notification, you can download your certificate from your DIKSHA profile page<br><br>For more information click on the 'course' menu option after pressing 0<br><hr><strong>**</strong> Press 0 to go to Main menu  or type your query directly</span>"
+       text_whatsapp: "You will be notified as soon as your certificate is issued to you. After the notification, you can download your certificate from your DIKSHA profile page\n \n For more information click on the 'course' menu option after pressing 0 \n ** Press 0 to go to Main menu  or type your query directly"
+       intent: "training_certificate" 
+       
 session_config:
   session_expiration_time: 60
   carry_over_slots_to_new_session: true
