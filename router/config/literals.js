@@ -23,8 +23,138 @@ message.START = {
             {
                 "text": "Other DIKSHA queries",
                 "value": "5",
+            },
+            {
+                "text": "jaadui pitara",
+                "value": "6",
             }
         ]
+    }
+}
+message.JAADUI_PITARA={
+    "type": "button",
+    "data": {
+        "text": " <span> What categories  would you like to explore?",
+        "buttons": [
+            {
+                "text": "Toys, Puzzles, Puppets",
+                "value": 1,
+            },
+            {
+                "text": "Stories and Poems",
+                "value": 2,
+            },
+            {
+                "text": "Playbooks and Activity sheets",
+                "value": 3,
+            },
+            {
+                "text": "Handbooks",
+                "value": 4,
+            },
+            {
+                "text": "Guides",
+                "value": 5,
+            },
+            {
+                "text": "Flashcards and Sequence cards",
+                "value": 6,
+            },
+            {
+                "text": "Main Menu",
+                "value": "0",
+            }
+        ]
+    }
+}
+message.TOYS_PUZZLES_PUPPETS =
+{
+    "type": "buttons",
+    "data": {
+        "text": "Please visit: <a target='_blank' href='https://diksha.gov.in/explore/1?selectedTab=all&keywords=ncf_jadoo_toyspuppets&showClose=true'>Toys, Puzzles, Puppets</a><br>",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+message.STORIES_AND_POEMS =
+{
+    "type": "buttons",
+    "data": {
+        "text": "Please visit: <a target='_blank' href='https://diksha.gov.in/explore/1?selectedTab=all&keywords=ncf_jadoo_storiespoems&showClose=true'>Stories and Poems</a><br>",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+message.PLAYBOOKS_AND_ACTIVITY_SHEETS =
+{
+    "type": "buttons",
+    "data": {
+        "text": "Please visit: <a target='_blank' href='https://diksha.gov.in/explore/1?selectedTab=all&keywords=ncf_jadoo_playbooks&showClose=true'>Playbooks and Activity sheets</a><br>",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+message.HANDBOOKS =
+{
+    "type": "buttons",
+    "data": {
+        "text": "Please visit: <a target='_blank' href='https://diksha.gov.in/explore/1?selectedTab=all&keywords=ncf_jadoo_handbooks&showClose=true'>Handbooks</a><br>",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+message.GUIDES =
+{
+    "type": "buttons",
+    "data": {
+        "text": "Please visit: <a target='_blank' href='https://diksha.gov.in/explore/1?selectedTab=all&keywords=ncf_jadoo_tlm&showClose=true'>Guides</a><br>",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
+    }
+}
+message.FLASHCARDS_AND_SEQUENCE_CARDS =
+{
+    "type": "buttons",
+    "data": {
+        "text": "Please visit: <a target='_blank' href='https://diksha.gov.in/explore/1?selectedTab=all&keywords=ncf_jadoo_flashcards&showClose=true'>Flashcards and Sequence Cards</a><br>",
+        "buttons": [{
+            "text": "Go Back",
+            "value": "99",
+        },
+        {
+            "text": "Main Menu",
+            "value": "0",
+        }]
     }
 }
 
