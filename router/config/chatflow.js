@@ -342,6 +342,38 @@ var chatflow = {
         messageKey: "WRONG_INPUT_AT_SECOND_LEVEL",
         responseVariable: ""
     },
+    step1_6: {
+        messageKey: "JAADUI_PITARA",
+        responseVariable: "jaAdui_pitara"
+    },
+    step1_6_1: {
+        messageKey: "TOYS_PUZZLES_PUPPETS",
+        responseVariable: ""
+    },
+    step1_6_2: {
+        messageKey: "STORIES_AND_POEMS",
+        responseVariable: ""
+    },
+    step1_6_3: {
+        messageKey: "PLAYBOOKS_AND_ACTIVITY_SHEETS",
+        responseVariable: ""
+    },
+    step1_6_4: {
+        messageKey: "HANDBOOKS",
+        responseVariable: ""
+    },
+    step1_6_5: {
+        messageKey: "GUIDES",
+        responseVariable: ""
+    },
+    step1_6_6: {
+        messageKey: "FLASHCARDS_AND_SEQUENCE_CARDS",
+        responseVariable: ""
+    },
+    step1_6_error: {
+        messageKey: "WRONG_INPUT_AT_SECOND_LEVEL",
+        responseVariable: ""
+    },
     step1_wrong_input: {
         messageKey: "UNKNOWN_OPTION",
         responseVariable: ""
